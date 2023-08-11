@@ -42,6 +42,7 @@ OIDC_AUTH = {
     'OIDC_BEARER_TOKEN_EXPIRATION_TIME': 4 * 10, # 4 minutes
 }
 
+
 def configure_oidc(auth_uri, client_id, public_uri, scope=None, client_secret=None):
     global OIDC_PROVIDERS
     OIDC_PROVIDERS['KeyCloak']['srv_discovery_url'] = auth_uri
