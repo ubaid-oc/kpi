@@ -324,12 +324,12 @@ export default assign({
       this.app.survey.settings.set('form_id', this.state.settings__form_id);
     }
 
-    const consentRows = this.app.survey.rows.filter(function(row) { 
+    const consentRows = this.app.survey.rows.filter(function(row) {
       try {
         return (row.getValue('bind::oc:external') === 'signature');
       } catch (err) {
         return false;
-      } 
+      }
     });
     if (consentRows.length > 0) {
       if (consentRows.length > 1) {
@@ -414,7 +414,7 @@ export default assign({
       actions.resources.createResource.triggerAsync(params)
         .then(() => {
           window.parent.postMessage('form_savecomplete', '*');
-          hashHistory.push('/library');
+          this.props.router.navigate('/library');
         });
     } else {
       // update existing asset
@@ -633,7 +633,7 @@ export default assign({
         labels: {ok: t('Yes, leave form'), cancel: t('Cancel')},
         onok: () => {
           window.parent.postMessage('form_savecomplete', '*');
-          hashHistory.push(route);
+          this.props.router.navigate(route);
         },
         oncancel: dialog.destroy
       };
@@ -701,7 +701,7 @@ export default assign({
 
   canNavigateToList() {
     return true;
-    // return this.state.surveyAppRendered && 
+    // return this.state.surveyAppRendered &&
     //   (this.state.asset_type !== 'survey' || this.props.location.pathname.startsWith('/library/new'));
   },
 
@@ -741,6 +741,7 @@ export default assign({
                 m={['back']}
                 onClick={this.safeNavigateToList}
                 disabled={!this.state.surveyAppRendered || !!this.state.surveyLoadError}
+                data-cy='back'
               >
                 {backButtonText}
               </bem.FormBuilderHeader__button>
