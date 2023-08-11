@@ -54,7 +54,7 @@ export interface SearchAssetsPredefinedParams {
   metadata?: boolean;
   collectionsFirst?: boolean;
   status?: string;
-  filterType?: any;
+  filterType?: {value: string; label: string};
 }
 
 interface BulkSubmissionsRequest {
@@ -787,20 +787,6 @@ interface DataInterface {
 
 const $ajax = (o: {}) => $.ajax(assign({}, {dataType: 'json', method: 'GET'}, o));
 
-// JQuery.ajaxError((_event: any, request: any, settings: any) => {
-//   if (request.status === 403 || request.status === 401 || request.status === 404) {
-//     dataInterface.selfProfile().done((data: any) => {
-//       if (data.message === 'user is not logged in') {
-//         dataInterface.checkKeycloakStatus().done(() => {
-//           console.log('retry ajax request');
-//           $.ajax(settings);
-//           return;
-//         });
-//       }
-//     });
-//   }
-// });
-
 export const dataInterface: DataInterface = {
   getProfile: () => fetch(`${ROOT_URL}/me/`).then((response) => response.json()),  // TODO replace selfProfile
   selfProfile: (): JQuery.jqXHR<AccountResponse | UserNotLoggedInResponse> => $ajax({url: `${ROOT_URL}/me/`}),
@@ -1413,7 +1399,7 @@ export const dataInterface: DataInterface = {
   searchMyLibraryAssets(params: SearchAssetsPredefinedParams = {}): JQuery.jqXHR<any> {
     // we only want orphans (assets not inside collection)
     // unless it's a search
-    let query: any = null;
+    let query: unknown = null;
     if (params.filterType?.value === 'question') {
       query = COMMON_QUERIES.q;
     } else if (params.filterType?.value === 'block') {
@@ -1723,3 +1709,22 @@ export const dataInterface: DataInterface = {
     return $ajax({url: `${ROOT_URL}/environment/`});
   },
 };
+
+// hook up to all AJAX requests to check auth problems
+// eslint-disable-next-line @typescript-eslint/naming-convention
+$(document).on('ajaxError', (_event, request, settings) => {
+  if (request.status === 403 || request.status === 401 || request.status === 404) {
+    // eslint-disable-next-line no-console
+    console.log('ajaxError');
+    dataInterface.selfProfile().done((data: {message: string;}) => {
+      if (data.message === 'user is not logged in') {
+        dataInterface.checkKeycloakStatus().done(() => {
+          // eslint-disable-next-line no-console
+          console.log('retry ajax request');
+          $.ajax(settings);
+          return;
+        });
+      }
+    });
+  }
+});
