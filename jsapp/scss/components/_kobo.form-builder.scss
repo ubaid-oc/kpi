@@ -212,7 +212,7 @@ $s-form-builder-content-width: 1024px;
       &:hover {
         color: colors.$kobo-gray-14;
       }
-      
+
       i {
         font-size: 32px;
         vertical-align: middle;
@@ -318,16 +318,16 @@ $s-form-builder-content-width: 1024px;
       font-weight: bold;
     }
   }
-  
-  &.formBuilder-header__button--back {
+
+  &.form-builder-header__button--back {
     text-transform: uppercase;
-    color: colors.$kobo-light-blue;
+    color: colors.$kobo-blue;
     background-color: colors.$kobo-white;
-    border: 2px solid colors.$kobo-light-blue;
-    
+    border: 2px solid colors.$kobo-blue;
+
     &:hover {
-      border-color: darken(colors.$kobo-light-blue, 5%);
-      color: darken(colors.$kobo-light-blue, 5%);
+      border-color: darken(colors.$kobo-blue, 10%);
+      color: darken(colors.$kobo-blue, 10%);
     }
   }
 

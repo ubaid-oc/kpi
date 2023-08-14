@@ -60,7 +60,7 @@ module.exports = do ->
           r.linkUp(@context)
       @linkUpChoiceLists()
 
-      @rowItemNameMaxLength = 36
+      @rowItemNameMaxLength = 64
 
     @create: (options={}, addlOpts) ->
       return new Survey(options, addlOpts)

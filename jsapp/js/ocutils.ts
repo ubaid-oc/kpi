@@ -17,7 +17,7 @@ const CROSS_STORAGE_IDLE_LOGOUT_TIME = 60*60; // 1hr
 export function initCrossStorageClient() {
   var crossStorageHub = window.location.origin.replace('formdesigner', 'build') + '/hub/hub.html';
   crossStorageClient = new CrossStorageClient(crossStorageHub, {
-    timeout: 4000
+    timeout: 4000,
   });
 }
 
@@ -28,47 +28,42 @@ export function getCrossStorageClient() {
   return crossStorageClient;
 }
 
-export function updateCrossStorageTimeOut() {
-  crossStorageClient.onConnect().then(function() {
-    const newTimeoutMoment = moment().add(CROSS_STORAGE_IDLE_LOGOUT_TIME, 's');
-    // console.log('updateCrossStorageTimeOut', newTimeoutMoment.valueOf());
-    crossStorageClient.set(CROSS_STORAGE_TIMEOUT_KEY, newTimeoutMoment.valueOf());
-  });
+export async function updateCrossStorageTimeOut(): Promise<string> {
+  await crossStorageClient.onConnect();
+  const newTimeoutMoment = moment().add(CROSS_STORAGE_IDLE_LOGOUT_TIME, 's');
+  crossStorageClient.set(CROSS_STORAGE_TIMEOUT_KEY, newTimeoutMoment.valueOf());
+  return 'updateCrossStorageTimeOut-success';
 }
 
-export function checkCrossStorageUser(userName: string) {
-  return crossStorageClient.onConnect().then(function() {
-    return crossStorageClient.get(CROSS_STORAGE_USER_KEY).then(function(userValue: string) {
-      userValue = userValue.trim();
-      if (_.isEmpty(userValue)) {
-        console.log('checkCrossStorageUser userValue null');
-        return Promise.reject('logout');
-      } else if (userValue.toLowerCase() !== userName.toLowerCase()) {
-        console.log('checkCrossStorageUser userValue different');
-        return Promise.reject('user-changed');
-      }
-      return Promise.resolve();
-    });
-  });
+export async function checkCrossStorageUser(userName: string): Promise<string|null> {
+  await crossStorageClient.onConnect();
+  let userValue = await crossStorageClient.get(CROSS_STORAGE_USER_KEY);
+  userValue = userValue.trim();
+  if (_.isEmpty(userValue)) {
+    console.log('checkCrossStorageUser userValue null');
+    throw new Error('logout');
+  } else if (userValue.toLowerCase() !== userName.toLowerCase()) {
+    console.log('checkCrossStorageUser userValue different');
+    throw new Error('user-changed');
+  }
+  return 'checkCrossStorageUser-success';
 }
 
-export function checkCrossStorageTimeOut() {
-  return crossStorageClient.onConnect().then(function() {
-    return crossStorageClient.get(CROSS_STORAGE_TIMEOUT_KEY).then(function(timeOutValue: string | null) {
-      if (timeOutValue === null) {
-        console.log('checkCrossStorageTimeOut timeOutValue null');
-        return Promise.reject('logout');
-      }
-      const currentMoment = moment();
-      const timeoutMoment = moment(parseInt(timeOutValue, 10));
-      if (currentMoment.isAfter(timeoutMoment)) {
-        console.log('checkCrossStorageTimeOut timeOutValue isAfter');
-        return Promise.reject('logout');
-      } else {
-        return Promise.resolve();
-      }
-    });
-  });
+export async function checkCrossStorageTimeOut(): Promise<string|null> {
+  await crossStorageClient.onConnect();
+  let timeOutValue = crossStorageClient.get(CROSS_STORAGE_TIMEOUT_KEY);
+  if (timeOutValue === null) {
+    console.log('checkCrossStorageTimeOut timeOutValue null');
+    throw new Error('logout');
+  }
+  const currentMoment = moment();
+  const timeoutMoment = moment(parseInt(timeOutValue, 10));
+  if (currentMoment.isAfter(timeoutMoment)) {
+    console.log('checkCrossStorageTimeOut timeOutValue isAfter');
+    throw new Error('logout');
+  } else {
+    return 'checkCrossStorageTimeOut-success';
+  }
 }
 
 export function setPeriodicCrossStorageCheck(checkFunction: TimerHandler) {

@@ -62,10 +62,15 @@ class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
             raise serializers.ValidationError('User not found')
         else:
             subdomain_userIds = KeycloakModel.objects.filter(subdomain=kc_user.subdomain).values_list('user_id', flat=True)
-            if not asset.owner.id in subdomain_userIds:
+            if isinstance(asset, dict) and 'owner' in asset:
+                asset_owner = asset['owner']
+            else:
+                asset_owner = asset.owner
+
+            if asset_owner.id not in subdomain_userIds:
                 # The client is not allowed to snapshot this asset
                 raise exceptions.PermissionDenied
-    
+
     def create(self, validated_data):
         """
         Create a snapshot of an asset, either by copying an existing

@@ -123,7 +123,7 @@ class MyLibraryRoute extends React.Component {
       );
     }
 
-    const typeFilterOptions = [
+    const TYPE_FILTER_OPTIONS = [
       {value: 'all', label: t('Show All')},
       {value: AssetTypeName.question, label: t('Question')},
       {value: AssetTypeName.block, label: t('Block')},
@@ -171,7 +171,7 @@ class MyLibraryRoute extends React.Component {
                 value={this.state.typeFilterVal}
                 isClearable={false}
                 isSearchable={false}
-                options={typeFilterOptions}
+                options={TYPE_FILTER_OPTIONS}
                 onChange={this.onTypeFilterChange}
               />
             </bem.LibraryTypeFilter>
