@@ -7,8 +7,6 @@ from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
 from kobo.apps.service_health.views import service_health
 
-from kobo.apps.service_health.views import service_health
-
 
 admin.autodiscover()
 admin.site.login = staff_member_required(
@@ -21,6 +19,8 @@ urlpatterns = [
     # Disable admin login form
     re_path(r'^admin/', admin.site.urls),
     path('', include('kobo.apps.accounts.mfa.urls')),
+    re_path(r'^api-auth/',
+            include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^accounts/logout/', logout),
     path('accounts/', include('allauth.urls')),  # Must be after kpi.url, login
     re_path(

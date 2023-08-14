@@ -809,7 +809,7 @@ export const dataInterface: DataInterface = {
 
   logout: (): JQuery.Promise<AccountResponse | UserNotLoggedInResponse> => {
     const d = $.Deferred();
-    $ajax({url: `${ROOT_URL}/accounts/logout/`, method: 'POST'}).done(d.resolve).fail(function (/*resp, etype, emessage*/) {
+    $ajax({url: `${ROOT_URL}/api-auth/logout/`, method: 'POST'}).done(d.resolve).fail(function (/*resp, etype, emessage*/) {
       // logout request wasn't successful, but may have logged the user out
       // querying '/me/' can confirm if we have logged out.
       dataInterface.selfProfile().done(function (data: {message?: string}){
