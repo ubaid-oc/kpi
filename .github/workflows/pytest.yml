@@ -69,6 +69,6 @@ jobs:
     - name: Test back-end code
       # Explicitly name the directories where coverage should be measured;
       # specifying just `--cov=.` includes `src`, which contains third-party packages
-      run: pytest --cov=hub --cov=kobo --cov=kpi -ra
+      run: pytest --cov=hub --cov=kobo --cov=kpi
     - name: Run coveralls for back-end code
       uses: AndreMiras/coveralls-python-action@develop
