@@ -6,8 +6,8 @@ import moment from 'moment';
 import _ from 'underscore';
 import { CrossStorageClient } from 'cross-storage';
 
-let crossStorageClient: any = null;
-let crossStorageCheckIntervalID : any= null;
+let crossStorageClient: CrossStorageClient;
+let crossStorageCheckIntervalID: number;
 
 const CROSS_STORAGE_TIMEOUT_KEY = 'OCAppTimeout';
 const CROSS_STORAGE_USER_KEY = 'currentUser';
@@ -15,7 +15,7 @@ const CROSS_STORAGE_CHECK_INTERVAL = 60*1000; // 1min
 const CROSS_STORAGE_IDLE_LOGOUT_TIME = 60*60; // 1hr
 
 export function initCrossStorageClient() {
-  var crossStorageHub = window.location.origin.replace('formdesigner', 'build') + '/hub/hub.html';
+  const crossStorageHub = window.location.origin.replace('formdesigner', 'build') + '/hub/hub.html';
   crossStorageClient = new CrossStorageClient(crossStorageHub, {
     timeout: 4000,
   });
@@ -35,35 +35,48 @@ export async function updateCrossStorageTimeOut(): Promise<string> {
   return 'updateCrossStorageTimeOut-success';
 }
 
-export async function checkCrossStorageUser(userName: string): Promise<string|null> {
-  await crossStorageClient.onConnect();
-  let userValue = await crossStorageClient.get(CROSS_STORAGE_USER_KEY);
-  userValue = userValue.trim();
-  if (_.isEmpty(userValue)) {
-    console.log('checkCrossStorageUser userValue null');
-    throw new Error('logout');
-  } else if (userValue.toLowerCase() !== userName.toLowerCase()) {
-    console.log('checkCrossStorageUser userValue different');
-    throw new Error('user-changed');
-  }
-  return 'checkCrossStorageUser-success';
+export async function checkCrossStorageUser(userName: string): Promise<string|void> {
+  return crossStorageClient.onConnect().then(async () => {
+    let userValue = await crossStorageClient.get(CROSS_STORAGE_USER_KEY);
+    userValue = userValue.trim();
+    if (_.isEmpty(userValue)) {
+      console.log('checkCrossStorageUser userValue null');
+      throw 'logout';
+    } else if (userValue.toLowerCase() !== userName.toLowerCase()) {
+      console.log('checkCrossStorageUser userValue different');
+      throw 'user-changed';
+    }
+    console.log('checkCrossStorageUser-success', userValue);
+    return 'checkCrossStorageUser-success';
+  }).catch((err: any) => {
+    // Handle error
+    console.log('checkCrossStorageUser crossStorageClient err', err);
+    throw err;
+  });
+
 }
 
-export async function checkCrossStorageTimeOut(): Promise<string|null> {
-  await crossStorageClient.onConnect();
-  let timeOutValue = crossStorageClient.get(CROSS_STORAGE_TIMEOUT_KEY);
-  if (timeOutValue === null) {
-    console.log('checkCrossStorageTimeOut timeOutValue null');
-    throw new Error('logout');
-  }
-  const currentMoment = moment();
-  const timeoutMoment = moment(parseInt(timeOutValue, 10));
-  if (currentMoment.isAfter(timeoutMoment)) {
-    console.log('checkCrossStorageTimeOut timeOutValue isAfter');
-    throw new Error('logout');
-  } else {
-    return 'checkCrossStorageTimeOut-success';
-  }
+export async function checkCrossStorageTimeOut(): Promise<string|void> {
+  return crossStorageClient.onConnect().then(async () => {
+    let timeOutValue = await crossStorageClient.get(CROSS_STORAGE_TIMEOUT_KEY);
+    if (timeOutValue === null) {
+      console.log('checkCrossStorageTimeOut timeOutValue null');
+      throw 'logout';
+    }
+    const currentMoment = moment();
+    const timeoutMoment = moment(parseInt(timeOutValue, 10));
+    if (currentMoment.isAfter(timeoutMoment)) {
+      console.log('checkCrossStorageTimeOut timeOutValue isAfter');
+      throw 'logout';
+    } else {
+      console.log('checkCrossStorageTimeOut-success', timeoutMoment);
+      return 'checkCrossStorageTimeOut-success';
+    }
+  }).catch((err: any) => {
+    // Handle error
+    console.log('checkCrossStorageTimeOut crossStorageClient err', err);
+    throw err;
+  });
 }
 
 export function setPeriodicCrossStorageCheck(checkFunction: TimerHandler) {

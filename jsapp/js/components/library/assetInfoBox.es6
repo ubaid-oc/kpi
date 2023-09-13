@@ -75,12 +75,12 @@ class AssetInfoBox extends React.Component {
           </bem.AssetInfoBox__cell>
           }
 
-          {this.state.areDetailsVisible &&
+          {/* {this.state.areDetailsVisible &&
           <bem.AssetInfoBox__cell>
             <label>{t('Description')}</label>
             {this.props.asset.settings.description || '-'}
           </bem.AssetInfoBox__cell>
-          }
+          } */}
 
           {this.state.areDetailsVisible &&
           <bem.AssetInfoBox__cell>
@@ -106,33 +106,33 @@ class AssetInfoBox extends React.Component {
             }
           </bem.AssetInfoBox__cell>
 
-          {this.state.areDetailsVisible &&
+          {/* {this.state.areDetailsVisible &&
           <bem.AssetInfoBox__cell>
             <label>{t('Organization')}</label>
             {assetUtils.getOrganizationDisplayString(this.props.asset)}
           </bem.AssetInfoBox__cell>
-          }
+          } */}
 
-          {this.state.areDetailsVisible &&
+          {/* {this.state.areDetailsVisible &&
           <bem.AssetInfoBox__cell>
             <label>{t('Sector')}</label>
             {assetUtils.getSectorDisplayString(this.props.asset)}
           </bem.AssetInfoBox__cell>
-          }
+          } */}
 
-          {this.state.areDetailsVisible &&
+          {/* {this.state.areDetailsVisible &&
           <bem.AssetInfoBox__cell>
             <label>{t('Country')}</label>
             {assetUtils.getCountryDisplayString(this.props.asset)}
           </bem.AssetInfoBox__cell>
-          }
+          } */}
 
-          {this.state.areDetailsVisible &&
+          {/* {this.state.areDetailsVisible &&
           <bem.AssetInfoBox__cell>
             <label>{t('Languages')}</label>
             {assetUtils.getLanguagesDisplayString(this.props.asset)}
           </bem.AssetInfoBox__cell>
-          }
+          } */}
         </bem.AssetInfoBox__column>
 
         <bem.AssetInfoBox__column m='toggle'>

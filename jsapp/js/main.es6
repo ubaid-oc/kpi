@@ -6,8 +6,6 @@
 require('jquery-ui/ui/widgets/sortable');
 require('jquery-ui/ui/widgets/resizable');
 
-import 'select2/dist/js/select2.full';
-
 import moment from 'moment';
 import AllRoutes from 'js/router/allRoutes';
 import RegistrationPasswordApp from './registrationPasswordApp';
@@ -63,34 +61,36 @@ $.ajaxSetup({
 
 initCrossStorageClient();
 
-function crossStorageCheck() {
+async function crossStorageCheck() {
   const currentUserName = sessionStore.currentAccount.username;
   if (currentUserName !== '') {
     // console.log('crossStorageCheck');
     const crossStorageUserName = currentUserName.slice(0, currentUserName.lastIndexOf('+'))
-    checkCrossStorageUser(crossStorageUserName)
-      .then(checkCrossStorageTimeOut)
-      .catch(function(err) {
-        if (err == 'logout' || err == 'user-changed') {
-          logout();
-        }
-      });
+    try {
+      await checkCrossStorageUser(crossStorageUserName);
+      await checkCrossStorageTimeOut();
+    } catch (err) {
+      if (err == 'logout' || err == 'user-changed') {
+        logout();
+      }
+    }
   }
 }
 
-function crossStorageCheckAndUpdate() {
+async function crossStorageCheckAndUpdate() {
   const currentUserName = sessionStore.currentAccount.username;
   if (currentUserName !== '') {
     // console.log('crossStorageCheckAndUpdate');
     const crossStorageUserName = currentUserName.slice(0, currentUserName.lastIndexOf('+'))
-    checkCrossStorageUser(crossStorageUserName)
-      .then(checkCrossStorageTimeOut)
-      .then(updateCrossStorageTimeOut)
-      .catch(function(err) {
-        if (err == 'logout' || err == 'user-changed') {
-          logout();
-        }
-      });
+    try {
+      await checkCrossStorageUser(crossStorageUserName);
+      await checkCrossStorageTimeOut();
+      await updateCrossStorageTimeOut();
+    } catch (err) {
+      if (err == 'logout' || err == 'user-changed') {
+        logout();
+      }
+    }
   }
 }
 

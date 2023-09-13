@@ -809,7 +809,7 @@ export const dataInterface: DataInterface = {
 
   logout: (): JQuery.Promise<AccountResponse | UserNotLoggedInResponse> => {
     const d = $.Deferred();
-    $ajax({url: `${ROOT_URL}/api-auth/logout/`, method: 'POST'}).done(d.resolve).fail(function (/*resp, etype, emessage*/) {
+    $ajax({url: `${ROOT_URL}/openid/logout/`, method: 'POST'}).done(d.resolve).fail(function (/*resp, etype, emessage*/) {
       // logout request wasn't successful, but may have logged the user out
       // querying '/me/' can confirm if we have logged out.
       dataInterface.selfProfile().done(function (data: {message?: string}){
@@ -1406,8 +1406,10 @@ export const dataInterface: DataInterface = {
       query = COMMON_QUERIES.b;
     } else if (params.filterType?.value === 'template') {
       query = COMMON_QUERIES.t;
+    } else if (params.filterType?.value === 'collection') {
+      query = COMMON_QUERIES.c;
     } else {
-      query = COMMON_QUERIES.qbt;
+      query = COMMON_QUERIES.qbtc;
     }
     if (!params.searchPhrase) {
       query += ' AND parent:null';
@@ -1712,19 +1714,19 @@ export const dataInterface: DataInterface = {
 
 // hook up to all AJAX requests to check auth problems
 // eslint-disable-next-line @typescript-eslint/naming-convention
-$(document).on('ajaxError', (_event, request, settings) => {
-  if (request.status === 403 || request.status === 401 || request.status === 404) {
-    // eslint-disable-next-line no-console
-    console.log('ajaxError');
-    dataInterface.selfProfile().done((data: {message: string;}) => {
-      if (data.message === 'user is not logged in') {
-        dataInterface.checkKeycloakStatus().done(() => {
-          // eslint-disable-next-line no-console
-          console.log('retry ajax request');
-          $.ajax(settings);
-          return;
-        });
-      }
-    });
-  }
-});
+// $(document).on('ajaxError', (_event, request, settings) => {
+//   if (request.status === 403 || request.status === 401 || request.status === 404) {
+//     // eslint-disable-next-line no-console
+//     console.log('ajaxError');
+//     dataInterface.selfProfile().done((data: {message: string;}) => {
+//       if (data.message === 'user is not logged in') {
+//         dataInterface.checkKeycloakStatus().done(() => {
+//           // eslint-disable-next-line no-console
+//           console.log('retry ajax request');
+//           $.ajax(settings);
+//           return;
+//         });
+//       }
+//     });
+//   }
+// });

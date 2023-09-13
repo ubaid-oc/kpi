@@ -700,9 +700,8 @@ export default assign({
   },
 
   canNavigateToList() {
-    return true;
-    // return this.state.surveyAppRendered &&
-    //   (this.state.asset_type !== 'survey' || this.props.location.pathname.startsWith('/library/new'));
+    return this.state.surveyAppRendered &&
+      (this.state.asset.asset_type !== 'survey' || this.props.router.location.pathname.startsWith('/library/new'));
   },
 
   // rendering methods

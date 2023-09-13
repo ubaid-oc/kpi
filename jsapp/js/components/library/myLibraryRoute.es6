@@ -128,6 +128,7 @@ class MyLibraryRoute extends React.Component {
       {value: AssetTypeName.question, label: t('Question')},
       {value: AssetTypeName.block, label: t('Block')},
       {value: AssetTypeName.template, label: t('Template')},
+      {value: AssetTypeName.collection, label: t('Collection')},
     ];
 
     return (
