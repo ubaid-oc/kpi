@@ -37,7 +37,7 @@ class SessionStore {
     dataInterface.getProfile().then(
       action(
         'verifyLoginSuccess',
-        (account: AccountResponse | {message: string}) => {
+        async (account: AccountResponse | {message: string}) => {
           this.isPending = false;
           this.isInitialLoadComplete = true;
           if ('email' in account) {
@@ -47,18 +47,19 @@ class SessionStore {
             if (currentUserName !== '') {
               const crossStorageUserName = currentUserName.slice(0, currentUserName.lastIndexOf('+'))
               console.log('verifyLogin check');
-              checkCrossStorageUser(crossStorageUserName)
-                .then(checkCrossStorageTimeOut)
-                .then(updateCrossStorageTimeOut)
-                .catch(function(err: string) {
-                  if (err == 'logout') {
-                    console.log('triggerLoggedIn logout');
-                    actions.auth.logout();
-                  } else if (err == 'user-changed') {
-                    console.log('triggerLoggedIn user changed');
-                    actions.auth.logout();
-                  }
-                });
+              try {
+                await checkCrossStorageUser(crossStorageUserName);
+                await checkCrossStorageTimeOut();
+                await updateCrossStorageTimeOut();
+              } catch (err) {
+                if (err == 'logout') {
+                  console.log('triggerLoggedIn logout');
+                  actions.auth.logout();
+                } else if (err == 'user-changed') {
+                  console.log('triggerLoggedIn user changed');
+                  actions.auth.logout();
+                }
+              }
             }
             window.parent.postMessage('fd_loggedin', '*');
             // Save UI language to Back-end for language usage statistics.
