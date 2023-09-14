@@ -57,11 +57,12 @@ if SESSION_COOKIE_DOMAIN:
     CSRF_TRUSTED_ORIGINS = [SESSION_COOKIE_DOMAIN]
     CSRF_COOKIE_SECURE = True
 ENKETO_CSRF_COOKIE_NAME = env.str('ENKETO_CSRF_COOKIE_NAME', '__csrf')
+CSRF_COOKIE_SAMESITE = 'None'
 
 SESSION_COOKIE_AGE = 60*60*24 # Session age is 24 hour
 SESSION_SAVE_EVERY_REQUEST = True # Renew session every request made
 SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE  = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
 
 # Instances of this model will be treated as allowed origins; see
 # https://github.com/ottoyiu/django-cors-headers#cors_model
@@ -788,7 +789,7 @@ CSP_OC_SITES = [
 ]
 CSP_FRAME_ANCESTORS = CSP_OC_SITES
 CSP_CONNECT_SRC = CSP_CONNECT_SRC + CSP_OC_SITES
-CSP_FRAME_SRC = CSP_FRAME_SRC +  CSP_OC_SITES
+CSP_FRAME_SRC = CSP_FRAME_SRC + CSP_OC_SITES
 
 csp_report_uri = env.url('CSP_REPORT_URI', None)
 if csp_report_uri:  # Let environ validate uri, but set as string
