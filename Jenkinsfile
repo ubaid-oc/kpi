@@ -12,7 +12,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 cleanWs()
-                checkout scmGit(branches: [[name: '*/upstream-release']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-github-token-as-password', url: 'https://github.com/OpenClinica/kpi']])
+                checkout scmGit(branches: [[name: '*/$release_branch']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-github-token-as-password', url: 'https://github.com/OpenClinica/kpi']])
             }
         }
         stage('Fetch ECR Credentials') {
