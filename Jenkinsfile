@@ -32,6 +32,9 @@ pipeline {
         }
         stage ("Build and Push Image to ECR") {
             steps {
+               script {
+                if ( env.ENV == "build" || env.ENV == "build & deploy")
+                   {
                 script {
                     sh """
                         https_proxy=socks5://127.0.0.1:1081 kubectl port-forward service/dind 1337:2375 &
@@ -43,13 +46,15 @@ pipeline {
                         docker buildx create --name multiarchbuilder --append --node arm64 --platform linux/arm64 tcp://127.0.0.1:1337 --driver docker-container --driver-opt env.BUILDKIT_STEP_LOG_MAX_SIZE=10000000 --driver-opt env.BUILDKIT_STEP_LOG_MAX_SPEED=10000000
                         docker buildx inspect --bootstrap --builder multiarchbuilder
                        """
-                    sh "docker buildx build --builder multiarchbuilder --platform linux/amd64,linux/aarch64 -t ${registry}:$BUILD_NUMBER --push ."
-
-                }
+                    sh "docker buildx build --builder multiarchbuilder --platform linux/amd64,linux/aarch64 -t ${registry}:${tag_version} --push ."
+                  }
+                 }
+                else {
+                sh "echo 'Skipping this step'" 
+               }   
             }
-
-        }
-        
+           }
+        }       
         stage ("Sanitize Workspace") {
             steps {
                 cleanWs()
@@ -58,14 +63,29 @@ pipeline {
         }
         stage ('Helm checkout') {
             steps {
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-github-token-as-password', url: 'https://github.com/ishanavnt-01/container-ops']])
+                script {
+                if ( env.ENV == "build & deploy" || env.ENV == "deploy" )
+                {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-github-token-as-password', url: 'https://github.com/OpenClinica/container-ops.git']])
+                }
+                 else {
+                sh "echo 'Skipping this step'" 
+                }        
+              }
             }
-        }
+           }         
         stage('Deploy Helm Chart') {
             steps {
-                sh "https_proxy=socks5://127.0.0.1:1081 /usr/local/bin/helm upgrade formdesigner --install apps/kobo_kpi --namespace ${ns} --set kpi.image.repository=${registry} --set kpi.image.tag=$BUILD_NUMBER"
-            }
-        }
-        
-    }
+               script {
+                if ( env.ENV == "build & deploy" || env.ENV == "deploy" )
+                {
+                sh "https_proxy=socks5://127.0.0.1:1081 /usr/local/bin/helm upgrade formdesigner --install apps/kobo_kpi --namespace ${ns} --set kpi.image.repository=${registry} --set kpi.image.tag=${tag_version}"
+                }
+                else {
+                sh "echo 'Skipping this step'" 
+                }        
+             }
+          }
+      }
+   }
 }
