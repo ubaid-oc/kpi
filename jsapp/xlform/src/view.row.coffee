@@ -43,6 +43,14 @@ module.exports = do ->
       @nonGroupsItemGroupNames = []
       @nonGroupsIntVals = []
       @itemGroupKey = 'bind::oc:itemgroup'
+      Backbone.on "ocConsentRowsEvent", @onOcConsentRowsEvent, @
+
+    onOcConsentRowsEvent: (ocConsentRowsEventArgs) ->
+      if ocConsentRowsEventArgs.type == 'consentRowChoiceValue' and @options.model.get("bind::oc:external")?.get("value") == 'signature'
+        if ocConsentRowsEventArgs.error
+          Backbone.trigger('consentRowChoiceValueError', { cid: ocConsentRowsEventArgs.cid })
+        else
+          Backbone.trigger('consentRowChoiceValueNotError', { cid: ocConsentRowsEventArgs.cid })
 
     drop: (evt, index)->
       @$el.trigger("update-sort", [@model, index])
@@ -161,7 +169,7 @@ module.exports = do ->
               @processGetCurrentAndChildModels repeatGroup, repeatGroupModels
 
               if repeatGroupModels.length > 0
-                repeatGroupModels = repeatGroupModels.filter (model) => 
+                repeatGroupModels = repeatGroupModels.filter (model) =>
                   if model.cid == model.cid
                     model
                   else
@@ -177,7 +185,7 @@ module.exports = do ->
                       if itemGroupName && itemGroupName != ''
                         itemGroupVal = itemGroupName
                         break
-              
+
               if itemGroupVal is ''
                 maxIntVal = 0
                 allIntVals = _.union(@repeatGroupsIntVals, @nonRepeatGroupsIntVals, @nonGroupsIntVals)
@@ -194,7 +202,7 @@ module.exports = do ->
               itemGroupVal = itemGroupPrependVal + (maxIntVal + 1)
             else
               if @model.collection?.models?.length > 0
-                currentLevelModels = @model.collection?.models.filter (model) => 
+                currentLevelModels = @model.collection?.models.filter (model) =>
                   if model.cid == model.cid
                     model
                   else
@@ -355,7 +363,7 @@ module.exports = do ->
       skipConfirm = $(evt.currentTarget).hasClass('js-force-delete-group')
       if !skipConfirm
         dialog = alertify.dialog('confirm')
-        opts = 
+        opts =
           title: _t('Delete group')
           message: _t('Are you sure you want to split apart this group?')
           labels:

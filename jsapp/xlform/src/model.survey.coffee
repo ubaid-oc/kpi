@@ -54,6 +54,7 @@ module.exports = do ->
       @linkUpChoiceLists()
 
       @rowItemNameMaxLength = 64
+      @errorMessage = null
 
     @create: (options={}, addlOpts) ->
       return new Survey(options, addlOpts)

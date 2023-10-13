@@ -86,6 +86,22 @@ module.exports = do ->
       "keyup input": "keyupinput"
       "click .js-remove-option": "remove"
     initialize: (@options)->
+      Backbone.on('consentRowChoiceValueError', @onConsentRowChoiceValueError, @)
+      Backbone.on('consentRowChoiceValueNotError', @onConsentRowChoiceValueNotError, @)
+
+    onConsentRowChoiceValueError: (args) ->
+      if args.cid == @model.cid
+        @$el.siblings('.message').remove()
+        @$el.closest('div').addClass('input-error')
+        if @$el.siblings('.message').length is 0
+          $message = $('<div/>').addClass('message').text('Consent items must have a value of "1"')
+          @$el.after($message)
+
+    onConsentRowChoiceValueNotError: (args) ->
+      if args.cid == @model.cid
+        @$el.closest('div').removeClass('input-error')
+        @$el.siblings('.message').remove()
+
     render: ->
       @t = $("<i class=\"fa fa-trash-o js-remove-option\">")
       @pw = $("<div class=\"editable-wrapper js-cancel-select-row\">")
@@ -117,7 +133,16 @@ module.exports = do ->
           @model.unset('name')
           val = 'AUTOMATIC'
           @$el.trigger("choice-list-update", @options.cl.cid)
-          @model.getSurvey()?.trigger('change') if valChanged
+          if valChanged
+            if @model.getSurvey()?
+              @model.getSurvey()?.trigger('change', { cid: @model.cid })
+            else
+              @model.collection._parent.getSurvey()?.trigger('change', { cid: @model.cid })
+            if @model.collection?.length == 1
+              if parseInt(@model.get('name')) == 1
+                Backbone.trigger('ocConsentRowsEvent', { type: 'consentRowChoiceValue', error: false, value: @model.get('name'), cid: @model.cid })
+              else
+                Backbone.trigger('ocConsentRowsEvent', { type: 'consentRowChoiceValue', error: true, value: @model.get('name'), cid: @model.cid })
           return
         else
           val = $modelUtils.sluggify(val, {
@@ -132,7 +157,16 @@ module.exports = do ->
           valChanged = true if val isnt @model.get('name')
           @model.set('name', val)
           @$el.trigger("choice-list-update", @options.cl.cid)
-          @model.getSurvey()?.trigger('change') if valChanged
+          if valChanged
+            if @model.getSurvey()?
+              @model.getSurvey()?.trigger('change', { cid: @model.cid })
+            else
+              @model.collection._parent.getSurvey()?.trigger('change', { cid: @model.cid })
+            if @model.collection?.length == 1
+              if parseInt(@model.get('name')) == 1
+                Backbone.trigger('ocConsentRowsEvent', { type: 'consentRowChoiceValue', error: false, value: @model.get('name'), cid: @model.cid })
+              else
+                Backbone.trigger('ocConsentRowsEvent', { type: 'consentRowChoiceValue', error: true, value: @model.get('name'), cid: @model.cid })
           return newValue: @model.get('name')
 
       @j = $('span', @i)
@@ -148,11 +182,14 @@ module.exports = do ->
           valChanged = true if val isnt @model.get(@optionImageField)
           if val is 'None' and @model.get(@optionImageField) is undefined
             valChanged = false
-            
+
           if valChanged
             @model.set(@optionImageField, val)
             @$el.trigger("choice-list-update", @options.cl.cid)
-            @model.getSurvey()?.trigger('change') 
+            if @model.getSurvey()?
+              @model.getSurvey()?.trigger('change', { cid: @model.cid })
+            else
+              @model.collection._parent.getSurvey()?.trigger('change', { cid: @model.cid })
         return
 
       @pw.html(@p)
