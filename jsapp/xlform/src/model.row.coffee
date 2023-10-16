@@ -57,14 +57,14 @@ module.exports = do ->
         listName = modelTypeValueArr[1]
         listChoices = @getSurvey().choices?.find((choice) -> choice.getValue('name') is listName)
         listChoices
-        
+
     isConsentItem: () ->
       isConsent = false
 
       listChoices = @getConsentItemChoices()
       listChoicesNames = listChoices?.options?._parent?.getNames()
       isConsent = listChoices?.options?.length is 1 and listChoicesNames?[0] is '1'
-        
+
       isConsent
 
     getConsentItemChoiceValue: () ->
@@ -85,7 +85,7 @@ module.exports = do ->
 
     selectableRows: () ->
       questions = []
-      
+
       non_selectable = ['datetime', 'time', 'note', 'group', 'kobomatrix', 'repeat', 'rank', 'score']
 
       survey = @getSurvey()

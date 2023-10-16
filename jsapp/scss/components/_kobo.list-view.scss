@@ -42,3 +42,11 @@ $mult: 0.5;
 
   float: right;
 }
+
+.list-view {
+  &.input-error {
+    .message {
+      color: $cool-red;
+    }
+  }
+}

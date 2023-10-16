@@ -4,6 +4,7 @@ import autoBind from 'react-autobind';
 import $ from 'jquery';
 import Select from 'react-select';
 import _ from 'underscore';
+import Backbone from 'backbone'
 import DocumentTitle from 'react-document-title';
 import Checkbox from '../components/checkbox';
 import TextBox from '../components/textBox';
@@ -274,6 +275,17 @@ export default assign({
 
   onSurveyChange: _.debounce(function () {
     window.parent.postMessage('form_saveneeded', '*');
+    const consentRows = this.app.survey.rows.filter(function(row) {
+      try {
+        return (row.getValue('bind::oc:external') === 'signature');
+      } catch (err) {
+        return false;
+      }
+    });
+    if (consentRows.length > 1) {
+      var errorMsg = `${t('Consent forms can have only one signature item.')}`;
+      Backbone.trigger('ocConsentRowsEvent', { type: 'consentRows', message: errorMsg });
+    }
     this.setState({
       asset_updated: update_states.UNSAVED_CHANGES,
     });
@@ -397,43 +409,6 @@ export default assign({
 
     if (this.state.settings__form_id !== undefined) {
       this.app.survey.settings.set('form_id', this.state.settings__form_id);
-    }
-
-    const consentRows = this.app.survey.rows.filter(function(row) { 
-      try {
-        return (row.getValue('bind::oc:external') === 'signature');
-      } catch (err) {
-        return false;
-      } 
-    });
-    if (consentRows.length > 0) {
-      if (consentRows.length > 1) {
-        var errorMsg = `${t('Consent forms can have only one signature item.')}`;
-        alertify.defaults.theme.ok = 'ajs-cancel';
-        let dialog = alertify.dialog('alert');
-        let opts = {
-          title: t('Error saving form'),
-          message: errorMsg,
-          label: t('Dismiss'),
-        };
-        dialog.set(opts).show();
-        return;
-      } else {
-        const consentRow = consentRows[0];
-        const consentRowChoiceValue = consentRow.getConsentItemChoiceValue()
-        if (consentRowChoiceValue !== '1') {
-          errorMsg = `${t('Consent items must have a value of "1"')}`;
-          alertify.defaults.theme.ok = 'ajs-cancel';
-          let dialog = alertify.dialog('alert');
-          let opts = {
-            title: t('Error saving form'),
-            message: errorMsg,
-            label: t('Dismiss'),
-          };
-          dialog.set(opts).show();
-          return;
-        }
-      }
     }
 
     let surveyJSON = surveyToValidJson(this.app.survey)
@@ -717,7 +692,7 @@ export default assign({
   },
 
   canNavigateToList() {
-    return this.state.surveyAppRendered && 
+    return this.state.surveyAppRendered &&
       (this.state.asset_type !== 'survey' || this.props.location.pathname.startsWith('/library/new'));
   },
 

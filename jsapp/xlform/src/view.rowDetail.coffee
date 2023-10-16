@@ -36,6 +36,7 @@ module.exports = do ->
       @extraClass = "xlf-dv-#{modelKey}"
       _.extend(@, viewRowDetail.DetailViewMixins[modelKey] || viewRowDetail.DetailViewMixins.default)
       Backbone.on('ocCustomEvent', @onOcCustomEvent, @)
+      Backbone.on('ocConsentRowsEvent', @onOcConsentRowsEvent, @)
       @$el.addClass(@extraClass)
 
     render: ()->
@@ -144,7 +145,7 @@ module.exports = do ->
       hideMessage =() =>
         $el.closest('div').removeClass(fieldClass)
         $el.siblings('.message').remove()
-      
+
       showOrHideCondition = () =>
         if checkIfNotEmpty
           if $el.val() != ''
@@ -169,7 +170,7 @@ module.exports = do ->
       el = opts.el || @$('input').get(0) || @$('textarea').get(0)
       $el = $(el)
       fieldClass = opts.fieldClass || 'input-error'
-      
+
       $el.off 'blur'
       $el.off 'keyup'
       $el.closest('div').removeClass(fieldClass)
@@ -276,7 +277,7 @@ module.exports = do ->
 
       if $textarea.closest('.card__text').length == 0
         return
-      
+
       $textarea.css("min-height", 20)
 
       resizableOpts = {
@@ -602,7 +603,7 @@ module.exports = do ->
       senderQuestionId = sender._parent.cid
       if (sender.key is '_isRepeat') and (questionId is senderQuestionId)
         @model.set('value', senderValue)
-    html: -> 
+    html: ->
       setTimeout =>
           modelValue = @model.getValue()
           Backbone.trigger('ocCustomEvent', { sender: @model, value: modelValue })
@@ -764,7 +765,7 @@ module.exports = do ->
           model_set_value += " #{select_width_value}"
       else
         model_set_value = select_width_value
-      
+
       @model.set 'value', model_set_value
 
     group_inputs_change_handler: () ->
@@ -782,7 +783,7 @@ module.exports = do ->
           model_set_value += " #{input_value}"
       else
         model_set_value = input_value
-      
+
       select_width_value = @$select_width.val()
       select_width_value = @select_width_default_value if select_width_value == 'select'
       if model_set_value != ''
@@ -883,11 +884,11 @@ module.exports = do ->
           @$select_width.val(select_width_value)
 
         @add_input_text_change_handler($input, @group_inputs_change_handler)
-        
+
         @$select_width.off 'change'
         @$select_width.on 'change', () =>
           @group_inputs_change_handler()
-        
+
         @$checkbox_samescreen.off 'change'
         @$checkbox_samescreen.on 'change', () =>
           @group_inputs_change_handler()
@@ -1028,6 +1029,52 @@ module.exports = do ->
       @listenForInputChange()
 
   viewRowDetail.DetailViewMixins.oc_external =
+    onOcConsentRowsEvent: (ocConsentRowsEventArgs) ->
+      if (ocConsentRowsEventArgs.type == 'consentRows')
+        $select = @$('select')
+
+        if (ocConsentRowsEventArgs.message != '')
+          @hideErrorMessage()
+
+          @showMessage(ocConsentRowsEventArgs.message, 'input-error')
+          @model.getSurvey().errorMessage = ocConsentRowsEventArgs.message
+        else
+          @model.getSurvey().errorMessage = null
+          @hideErrorMessage()
+
+          if $select.val() == 'signature'
+            @showSignatureMessage()
+
+    showMessage: (message, fieldClass) ->
+      $select = @$('select')
+      $select.closest('div').addClass(fieldClass)
+      if $select.siblings('.message').length is 0
+        $message = $('<div/>').addClass('message').text(_t(message))
+        $select.after($message)
+
+    showErrorMessage: () ->
+      errorMessage = "Constraint / Constraint Message is not empty"
+      errorFieldClass = 'input-error'
+      @showMessage(errorMessage, errorFieldClass)
+
+    showSignatureMessage: () ->
+      signatureMessage = "Signature items must be Select Multiple questions with one option"
+      fieldClass = ''
+      if (@model.getSurvey().errorMessage?)
+        signatureMessage = @model.getSurvey().errorMessage
+        fieldClass = 'input-error'
+      @showMessage(signatureMessage, fieldClass)
+
+    hideMessage: (fieldClass) ->
+      $select = @$('select')
+      if (fieldClass != '')
+        if ($select.closest('div').hasClass(fieldClass))
+          $select.closest('div').removeClass(fieldClass)
+      $select.siblings('.message').remove()
+
+    hideErrorMessage: () ->
+      @hideMessage('input-error')
+
     model_type: () ->
       @model._parent.getValue('type').split(' ')[0]
     getOptions: () ->
@@ -1064,23 +1111,6 @@ module.exports = do ->
       for identifier_type_option in @identifier_type_options
         $('<option />', {value: "#{identifier_type_option}", text: "#{identifier_type_option}"}).appendTo(@$select_identifier_type)
 
-      fieldClass = 'input-error'
-      message = "Constraint / Constraint Message is not empty"
-      showMessage = () =>
-        $select.closest('div').addClass(fieldClass)
-        if $select.siblings('.message').length is 0
-          $message = $('<div/>').addClass('message').text(_t(message))
-          $select.after($message)
-
-      hideMessage = () =>
-        $select.closest('div').removeClass(fieldClass)
-        $select.siblings('.message').remove()
-
-      showSignatureMessage = () =>
-        message = "Signature items must be Select Multiple questions with one option"
-        if $select.siblings('.message').length is 0
-          $message = $('<div/>').addClass('message').text(_t(message))
-          $select.after($message)
 
       addSelectContactDataType = () =>
         @$('.settings__input').append(@$label_select_contact_data_type)
@@ -1120,7 +1150,7 @@ module.exports = do ->
           if @model._parent.isConsentItem()
             $select.val('signature')
             @model.set 'value', $select.val()
-            showSignatureMessage()
+            @showSignatureMessage()
           else
             $select.val('No')
         else
@@ -1132,7 +1162,7 @@ module.exports = do ->
           else if modelValue == 'identifier'
             addSelectIdentifierType()
           else if modelValue == 'signature'
-            showSignatureMessage()
+            @showSignatureMessage()
 
         $select.change () =>
           Backbone.trigger('ocCustomEvent', { sender: @model, value: $select.val() })
@@ -1146,7 +1176,7 @@ module.exports = do ->
           if $select.val() == 'No'
             @model.set 'value', ''
             resetInstanceValues()
-            hideMessage()
+            @hideErrorMessage()
           else
             @model.set 'value', $select.val()
             resetInstanceValues()
@@ -1155,11 +1185,11 @@ module.exports = do ->
               constraint_value = @rowView.model.attributes.constraint.getValue()
               constraint_message_value = @rowView.model.attributes.constraint_message.getValue()
               if (constraint_value != '') or (constraint_message_value != '')
-                showMessage()
+                @showMessage()
             else if $select.val() == 'identifier'
               addSelectIdentifierType()
             else if $select.val() == 'signature'
-              showSignatureMessage()
+              @showSignatureMessage()
 
   viewRowDetail.DetailViewMixins.readonly =
     html: ->
@@ -1225,7 +1255,7 @@ module.exports = do ->
     getOptions: () ->
       currentQuestion = @model._parent
       non_selectable = ['datetime', 'time', 'note', 'group', 'kobomatrix', 'repeat', 'rank', 'score', 'calculate']
-      
+
       questions = []
       currentQuestion.getSurvey().forEachRow (question) =>
         if (question.getValue('type') not in non_selectable) and (question.cid != currentQuestion.cid)
@@ -1234,7 +1264,7 @@ module.exports = do ->
 
       options = []
       options = _.map(questions, (row) ->
-        
+
         try
           labelValue = row.getValue('label')
         catch e
@@ -1255,7 +1285,7 @@ module.exports = do ->
       @fieldTab = "active"
       @$el.addClass("card__settings__fields--#{@fieldTab}")
       options = @getOptions()
-      
+
       return viewRowDetail.Templates.dropdown @cid, @model.key, options, _t("Calculation trigger")
     afterRender: ->
       $select = @$('select')
