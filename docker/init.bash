@@ -16,9 +16,9 @@ fi
 echo 'Synchronizing database.'
 # python manage.py syncdb --noinput
 
-echo 'Running fake migrations.'
-python manage.py migrate auth 0007 --fake --noinput
-python manage.py migrate auth 0008 --fake --noinput
+# echo 'Running fake migrations.'
+# python manage.py migrate auth 0007 --fake --noinput
+# python manage.py migrate auth 0008 --fake --noinput
 echo 'Running migrations.'
 python manage.py migrate --noinput
 
@@ -26,6 +26,8 @@ if [[ ! -L "${KPI_SRC_DIR}/node_modules" ]] || [[ ! -d "${KPI_SRC_DIR}/node_modu
     echo "Restoring \`npm\` packages to \`${KPI_SRC_DIR}/node_modules\`."
     rm -rf "${KPI_SRC_DIR}/node_modules"
     ln -s "${KPI_NODE_PATH}" "${KPI_SRC_DIR}/node_modules"
+    npm install --quiet && \
+    npm cache clean --force
 fi
 
 if [[ ! -L "${KPI_SRC_DIR}/jsapp/compiled" ]] || [[ ! -d "${KPI_SRC_DIR}/jsapp/compiled" ]]; then
