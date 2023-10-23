@@ -1,4 +1,4 @@
-FROM kobotoolbox/koboform_base:latest
+FROM 837577998611.dkr.ecr.us-west-2.amazonaws.com/kobotoolbox/koboform_base:latest
 
 
 # Note: Additional environment variables have been set in `Dockerfile.koboform_base`.
