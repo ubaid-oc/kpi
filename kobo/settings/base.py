@@ -794,9 +794,10 @@ CSP_OC_SITES = [
     'https://*.staging.openclinica.io',
     'https://*.openclinica-dev-eks.io',
 ]
-CSP_FRAME_ANCESTORS = CSP_OC_SITES
-CSP_CONNECT_SRC = CSP_CONNECT_SRC + CSP_OC_SITES
-CSP_FRAME_SRC = CSP_FRAME_SRC + CSP_OC_SITES
+CSP_ENV_SITES = env.url('CSP_ENV_SITES', [])
+CSP_FRAME_ANCESTORS = CSP_OC_SITES + CSP_ENV_SITES
+CSP_CONNECT_SRC = CSP_CONNECT_SRC + CSP_OC_SITES + CSP_ENV_SITES
+CSP_FRAME_SRC = CSP_FRAME_SRC + CSP_OC_SITES + CSP_ENV_SITES
 
 csp_report_uri = env.url('CSP_REPORT_URI', None)
 if csp_report_uri:  # Let environ validate uri, but set as string
