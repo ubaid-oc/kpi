@@ -36,12 +36,10 @@ fi
 /bin/bash "${INIT_PATH}/wait_for_mongo.bash"
 /bin/bash "${INIT_PATH}/wait_for_postgres.bash"
 
-if [[ -z $INITIAL_SETUP ]]; then
-    echo 'Running fake migrations.'
-    gosu "${UWSGI_USER}" python manage.py migrate bossoidc2 0002_auto_20201110_2129 --fake --noinput
-    gosu "${UWSGI_USER}" python manage.py migrate bossoidc2 0002_keycloak_subdomain --fake --noinput
-    gosu "${UWSGI_USER}" python manage.py migrate bossoidc2 0003_keycloak_usertype --fake --noinput
-fi
+echo 'Running fake migrations.'
+gosu "${UWSGI_USER}" python manage.py migrate bossoidc2 0002_auto_20201110_2129 --fake --noinput
+gosu "${UWSGI_USER}" python manage.py migrate bossoidc2 0002_keycloak_subdomain --fake --noinput
+gosu "${UWSGI_USER}" python manage.py migrate bossoidc2 0003_keycloak_usertype --fake --noinput
 
 echo 'Running migrations...'
 gosu "${UWSGI_USER}" python manage.py migrate --noinput
