@@ -793,6 +793,7 @@ CSP_OC_SITES = [
     'https://*.openclinica.io',
     'https://*.staging.openclinica.io',
     'https://*.openclinica-dev-eks.io',
+    'https://*.cloudfront.net',
 ]
 CSP_ENV_SITES = env.url('CSP_ENV_SITES', [])
 CSP_FRAME_ANCESTORS = CSP_OC_SITES + CSP_ENV_SITES
