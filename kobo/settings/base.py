@@ -678,6 +678,12 @@ if RAVEN_JS_DSN_URL:
 
 # replace this with the pointer to the kobocat server, if it exists
 KOBOCAT_URL = os.environ.get('KOBOCAT_URL', 'http://kobocat')
+
+# In case server must serve two KoBoCAT domain names (e.g. during a
+# domain name transfer), `settings.KOBOCAT_OLD_URL` adds support for
+# the domain name.
+KOBOCAT_OLD_URL = os.environ.get('KOBOCAT_OLD_URL')
+
 KOBOCAT_INTERNAL_URL = os.environ.get('KOBOCAT_INTERNAL_URL',
                                       'http://kobocat')
 
@@ -766,10 +772,10 @@ CSP_IMG_SRC = CSP_DEFAULT_SRC + [
 CSP_FRAME_SRC = CSP_DEFAULT_SRC
 
 if GOOGLE_ANALYTICS_TOKEN:
-    google_domain = '*.google-analytics.com'
-    CSP_SCRIPT_SRC.append(google_domain)
-    CSP_CONNECT_SRC.append(google_domain)
-    CSP_IMG_SRC.append(google_domain)
+    # Taken from https://developers.google.com/tag-platform/tag-manager/csp#google_analytics_4_google_analytics
+    CSP_SCRIPT_SRC.append('https://*.googletagmanager.com')
+    CSP_CONNECT_SRC.extend(['https://*.google-analytics.com', 'https://*.analytics.google.com', 'https://*.googletagmanager.com'])
+    CSP_IMG_SRC.extend(['https://*.google-analytics.com', 'https://*.googletagmanager.com'])
 if RAVEN_JS_DSN_URL and RAVEN_JS_DSN_URL.scheme:
     raven_js_url = RAVEN_JS_DSN_URL.scheme + '://' + RAVEN_JS_DSN_URL.hostname
     CSP_SCRIPT_SRC.append('https://cdn.ravenjs.com')
@@ -787,10 +793,12 @@ CSP_OC_SITES = [
     'https://*.openclinica.io',
     'https://*.staging.openclinica.io',
     'https://*.openclinica-dev-eks.io',
+    'https://*.cloudfront.net',
 ]
-CSP_FRAME_ANCESTORS = CSP_OC_SITES
-CSP_CONNECT_SRC = CSP_CONNECT_SRC + CSP_OC_SITES
-CSP_FRAME_SRC = CSP_FRAME_SRC + CSP_OC_SITES
+CSP_ENV_SITES = env.url('CSP_ENV_SITES', [])
+CSP_FRAME_ANCESTORS = CSP_OC_SITES + CSP_ENV_SITES
+CSP_CONNECT_SRC = CSP_CONNECT_SRC + CSP_OC_SITES + CSP_ENV_SITES
+CSP_FRAME_SRC = CSP_FRAME_SRC + CSP_OC_SITES + CSP_ENV_SITES
 
 csp_report_uri = env.url('CSP_REPORT_URI', None)
 if csp_report_uri:  # Let environ validate uri, but set as string
