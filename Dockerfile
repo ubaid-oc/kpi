@@ -57,7 +57,7 @@ RUN mkdir -p "${NGINX_STATIC_DIR}" && \
 
 RUN apt-get -qq update && \
     apt-get -qq -y install curl && \
-    curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
+    curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
     apt-get -qq -y install --no-install-recommends \
         ffmpeg \
         gdal-bin \
