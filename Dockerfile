@@ -72,7 +72,7 @@ RUN apt-get -qq update && \
         less \
         libproj-dev \
         locales \
-        nodejs=$(apt-cache show nodejs | grep 'Version: .*nodesource' | cut -f 2 -d ' ') \
+        nodejs=$(apt-cache show nodejs | grep -F 'Version: 16.15.0' | cut -f 2 -d ' ') \
         postgresql-client \
         procps \
         rsync \
