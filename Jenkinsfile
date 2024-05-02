@@ -27,7 +27,7 @@ pipeline {
             steps {
                 sh '/usr/local/bin/eksctl version'
                 sh '/usr/local/bin/eksctl utils write-kubeconfig --cluster=${clustername} --region=${region}'
-                sh "ssh -J root@sbs-dev-jump -D 1081 -f root@ruleservice-dev -N"
+                sh "ssh -J root@sbs-dev-jump -D 1081 -f root@eks-maintenance-dev -N"
             }
         }
         stage ("Build and Push Image to ECR") {
