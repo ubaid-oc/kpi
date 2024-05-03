@@ -54,7 +54,7 @@ if SESSION_COOKIE_DOMAIN:
     SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'kobonaut')
     # The trusted CSRF origins must encompass Enketo's subdomain. See
     # https://docs.djangoproject.com/en/2.2/ref/settings/#std:setting-CSRF_TRUSTED_ORIGINS
-    CSRF_TRUSTED_ORIGINS = [SESSION_COOKIE_DOMAIN]
+    CSRF_TRUSTED_ORIGINS = [SESSION_COOKIE_DOMAIN, ".openclinica.io", ".openclinica-dev.io", ".openclinica-dev-eks.io", ".openclinica-staging.io", ".openclinica-staging-2.io"]
     CSRF_COOKIE_SECURE = True
 ENKETO_CSRF_COOKIE_NAME = env.str('ENKETO_CSRF_COOKIE_NAME', '__csrf')
 CSRF_COOKIE_SAMESITE = 'None'
