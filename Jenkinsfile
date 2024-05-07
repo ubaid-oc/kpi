@@ -27,7 +27,7 @@ pipeline {
             steps {
                 sh '/usr/local/bin/eksctl version'
                 sh '/usr/local/bin/eksctl utils write-kubeconfig --cluster=${clustername} --region=${region}'
-                sh "ssh -J root@sbs-dev-jump -D 1081 -f root@eks-maintenance-dev -N"
+                sh "ssh -J root@sbs-dev-jump -D 1094 -f root@eks-maintenance-dev -N"
             }
         }
         stage ("Build and Push Image to ECR") {
@@ -37,7 +37,7 @@ pipeline {
                    {
                 script {
                     sh """
-                        https_proxy=socks5://127.0.0.1:1081 kubectl port-forward service/dind 1337:2375 &
+                        https_proxy=socks5://127.0.0.1:1094 kubectl port-forward service/dind 1337:2375 &
                         sleep 2
                         if docker buildx inspect multiarchbuilder > /dev/null 2>&1; then
                         docker buildx rm multiarchbuilder
@@ -79,7 +79,7 @@ pipeline {
                script {
                 if ( env.ENV == "build & deploy" || env.ENV == "deploy" )
                 {
-                sh "https_proxy=socks5://127.0.0.1:1081 /usr/local/bin/helm upgrade formdesigner --install apps/kobo_kpi --namespace ${ns} --set kpi.image.repository=${registry} --set kpi.image.tag=${tag_version}"
+                sh "https_proxy=socks5://127.0.0.1:1094 /usr/local/bin/helm upgrade formdesigner --install apps/kobo_kpi --namespace ${ns} --set kpi.image.repository=${registry} --set kpi.image.tag=${tag_version}"
                 }
                 else {
                 sh "echo 'Skipping this step'" 
