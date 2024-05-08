@@ -375,7 +375,6 @@ module.exports = do ->
       if show and !@_settingsExpanded
         @_expandedRender()
         @$card.addClass('card--expanded-settings')
-        @hideMultioptions?()
         @_settingsExpanded = true
         # rerender locking (if applies to class extending BaseRowView)
         if @applyLocking
@@ -819,8 +818,7 @@ module.exports = do ->
 
     showMultioptions: ->
       @$card.addClass('card--expandedchoices')
-      @$card.removeClass('card--expanded-settings')
-      @toggleSettings(false)
+      @is_expanded = true
       return
 
     toggleMultioptions: ->
@@ -828,7 +826,6 @@ module.exports = do ->
         @hideMultioptions()
       else
         @showMultioptions()
-        @is_expanded = true
       return
 
   class KoboMatrixView extends RowView
