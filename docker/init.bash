@@ -59,7 +59,7 @@ if [[ ! -d "${KPI_SRC_DIR}/staticfiles" ]] || ! python "${KPI_SRC_DIR}/docker/ch
 
         echo "Syncing \`npm\` packages…"
         if ( ! check-dependencies ); then
-            npm install --quiet > /dev/null 2>&1
+            npm install --legacy-peer-deps --quiet > /dev/null 2>&1
         else
             npm run postinstall > /dev/null 2>&1
         fi
