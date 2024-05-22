@@ -66,11 +66,6 @@ def service_health(request):
     postgres_time = time.time() - t0
 
     t0 = time.time()
-    failure, enketo_message, enketo_content = get_response(settings.ENKETO_INTERNAL_URL)
-    any_failure = True if failure else any_failure
-    enketo_time = time.time() - t0
-
-    t0 = time.time()
     failure, kobocat_message, kobocat_content = get_response(settings.KOBOCAT_INTERNAL_URL + '/service_health/')
     any_failure = True if failure else any_failure
     kobocat_time = time.time() - t0
@@ -79,13 +74,11 @@ def service_health(request):
         '{} KPI\r\n\r\n'
         'Mongo: {} in {:.3} seconds\r\n'
         'Postgres: {} in {:.3} seconds\r\n'
-        'Enketo [{}]: {} in {:.3} seconds\r\n'
         'KoBoCAT [{}]: {} in {:.3} seconds\r\n'
     ).format(
         'FAIL' if any_failure else 'OK',
         mongo_message, mongo_time,
         postgres_message, postgres_time,
-        settings.ENKETO_INTERNAL_URL, enketo_message, enketo_time,
         settings.KOBOCAT_INTERNAL_URL, kobocat_message, kobocat_time
     )
 
