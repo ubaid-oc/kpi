@@ -196,7 +196,7 @@ actions.resources.listTags.completed.listen(function(results){
   }
 });
 
-actions.resources.updateAsset.listen(function(uid, values, params={}) {
+actions.resources.updateAsset.listen(function(uid, values, params = {}) {
   const crossStorage = getCrossStorageClient();
   crossStorage.onConnect()
     .then(function() {
@@ -222,22 +222,6 @@ actions.resources.updateAsset.listen(function(uid, values, params={}) {
               params.onFailed(resp);
             }
           });
-      }
-    });
-  
-  
-  dataInterface.patchAsset(uid, values)
-    .done((asset) => {
-      actions.resources.updateAsset.completed(asset);
-      if (typeof params.onComplete === 'function') {
-        params.onComplete(asset, uid, values);
-      }
-      notify(t('successfully updated'));
-    })
-    .fail(function(resp){
-      actions.resources.updateAsset.failed(resp);
-      if (params.onFailed) {
-        params.onFailed(resp);
       }
     });
 });
