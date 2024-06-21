@@ -56,14 +56,16 @@ if SESSION_COOKIE_DOMAIN:
     # https://docs.djangoproject.com/en/2.2/ref/settings/#std:setting-CSRF_TRUSTED_ORIGINS
     CSRF_TRUSTED_ORIGINS = [SESSION_COOKIE_DOMAIN, ".openclinica.io", ".openclinica-dev.io", ".openclinica-dev-eks.io", ".openclinica-staging.io", ".openclinica-staging-2.io"]
     CSRF_COOKIE_SECURE = True
-ENKETO_CSRF_COOKIE_NAME = env.str('ENKETO_CSRF_COOKIE_NAME', '__csrf')
 CSRF_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_DOMAIN = env.str('CSRF_COOKIE_DOMAIN', None)
+CSRF_COOKIE_NAME = 'occsrftoken'
 
 SESSION_COOKIE_AGE = 60*60*24 # Session age is 24 hour
 SESSION_SAVE_EVERY_REQUEST = True # Renew session every request made
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'None'
+
+ENKETO_CSRF_COOKIE_NAME = env.str('ENKETO_CSRF_COOKIE_NAME', '__csrf')
 
 # Instances of this model will be treated as allowed origins; see
 # https://github.com/ottoyiu/django-cors-headers#cors_model

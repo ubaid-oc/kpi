@@ -45,7 +45,7 @@ $.ajaxSetup({
   beforeSend: function (xhr, settings) {
     let csrfToken = '';
     try {
-      csrfToken = document.cookie.match(/csrftoken=(\w{64})/)[1];
+      csrfToken = document.cookie.match(/occsrftoken=(\w{64})/)[1];
     } catch (err) {
       console.error('Cookie not matched');
     }
@@ -53,7 +53,7 @@ $.ajaxSetup({
       const cookies = new Cookies();
       xhr.setRequestHeader(
         'X-CSRFToken',
-        csrfToken || cookies.get('csrftoken')
+        csrfToken || cookies.get('occsrftoken')
       );
     }
   },
