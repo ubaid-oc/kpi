@@ -31,28 +31,28 @@ pipeline {
             }
         }
         stage ("Build and Push Image to ECR") {
-            steps {
-               script {
-                if ( env.ENV == "build" || env.ENV == "build & deploy")
-                   {
-                script {
-                    sh """
-                        https_proxy=socks5://127.0.0.1:1094 kubectl port-forward service/dind 1410:2375 &
-                        sleep 2
-                        if docker buildx inspect multiarchbuilder1410 > /dev/null 2>&1; then
-                        docker buildx rm multiarchbuilder1410
-                        fi
-                        docker buildx create --name multiarchbuilder1410 --node amd64 --platform linux/amd64,linux/aarch64 --driver docker-container --driver-opt env.BUILDKIT_STEP_LOG_MAX_SIZE=10000000 --driver-opt env.BUILDKIT_STEP_LOG_MAX_SPEED=10000000
-                        docker buildx create --name multiarchbuilder1410 --append --node arm64 --platform linux/arm64 tcp://127.0.0.1:1410 --driver docker-container --driver-opt env.BUILDKIT_STEP_LOG_MAX_SIZE=10000000 --driver-opt env.BUILDKIT_STEP_LOG_MAX_SPEED=10000000
-                        docker buildx inspect --bootstrap --builder multiarchbuilder1410
-                       """
-                    sh "docker buildx build --builder multiarchbuilder1410 --platform linux/amd64,linux/aarch64 -t ${registry}:${tag_version} --push ."
-                  }
-                 }
-                else {
-                sh "echo 'Skipping this step'" 
-               }   
+            environment {
+                REMOTE_AMD_HOST_IP = "172.24.20.170"
             }
+            steps {
+              script {
+                if ( env.ENV == "build" || env.ENV == "build & deploy") {
+                    sh """
+                        # Unset DOCKER_HOST to ensure commands target the local Docker daemon by default
+                        unset DOCKER_HOST
+                        if docker buildx inspect multiarchbuilder > /dev/null 2>&1; then
+                            docker buildx rm multiarchbuilder
+                        fi
+                        docker buildx create --name multiarchbuilder --node arm64 --platform linux/aarch64,linux/amd64
+                        docker buildx create --name multiarchbuilder --append --node amd64 --platform linux/amd64 tcp://${REMOTE_AMD_HOST_IP}:2375
+                        docker buildx inspect --bootstrap --builder multiarchbuilder
+                       """
+                    sh "docker buildx build --builder multiarchbuilder --platform linux/amd64,linux/aarch64 -t ${registry}:${tag_version} --push ."
+                  }
+                else {
+                    sh "echo 'Skipping this step'" 
+                }    
+             }
            }
         }       
         stage ("Sanitize Workspace") {
