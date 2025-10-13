@@ -31,23 +31,19 @@ pipeline {
             }
         }
         stage ("Build and Push Image to ECR") {
-            environment {
-                REMOTE_AMD_HOST_IP = "172.24.20.170"
-            }
             steps {
               script {
                 if ( env.ENV == "build" || env.ENV == "build & deploy") {
                     sh """
                         # Unset DOCKER_HOST to ensure commands target the local Docker daemon by default
                         unset DOCKER_HOST
-                        if docker buildx inspect multiarchbuilder > /dev/null 2>&1; then
-                            docker buildx rm multiarchbuilder
+                        if docker buildx inspect arm64builder > /dev/null 2>&1; then
+                            docker buildx rm arm64builder
                         fi
-                        docker buildx create --name multiarchbuilder --node arm64 --platform linux/aarch64,linux/amd64
-                        docker buildx create --name multiarchbuilder --append --node amd64 --platform linux/amd64 tcp://${REMOTE_AMD_HOST_IP}:2375
-                        docker buildx inspect --bootstrap --builder multiarchbuilder
+                        docker buildx create --name arm64builder --node arm64 --platform linux/aarch64
+                        docker buildx inspect --bootstrap --builder arm64builder
                        """
-                    sh "docker buildx build --builder multiarchbuilder --platform linux/amd64,linux/aarch64 -t ${registry}:${tag_version} --push ."
+                    sh "docker buildx build --builder arm64builder --platform linux/aarch64 -t ${registry}:${tag_version} --push ."
                   }
                 else {
                     sh "echo 'Skipping this step'" 
