@@ -94,7 +94,23 @@ module.exports = do ->
       "keyup input": "keyupinput"
       "keydown input": "keydowninput"
       "click .js-remove-option": "remove"
+
+    onConsentRowChoiceValueError: (args) ->
+      if args.cid == @model.cid
+        @$el.siblings('.message').remove()
+        @$el.closest('div').addClass('input-error')
+        if @$el.siblings('.message').length is 0
+          $message = $('<div/>').addClass('message').text('Consent items must have a value of "1"')
+          @$el.after($message)
+
+    onConsentRowChoiceValueNotError: (args) ->
+      if args.cid == @model.cid
+        @$el.closest('div').removeClass('input-error')
+        @$el.siblings('.message').remove()
+
     initialize: (@options)->
+      Backbone.on('consentRowChoiceValueError', @onConsentRowChoiceValueError, @)
+      Backbone.on('consentRowChoiceValueNotError', @onConsentRowChoiceValueNotError, @)
     render: ->
       @t = $("<i class=\"k-icon k-icon-trash js-remove-option\">")
       @pw = $("<div class=\"editable-wrapper js-option-label-input js-cancel-select-row\">")
