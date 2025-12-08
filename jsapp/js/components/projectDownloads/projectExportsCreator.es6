@@ -556,7 +556,7 @@ export default class ProjectExportsCreator extends React.Component {
             <bem.ProjectDownloads__title>
               {t('Export')}
               &nbsp;
-              <em>{t('Select Many')}</em>
+              <em>{t('Select Multiple')}</em>
               &nbsp;
               {t('questions as…')}
             </bem.ProjectDownloads__title>
