@@ -1,0 +1,7 @@
+.asset-label {
+  display: inline-block;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
+}

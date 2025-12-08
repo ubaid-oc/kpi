@@ -471,7 +471,7 @@ export default assign({
   },
 
   buttonStates() {
-    var ooo = {};
+    const ooo = {};
     if (!this.app) {
       ooo.allButtonsDisabled = true;
     } else {
@@ -482,7 +482,7 @@ export default assign({
       ooo.groupable = !!this.state.groupButtonIsActive;
       ooo.showAllOpen = !!this.state.multioptionsExpanded;
       ooo.showAllAvailable = (() => {
-        var hasSelect = false;
+        let hasSelect = false;
         this.app.survey.forEachRow(function(row){
           if (row._isSelectQuestion()) {
             hasSelect = true;
@@ -497,26 +497,33 @@ export default assign({
       ooo.formIdValue = this.state.settings__form_id;
     }
 
-    ooo.saveButtonText = t('save');
-    ooo.backButtonText = t('back');
+    const isNewLibraryAsset = this.state.backRoute === ROUTES.LIBRARY
+      && this.state.asset === false
+      && this.state.isNewAsset === true;
+
+    let saveButtonText = t('save');
+    let backButtonText = t('back');
+
+    if (this.state.asset_type === 'survey') {
+      saveButtonText = t('save draft');
+    } else {
+      // eslint-disable-next-line no-lonely-if
+      if (isNewLibraryAsset) {
+        saveButtonText = t('create');
+        backButtonText = t('back to library');
+      } else {
+        saveButtonText = t('save changes');
+      }
+    }
 
     if (this.state.editorState === 'new') {
       ooo.saveButtonText = t('create');
     } else if (this.state.surveySaveFail) {
-      if (this.state.asset_type === 'survey') {
-        ooo.saveButtonText = `${t('save draft')} (${t('retry')}) `;
-      } else {
-        ooo.saveButtonText = `${t('save changes')} (${t('retry')}) `;
-      }
+      ooo.saveButtonText = `${saveButtonText} (${t('retry')}) `;
     } else {
-      // eslint-disable-next-line no-lonely-if
-      if (this.state.asset_type === 'survey') {
-        ooo.saveButtonText = t('save draft');
-      } else {
-        ooo.saveButtonText = t('save changes');
-        ooo.backButtonText = t('back to library');
-      }
+      ooo.saveButtonText = `${saveButtonText}`;
     }
+    ooo.backButtonText = `${backButtonText}`;
 
     return ooo;
   },
@@ -809,7 +816,7 @@ export default assign({
               disabled={!groupable}
               data-tip={groupable ? t('Duplicate selected questions') : t('Duplicate questions disabled. Please select at least one question.')}
             >
-              <i className='k-icon-clone' />
+              <i className='k-icon-duplicate' />
             </bem.FormBuilderHeader__button>
 
             <bem.FormBuilderHeader__button
@@ -840,20 +847,19 @@ export default assign({
 
           <bem.FormBuilderHeader__cell m='spacer'/>
 
-          <bem.FormBuilderHeader__cell>
+          <bem.FormBuilderHeader__cell m='supportUrl'>
             <a
-              class="formdesigner-support-url"
-              href={FORM_DESIGNER_SUPPORT_URL}
-              target='_blank'
-              data-tip={t('Learn more about Form Designer')}
-            >
-              <i className='k-icon k-icon-help'/>
+                href={FORM_DESIGNER_SUPPORT_URL}
+                target='_blank'
+                data-tip={t('Learn more about Form Designer')}
+              >
+                <i className='k-icon k-icon-help'/>
             </a>
           </bem.FormBuilderHeader__cell>
 
           <bem.FormBuilderHeader__cell m='verticalRule'/>
 
-          <bem.FormBuilderHeader__cell>
+          <bem.FormBuilderHeader__cell m='rightTaskbar-button'>
             <bem.FormBuilderHeader__button
               m={['panel-toggle', this.state.asideLibrarySearchVisible ? 'active' : null]}
               onClick={this.toggleAsideLibrarySearch}
@@ -866,7 +872,7 @@ export default assign({
 
           <bem.FormBuilderHeader__cell m={'verticalRule'} />
 
-          <bem.FormBuilderHeader__cell>
+          <bem.FormBuilderHeader__cell m='rightTaskbar-button'>
             <bem.FormBuilderHeader__button
               m={['panel-toggle', this.state.asideLayoutSettingsVisible ? 'active' : null]}
               onClick={this.toggleAsideLayoutSettings}
@@ -1072,7 +1078,7 @@ export default assign({
       !this.state.asset ||
       !hasAssetAnyLocking(this.state.asset.content)
     ) {
-      return assetTypeLabel;
+      return (<span className='asset-label'>{assetTypeLabel}</span>);
     // Case 2: asset is locked fully or partially
     } else {
       let lockedLabel = t('Partially locked ##type##').replace('##type##', assetTypeLabel);

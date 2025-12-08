@@ -206,19 +206,6 @@ $s-form-builder-content-width: 1024px;
       margin-left: 5px;
     }
 
-    .formdesigner-support-url {
-      color: #8a8ea3;
-
-      &:hover {
-        color: colors.$kobo-gray-14;
-      }
-
-      i {
-        font-size: 32px;
-        vertical-align: middle;
-      }
-    }
-
     // second row
     &.form-builder-header__cell--toolsButtons {
       margin: 0 10px;
@@ -228,6 +215,7 @@ $s-form-builder-content-width: 1024px;
         // for tooltip
         overflow: visible;
         padding: 0;
+        margin-right: 10px;
 
         &[data-tip]::after {
           margin-left: 30px;
@@ -258,6 +246,39 @@ $s-form-builder-content-width: 1024px;
             top: 15px;
           }
         }
+      }
+
+      button:last-child {
+        margin-right: 0;
+      }
+    }
+
+    &.form-builder-header__cell--supportUrl {
+      margin: 0 10px;
+
+      a:hover {
+        color: colors.$kobo-gray-14;
+
+        .k-icon {
+          color: colors.$kobo-gray-14;
+        }
+      }
+
+      i {
+        font-size: 32px;
+        vertical-align: bottom;
+      }
+
+      .k-icon {
+        color: #8a8ea3;
+        font-size: 32px;
+        vertical-align: bottom;
+      }
+    }
+
+    &.form-builder-header__cell--rightTaskbar-buttons {
+      .k-icon {
+        vertical-align: bottom;
       }
     }
 
