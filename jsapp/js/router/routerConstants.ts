@@ -16,6 +16,8 @@ export const ROUTES = Object.freeze({
   MY_LIBRARY: '/library/my-library',
   PUBLIC_COLLECTIONS: '/library/public-collections',
   NEW_LIBRARY_ITEM: '/library/asset/new',
+  NEW_LIBRARY_TEMPLATE_ITEM: '/library/asset/new/template',
+  NEW_LIBRARY_TEMPLATE_ITEM_CHILD: '/library/asset/:uid/new/template',
   LIBRARY_ITEM: '/library/asset/:uid',
   EDIT_LIBRARY_ITEM: '/library/asset/:uid/edit',
   NEW_LIBRARY_CHILD: '/library/asset/:uid/new',
