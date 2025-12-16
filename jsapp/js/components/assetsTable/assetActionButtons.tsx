@@ -438,6 +438,7 @@ class AssetActionButtons extends React.Component<
     const hasDetailsEditable =
       assetType === ASSET_TYPES.template.id ||
       assetType === ASSET_TYPES.collection.id;
+    const isCollection = assetType === ASSET_TYPES.collection.id;
 
     const routeAssetUid = getRouteAssetUid();
 
@@ -461,7 +462,7 @@ class AssetActionButtons extends React.Component<
         {userCanEdit && hasDetailsEditable && (
           <bem.AssetActionButtons__iconButton
             onClick={this.modifyDetails}
-            data-tip={t('Modify details')}
+            data-tip={isCollection ? t('Rename Collection') : t('Modify details')}
             className='right-tooltip'
           >
             <i className='k-icon k-icon-settings' />
@@ -478,7 +479,7 @@ class AssetActionButtons extends React.Component<
           </bem.AssetActionButtons__iconButton>
         )}
 
-        {userCanEdit && (
+        {userCanEdit && !isCollection && (
           <bem.AssetActionButtons__iconButton
             onClick={this.share}
             data-tip={t('Share')}
