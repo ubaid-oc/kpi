@@ -414,7 +414,11 @@ export default assign({
       actions.resources.createResource.triggerAsync(params)
         .then(() => {
           window.parent.postMessage('form_savecomplete', '*');
-          this.props.router.navigate('/library');
+          let targetPath = ROUTES.LIBRARY;
+          if (this.state.parentAsset) {
+            targetPath = ROUTES.LIBRARY_ITEM.replace(':uid', this.state.parentAsset);
+          }
+          this.props.router.navigate(targetPath);
         });
     } else {
       // update existing asset
@@ -648,6 +652,16 @@ export default assign({
     }
   },
 
+  getParentUid() {
+    if (this.state.asset.parent) {
+      const parentArr = this.state.asset.parent.split('/');
+      const parentAssetUid = parentArr[parentArr.length - 2];
+      return parentAssetUid;
+    } else {
+      return null;
+    }
+  },
+
   safeNavigateToList() {
     if (this.state.backRoute) {
       this.safeNavigateToRoute(this.state.backRoute);
@@ -656,6 +670,18 @@ export default assign({
     } else {
       this.safeNavigateToRoute(ROUTES.FORMS);
     }
+  },
+
+  safeNavigateToCollection() {
+    let targetRoute = this.state.backRoute;
+    if (this.state.backRoute === ROUTES.LIBRARY) {
+      if (this.getParentUid()) {
+        targetRoute = ROUTES.LIBRARY_ITEM.replace(':uid', this.getParentUid());
+      } else {
+        this.safeNavigateToRoute(ROUTES.LIBRARY);
+      }
+    }
+    this.safeNavigateToRoute(targetRoute);
   },
 
   safeNavigateToAsset() {
@@ -745,7 +771,7 @@ export default assign({
             {this.canNavigateToList() &&
               <bem.FormBuilderHeader__button
                 m={['back']}
-                onClick={this.safeNavigateToList}
+                onClick={this.state.asset.parent ? this.safeNavigateToCollection : this.safeNavigateToList}
                 disabled={!this.state.surveyAppRendered || !!this.state.surveyLoadError}
                 data-cy='back'
               >
