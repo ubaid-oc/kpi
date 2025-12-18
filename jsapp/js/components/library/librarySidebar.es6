@@ -123,7 +123,7 @@ class LibrarySidebar extends Reflux.Component {
           triggerLabel={t('new')}
         >
           <bem.PopoverMenu__item onClick={this.goToBlockCreator}>
-            {t('Question Block')}
+            {t('Question')}
           </bem.PopoverMenu__item>
           <bem.PopoverMenu__item onClick={this.goToTemplateCreator}>
             {t('Template')}
