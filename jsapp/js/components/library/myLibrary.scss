@@ -28,7 +28,7 @@
     }
 
     &.library-actions-buttons--display-all-tags {
-      .library-actions-buttons__button {
+      .library-actions-buttons__button--all-tags-toggle {
         color: colors.$kobo-blue;
       }
     }
