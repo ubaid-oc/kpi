@@ -52,6 +52,10 @@ class AssetsTableRow extends React.Component<AssetsTableRowProps> {
     );
   }
 
+  modifyDetails() {
+    assetUtils.modifyDetails(this.props.asset);
+  }
+
   onDeleteComplete() {
     // do nothing
   }
@@ -117,7 +121,7 @@ class AssetsTableRow extends React.Component<AssetsTableRowProps> {
           {settings_version}
         </bem.AssetsTableRow__column>
 
-        <bem.AssetsTableRow__column m='item-type'>
+        <bem.AssetsTableRow__column m='item-type' className='capitalize'>
           {ASSET_TYPES[this.props.asset.asset_type].label}
         </bem.AssetsTableRow__column>
 
@@ -129,7 +133,16 @@ class AssetsTableRow extends React.Component<AssetsTableRowProps> {
           {formatTime(this.props.asset.date_modified)}
         </bem.AssetsTableRow__column>
 
-        <bem.AssetsTableRow__column m='actions'>
+        { this.props.asset.asset_type !== ASSET_TYPES.collection.id && (
+        <bem.AssetsTableRow__buttons>
+          <AssetActionButtons asset={this.props.asset} />
+        </bem.AssetsTableRow__buttons>
+        )}
+
+        <bem.AssetsTableRow__column
+          m='actions'
+          className={this.props.asset.asset_type === ASSET_TYPES.collection.id ? 'no-actions-buttons' : 'with-actions-buttons' }
+        >
 
           <bem.AssetActionButtons>
 
@@ -137,6 +150,16 @@ class AssetsTableRow extends React.Component<AssetsTableRowProps> {
               <bem.AssetActionButtons__iconButton
                 href={`#/library/asset/${this.props.asset.uid}/edit`}
                 data-tip={t('Edit')}
+                className='right-tooltip'
+              >
+                <i className='k-icon k-icon-edit' />
+              </bem.AssetActionButtons__iconButton>
+            )}
+
+            {userCanEdit && this.props.asset.asset_type === ASSET_TYPES.collection.id && (
+              <bem.AssetActionButtons__iconButton
+                onClick={this.modifyDetails}
+                data-tip={t('Rename Collection')}
                 className='right-tooltip'
               >
                 <i className='k-icon k-icon-edit' />
