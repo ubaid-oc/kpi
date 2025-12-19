@@ -149,7 +149,16 @@ module.exports = do ->
           @model.set('setManually', false)
           val = 'AUTOMATIC'
           @$el.trigger("choice-list-update", @options.cl.cid)
-          @model.getSurvey()?.trigger('change') if valChanged
+          if valChanged
+            if @model.getSurvey()?
+              @model.getSurvey()?.trigger('change', { cid: @model.cid })
+            else
+              @model.collection._parent.getSurvey()?.trigger('change', { cid: @model.cid })
+            if @model.collection?.length == 1
+              if parseInt(@model.get('name')) == 1
+                Backbone.trigger('ocConsentRowsEvent', { type: 'consentRowChoiceValue', error: false, value: @model.get('name'), cid: @model.cid })
+              else
+                Backbone.trigger('ocConsentRowsEvent', { type: 'consentRowChoiceValue', error: true, value: @model.get('name'), cid: @model.cid })
           return
         else
           val = $modelUtils.sluggify(val, {
@@ -164,7 +173,16 @@ module.exports = do ->
           valChanged = true if val isnt @model.get('name')
           @model.set('name', val)
           @$el.trigger("choice-list-update", @options.cl.cid)
-          @model.getSurvey()?.trigger('change') if valChanged
+          if valChanged
+            if @model.getSurvey()?
+              @model.getSurvey()?.trigger('change', { cid: @model.cid })
+            else
+              @model.collection._parent.getSurvey()?.trigger('change', { cid: @model.cid })
+            if @model.collection?.length == 1
+              if parseInt(@model.get('name')) == 1
+                Backbone.trigger('ocConsentRowsEvent', { type: 'consentRowChoiceValue', error: false, value: @model.get('name'), cid: @model.cid })
+              else
+                Backbone.trigger('ocConsentRowsEvent', { type: 'consentRowChoiceValue', error: true, value: @model.get('name'), cid: @model.cid })
           return newValue: @model.get('name')
       ).bind @
       @pw.html(@p)
@@ -191,7 +209,10 @@ module.exports = do ->
           if valChanged
             @model.set(@optionImageField, val)
             @$el.trigger("choice-list-update", @options.cl.cid)
-            @model.getSurvey()?.trigger('change')
+            if @model.getSurvey()?
+              @model.getSurvey()?.trigger('change', { cid: @model.cid })
+            else
+              @model.collection._parent.getSurvey()?.trigger('change', { cid: @model.cid })
         return
       ).bind @
 

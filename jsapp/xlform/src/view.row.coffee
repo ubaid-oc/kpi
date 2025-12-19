@@ -57,7 +57,15 @@ module.exports = do ->
       @nonGroupsItemGroupNames = []
       @nonGroupsIntVals = []
       @itemGroupKey = 'bind::oc:itemgroup'
+      Backbone.on "ocConsentRowsEvent", @onOcConsentRowsEvent, @
       return
+
+    onOcConsentRowsEvent: (ocConsentRowsEventArgs) ->
+      if ocConsentRowsEventArgs.type == 'consentRowChoiceValue' and @options.model.get("bind::oc:external")?.get("value") == 'signature'
+        if ocConsentRowsEventArgs.error
+          Backbone.trigger('consentRowChoiceValueError', { cid: ocConsentRowsEventArgs.cid })
+        else
+          Backbone.trigger('consentRowChoiceValueNotError', { cid: ocConsentRowsEventArgs.cid })
 
     drop: (evt, index)->
       @$el.trigger("update-sort", [@model, index])
