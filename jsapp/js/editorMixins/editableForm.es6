@@ -857,16 +857,6 @@ export default assign({
               </i>
             </bem.FormBuilderHeader__button>
 
-            { this.toggleCascade !== undefined &&
-              <bem.FormBuilderHeader__button
-                m={['cascading']}
-                onClick={this.toggleCascade}
-                data-tip={t('Insert cascading select')}
-                className={this.isAddingQuestionsRestricted() ? LOCKING_UI_CLASSNAMES.DISABLED : ''}
-              >
-                <i className='k-icon k-icon-cascading' />
-              </bem.FormBuilderHeader__button>
-            }
           </bem.FormBuilderHeader__cell>
 
           <bem.FormBuilderHeader__cell m='verticalRule'/>
