@@ -1406,13 +1406,13 @@ export const dataInterface: DataInterface = {
       query = COMMON_QUERIES.b;
     } else if (params.filterType?.value === 'template') {
       query = COMMON_QUERIES.t;
-    } else if (params.filterType?.value === 'collection') {
-      query = COMMON_QUERIES.c;
     } else {
-      query = COMMON_QUERIES.qbtc;
+      query = COMMON_QUERIES.qbt;
     }
-    if (!params.searchPhrase) {
+    if (!params.uid) {
       query += ' AND parent:null';
+    } else {
+      query += ` AND parent__uid:${params.uid}`;
     }
 
     return this._searchAssetsWithPredefinedQuery(params, query);
