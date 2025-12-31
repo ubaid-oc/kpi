@@ -123,6 +123,10 @@ class OwnedCollectionsStore extends Reflux.Store {
   find(uid: string) {
     return this.data.collections.find((asset) => asset.uid === uid);
   }
+
+  getCollections() {
+    return this.data.collections;
+  }
 }
 
 /** This store keeps an up to date list of owned collections. */

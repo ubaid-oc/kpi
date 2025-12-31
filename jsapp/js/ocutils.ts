@@ -143,3 +143,7 @@ export function processArrayMiddleOut(array: any[], startIndex: number, directio
 export function getLibraryFilterCacheName() {
   return 'kpi.library.filter-style';
 }
+
+export function getCollectionUidCacheName() {
+  return 'kpi.library.collection-uid';
+}

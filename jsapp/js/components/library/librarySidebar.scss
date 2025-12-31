@@ -1,0 +1,37 @@
+@use '~kobo-common/src/styles/colors';
+
+.form-sidebar__item--collection {
+  padding-left: 10px !important;
+  margin: 5px 5px 5px 0px;
+}
+
+.form-sidebar__item--collection
+{
+  .form-sidebar__itemlink {
+    padding: 0px 10px 0px 0px;
+    min-width: 145px;
+    max-width: 145px;
+
+    i {
+      font-size: 24px;
+      vertical-align: middle;
+      display: inline-block;
+      margin-right: 5px;
+    }
+  }
+
+  .popover-menu__toggle i {
+    font-size: 20px !important;
+  }
+}
+
+.form-sidebar__itemlink {
+  color: colors.$kobo-gray-40;
+  font-size: 12px;
+}
+
+.form-sidebar__item--selected
+{
+    background: colors.$kobo-gray-92;
+}
+
