@@ -6,7 +6,6 @@ import Reflux from 'reflux';
 import editableFormMixin from '../editorMixins/editableForm';
 import {update_states} from 'js/constants';
 import {ROUTES} from 'js/router/routerConstants';
-import mixins from '../mixins';
 import {withRouter} from 'js/router/legacy';
 import { ASSET_TYPES } from '../constants';
 
@@ -57,10 +56,7 @@ class LibraryAssetEditorComponent extends React.Component {
     if (this.props.router.path === ROUTES.NEW_LIBRARY_CHILD) {
       this.state.asset = false;
       this.state.parentAsset = this.props.params.uid;
-      this.state.backRoute = ROUTES.LIBRARY_ITEM.replace(
-        ':uid',
-        this.props.params.uid
-      );
+      this.state.backRoute = ROUTES.LIBRARY;
     }
 
     if (this.props.router.path === ROUTES.NEW_LIBRARY_TEMPLATE_ITEM) {
@@ -72,10 +68,7 @@ class LibraryAssetEditorComponent extends React.Component {
       this.state.asset = false;
       this.state.desiredAssetType = ASSET_TYPES.template.id;
       this.state.parentAsset = this.props.params.uid;
-      this.state.backRoute = ROUTES.LIBRARY_ITEM.replace(
-        ':uid',
-        this.props.params.uid
-      );
+      this.state.backRoute = ROUTES.LIBRARY;
     }
 
     if (this.props.router.searchParams.get('back')) {

@@ -414,11 +414,7 @@ export default assign({
       actions.resources.createResource.triggerAsync(params)
         .then(() => {
           window.parent.postMessage('form_savecomplete', '*');
-          let targetPath = ROUTES.LIBRARY;
-          if (this.state.parentAsset) {
-            targetPath = ROUTES.LIBRARY_ITEM.replace(':uid', this.state.parentAsset);
-          }
-          this.props.router.navigate(targetPath);
+          this.props.router.navigate(ROUTES.LIBRARY);
         });
     } else {
       // update existing asset
@@ -771,7 +767,7 @@ export default assign({
             {this.canNavigateToList() &&
               <bem.FormBuilderHeader__button
                 m={['back']}
-                onClick={this.state.asset.parent ? this.safeNavigateToCollection : this.safeNavigateToList}
+                onClick={this.safeNavigateToList}
                 disabled={!this.state.surveyAppRendered || !!this.state.surveyLoadError}
                 data-cy='back'
               >
