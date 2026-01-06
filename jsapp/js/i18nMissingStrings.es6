@@ -99,7 +99,7 @@ test= t('Manually enter your skip logic in XLSForm code');
 test= t('response value');
 test= t('Are you sure you want to delete this question?');
 test= t('Select One');
-test= t('Select Many');
+test= t('Select Multiple');
 test= t('Unable to deploy');
 
 // legacy strings

@@ -258,6 +258,7 @@ bem.FormSidebar__label = makeBem(bem.FormSidebar, 'label');
 bem.FormSidebar__labelText = makeBem(bem.FormSidebar, 'label-text');
 bem.FormSidebar__labelCount = makeBem(bem.FormSidebar, 'label-count');
 bem.FormSidebar__grouping = makeBem(bem.FormSidebar, 'grouping');
+bem.FormSidebar__itemlink = makeBem(bem.FormSidebar, 'itemlink', 'a');
 
 bem.KDrawer = makeBem(null, 'k-drawer');
 bem.KDrawer__primaryIcons = makeBem(bem.KDrawer, 'primary-icons', 'nav');

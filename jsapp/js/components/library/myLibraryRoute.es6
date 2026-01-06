@@ -128,7 +128,6 @@ class MyLibraryRoute extends React.Component {
       {value: AssetTypeName.question, label: t('Question')},
       {value: AssetTypeName.block, label: t('Block')},
       {value: AssetTypeName.template, label: t('Template')},
-      {value: AssetTypeName.collection, label: t('Collection')},
     ];
 
     return (
@@ -178,7 +177,18 @@ class MyLibraryRoute extends React.Component {
             </bem.LibraryTypeFilter>
           </bem.LibraryActions>
           <bem.Breadcrumbs m='gray-wrapper'>
-            <bem.Breadcrumbs__crumb>{ROOT_BREADCRUMBS.MY_LIBRARY.label}</bem.Breadcrumbs__crumb>
+            <bem.Breadcrumbs__crumb>
+              {ROOT_BREADCRUMBS.MY_LIBRARY.label}
+            </bem.Breadcrumbs__crumb>
+            {
+              myLibraryStore.getCollectionUid() &&
+              <React.Fragment>
+                <i className='k-icon k-icon-angle-right'/>
+                <bem.Breadcrumbs__crumb>
+                  {myLibraryStore.getCollectionData()?.name || t('Collection')}
+                </bem.Breadcrumbs__crumb>
+              </React.Fragment>
+            }
           </bem.Breadcrumbs>
 
           <AssetsTable

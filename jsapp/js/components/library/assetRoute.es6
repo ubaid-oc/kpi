@@ -112,8 +112,6 @@ class AssetRoute extends React.Component {
                 </bem.FormView__cell>
               }
 
-              <AssetPublicButton asset={this.state.asset}/>
-
               <AssetActionButtons asset={this.state.asset}/>
             </bem.FormView__cell>
 

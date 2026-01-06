@@ -23,6 +23,8 @@ import type {
 } from 'js/dataInterface';
 import type {AssetTypeName} from 'js/constants';
 import libraryTypeFilterStore from './libraryTypeFilterStore';
+import {getCollectionUidCacheName} from 'js/ocutils';
+import ownedCollectionsStore from './ownedCollectionsStore';
 
 interface MyLibraryStoreData {
   isFetchingData: boolean;
@@ -36,6 +38,7 @@ interface MyLibraryStoreData {
   orderValue: OrderDirection | null | undefined;
   filterColumnId: string | null;
   filterValue: string | null;
+  collectionUid: string | null;
 }
 
 class MyLibraryStore extends Reflux.Store {
@@ -69,6 +72,7 @@ class MyLibraryStore extends Reflux.Store {
     orderValue: this.DEFAULT_ORDER_COLUMN.defaultValue,
     filterColumnId: null,
     filterValue: null,
+    collectionUid: null,
   };
 
   fetchDataDebounced?: () => void;
@@ -126,7 +130,8 @@ class MyLibraryStore extends Reflux.Store {
       filterType: libraryTypeFilterStore.getFilterType(),
       pageSize: this.PAGE_SIZE,
       page: this.data.currentPage,
-      collectionsFirst: true,
+      // collectionsFirst: true,
+      uid: this.getCollectionUid() || undefined,
     };
 
     if (this.data.filterColumnId !== null) {
@@ -290,10 +295,7 @@ class MyLibraryStore extends Reflux.Store {
   }
 
   onAssetCreated(asset: AssetResponse) {
-    if (
-      assetUtils.isLibraryAsset(asset.asset_type) &&
-      asset.parent === null
-    ) {
+    if (assetUtils.isLibraryAsset(asset.asset_type)) {
       if (this.data.totalUserAssets !== null) {
         this.data.totalUserAssets++;
       }
@@ -373,6 +375,35 @@ class MyLibraryStore extends Reflux.Store {
 
   findAssetByUrl(url: string) {
     return this.data.assets.find((asset) => asset.url === url);
+  }
+
+  getCollectionUid() {
+    return this.data.collectionUid;
+  }
+
+  setCollectionUid(newVal: string) {
+    if (this.data.collectionUid !== newVal) {
+      this.data.collectionUid = newVal;
+      sessionStorage.setItem(getCollectionUidCacheName(), JSON.stringify(this.data.collectionUid));
+      this.trigger(this.data);
+      this.fetchData(true);
+    }
+  }
+
+  clearCollectionUid() {
+    this.data.collectionUid = null;
+    sessionStorage.removeItem(getCollectionUidCacheName());
+    this.trigger(this.data);
+    this.fetchData(true);
+  }
+
+  getCollectionData() {
+    let collectionData = null;
+    const parentUid = this.getCollectionUid();
+    if (parentUid) {
+      collectionData = ownedCollectionsStore.find(parentUid);
+    }
+    return collectionData;
   }
 }
 

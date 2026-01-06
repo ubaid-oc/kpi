@@ -42,7 +42,7 @@ class KoboMatrix extends React.Component {
         },
         {
           value: 'select_many',
-          label: t('Select Many'),
+          label: t('Select Multiple'),
         },
         {
           value: 'text',
@@ -258,8 +258,8 @@ class KoboMatrix extends React.Component {
     const prevType = data.getIn([colKuid, 'type']);
     var _this = this;
 
-    // warn only if existing column type is one of (Select One, Select Many)
-    // and new type is NOT one of (Select One, Select Many)
+    // warn only if existing column type is one of (Select One, Select Multiple)
+    // and new type is NOT one of (Select One, Select Multiple)
     if (['select_one', 'select_many'].includes(prevType) && !['select_one', 'select_many'].includes(newType)) {
       let dialog = alertify.dialog('confirm');
       let opts = {

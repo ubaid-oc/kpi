@@ -473,7 +473,7 @@ mixins.droppable = {
       && routerIsActive('forms')
       && router.params.uid !== undefined
     );
-    const isLibrary = routerIsActive('library');
+    const isLibrary = routerIsActive(ROUTES.LIBRARY);
     const multipleFiles = (params.totalFiles && totalFiles > 1) ? true : false;
     params = assign({library: isLibrary}, params);
 
@@ -491,6 +491,10 @@ mixins.droppable = {
       if (destination) {
         params = assign({destination: destination}, params);
       }
+    }
+
+    if (isLibrary && this.props.params.uid) {
+      params = assign({parent: assetUtils.buildAssetUrl(this.props.params.uid)}, params);
     }
 
     actions.resources.createImport(params, (data: ImportResponse) => {
@@ -518,6 +522,12 @@ mixins.droppable = {
                 actions.resources.loadAsset({id: assetUid});
               } else if (!isLibrary) {
                 history.push(`/forms/${assetUid}`);
+              } else {
+                if (this.props.params.uid) {
+                  history.push(ROUTES.LIBRARY_ITEM.replace(':uid', this.props.params.uid));
+                } else {
+                  history.push(ROUTES.LIBRARY);
+                }
               }
               notify(t('XLS Import completed'));
             }

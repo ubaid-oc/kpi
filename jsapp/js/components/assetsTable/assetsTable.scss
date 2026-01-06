@@ -148,11 +148,16 @@ $assets-table-hover-bg: colors.$kobo-gray-98;
  * AssetsTableRow
  * ========================================================================== */
 
-.assets-table-row {
+ .capitalize {
+  text-transform: capitalize;
+ }
+
+ .assets-table-row {
   display: flex;
   flex-direction: row;
   position: relative;
   align-items: flex-start;
+  background-color: colors.$kobo-gray-96;
 
   &.assets-table-row--asset {
     &:hover {
@@ -352,12 +357,16 @@ $assets-table-hover-bg: colors.$kobo-gray-98;
     }
 
     &.assets-table-row__column--actions {
-      width: 17%;
+      width: 22%;
       text-align: right;
 
       .asset-action-buttons {
-        justify-content: flex-end;
+        justify-content: flex-start;
       }
+    }
+
+    &.assets-table-row__column--actions.header {
+      text-align: center;
     }
 
     .k-icon {

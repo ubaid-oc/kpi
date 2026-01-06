@@ -39,6 +39,7 @@ module.exports = do ->
       @$el.addClass(@extraClass)
 
       Backbone.on('ocCustomEvent', @onOcCustomEvent, @)
+      Backbone.on('ocConsentRowsEvent', @onOcConsentRowsEvent, @)
 
       return
 
@@ -66,6 +67,7 @@ module.exports = do ->
             $el.prop('checked', true)
       @model.on 'change:value', reflectValueInEl
       reflectValueInEl()
+
       $el.on 'change', ()=>
         changing = true
         @model.set('value', $el.prop('checked'))
@@ -541,7 +543,6 @@ module.exports = do ->
       term = term.replace(regex, '').toLowerCase()
       return {id: term, text: term}
 
-
   viewRowDetail.DetailViewMixins.default =
     html: ->
       @fieldTab = "active"
@@ -571,10 +572,6 @@ module.exports = do ->
         if evt.key is 'Enter' or evt.keyCode is 13
           evt.preventDefault()
           $textarea.blur()
-
-  # viewRowDetail.DetailViewMixins.calculation =
-  #   html: -> false
-  #   insertInDOM: (rowView)-> return
 
   viewRowDetail.DetailViewMixins._isRepeat =
     onOcCustomEvent: (ocCustomEventArgs) ->
@@ -1051,7 +1048,61 @@ module.exports = do ->
     afterRender: ->
       @listenForInputChange()
 
+  viewRowDetail.DetailViewMixins.oc_description =
+    html: ->
+      @fieldTab = "active"
+      @$el.addClass("card__settings__fields--#{@fieldTab}")
+      viewRowDetail.Templates.textbox @cid, @model.key, t("Item Description"), 'text', 'Enter variable definition (e.g., CDASH data definition) (optional)', '3999'
+    afterRender: ->
+      @listenForInputChange()
+
   viewRowDetail.DetailViewMixins.oc_external =
+    onOcConsentRowsEvent: (ocConsentRowsEventArgs) ->
+      if (ocConsentRowsEventArgs.type == 'consentRows')
+        $select = @$('select')
+
+        if (ocConsentRowsEventArgs.message != '')
+          @hideErrorMessage()
+
+          @showMessage(ocConsentRowsEventArgs.message, 'input-error')
+          @model.getSurvey().errorMessage = ocConsentRowsEventArgs.message
+        else
+          @model.getSurvey().errorMessage = null
+          @hideErrorMessage()
+
+          if $select.val() == 'signature'
+            @showSignatureMessage()
+
+    showMessage: (message, fieldClass) ->
+      $select = @$('select')
+      $select.closest('div').addClass(fieldClass)
+      if $select.siblings('.message').length is 0
+        $message = $('<div/>').addClass('message').text(_t(message))
+        $select.after($message)
+
+    showErrorMessage: () ->
+      errorMessage = "Constraint / Constraint Message is not empty"
+      errorFieldClass = 'input-error'
+      @showMessage(errorMessage, errorFieldClass)
+
+    showSignatureMessage: () ->
+      signatureMessage = "Signature items must be Select Multiple questions with one option"
+      fieldClass = ''
+      if (@model.getSurvey().errorMessage?)
+        signatureMessage = @model.getSurvey().errorMessage
+        fieldClass = 'input-error'
+      @showMessage(signatureMessage, fieldClass)
+
+    hideMessage: (fieldClass) ->
+      $select = @$('select')
+      if (fieldClass != '')
+        if ($select.closest('div').hasClass(fieldClass))
+          $select.closest('div').removeClass(fieldClass)
+      $select.siblings('.message').remove()
+
+    hideErrorMessage: () ->
+      @hideMessage('input-error')
+
     model_type: () ->
       @model._parent.getValue('type').split(' ')[0]
     getOptions: () ->
@@ -1088,23 +1139,6 @@ module.exports = do ->
       for identifier_type_option in @identifier_type_options
         $('<option />', {value: "#{identifier_type_option}", text: "#{identifier_type_option}"}).appendTo(@$select_identifier_type)
 
-      fieldClass = 'input-error'
-      message = "Constraint / Constraint Message is not empty"
-      showMessage = () =>
-        $select.closest('div').addClass(fieldClass)
-        if $select.siblings('.message').length is 0
-          $message = $('<div/>').addClass('message').text(message)
-          $select.after($message)
-
-      hideMessage = () =>
-        $select.closest('div').removeClass(fieldClass)
-        $select.siblings('.message').remove()
-
-      showSignatureMessage = () =>
-        message = "Signature items must be Select Multiple questions with one option"
-        if $select.siblings('.message').length is 0
-          $message = $('<div/>').addClass('message').text(message)
-          $select.after($message)
 
       addSelectContactDataType = () =>
         @$('.settings__input').append(@$label_select_contact_data_type)
@@ -1144,7 +1178,7 @@ module.exports = do ->
           if @model._parent.isConsentItem()
             $select.val('signature')
             @model.set 'value', $select.val()
-            showSignatureMessage()
+            @showSignatureMessage()
           else
             $select.val('No')
         else
@@ -1156,7 +1190,7 @@ module.exports = do ->
           else if modelValue == 'identifier'
             addSelectIdentifierType()
           else if modelValue == 'signature'
-            showSignatureMessage()
+            @showSignatureMessage()
 
         $select.change () =>
           Backbone.trigger('ocCustomEvent', { sender: @model, value: $select.val() })
@@ -1170,7 +1204,7 @@ module.exports = do ->
           if $select.val() == 'No'
             @model.set 'value', ''
             resetInstanceValues()
-            hideMessage()
+            @hideErrorMessage()
           else
             @model.set 'value', $select.val()
             resetInstanceValues()
@@ -1179,10 +1213,108 @@ module.exports = do ->
               constraint_value = @rowView.model.attributes.constraint.getValue()
               constraint_message_value = @rowView.model.attributes.constraint_message.getValue()
               if (constraint_value != '') or (constraint_message_value != '')
-                showMessage()
+                @showMessage()
             else if $select.val() == 'identifier'
               addSelectIdentifierType()
             else if $select.val() == 'signature'
-              showSignatureMessage()
+              @showSignatureMessage()
+
+  viewRowDetail.DetailViewMixins.readonly =
+    html: ->
+      @fieldTab = "active"
+      @$el.addClass("card__settings__fields--#{@fieldTab}")
+      viewRowDetail.Templates.checkbox @cid, @model.key, t("Read only")
+    afterRender: ->
+      @listenForCheckboxChange()
+
+  viewRowDetail.DetailViewMixins.calculation =
+    html: ->
+      @fieldTab = "active"
+      @$el.addClass("card__settings__fields--#{@fieldTab}")
+      viewRowDetail.Templates.textarea @cid, @model.key, t("Calculation"), 'text'
+    changeModelValue: () ->
+      $textarea = $(@$('textarea').get(0))
+      $elVal = $textarea.val().replace(/\n/g, "")
+      @model.set('value', $elVal)
+    afterRender: ->
+      $textarea = $(@$('textarea').get(0))
+      $textarea.val(@model.get("value"))
+
+      if @model.get("value")?
+        setTimeout =>
+          textareaScrollHeight = $textarea.prop('scrollHeight')
+          $textarea.css("height", "")
+          $textarea.css("height", textareaScrollHeight)
+        , 1
+
+      questionType = @model._parent.get('type').get('typeId')
+      if questionType is 'calculate'
+        @makeRequired()
+
+      $textarea.on 'blur', () =>
+        @changeModelValue()
+      $textarea.on 'change', () =>
+        @changeModelValue()
+      $textarea.on 'keyup', () =>
+        @changeModelValue()
+      $textarea.on 'keypress', (evt) =>
+        if evt.key is 'Enter' or evt.keyCode is 13
+          evt.preventDefault()
+          $textarea.blur()
+
+  viewRowDetail.DetailViewMixins.select_one_from_file_filename =
+    html: ->
+      @fieldTab = "active"
+      @$el.addClass("card__settings__fields--#{@fieldTab}")
+      viewRowDetail.Templates.textbox @cid, @model.key, t("External List Filename"), 'text', 'Enter external list filename'
+    afterRender: ->
+      @listenForInputChange()
+      @makeRequired()
+
+  viewRowDetail.DetailViewMixins.trigger =
+    getOptions: () ->
+      currentQuestion = @model._parent
+      non_selectable = ['datetime', 'time', 'note', 'group', 'kobomatrix', 'repeat', 'rank', 'score', 'calculate']
+
+      questions = []
+      currentQuestion.getSurvey().forEachRow (question) =>
+        if (question.getValue('type') not in non_selectable) and (question.cid != currentQuestion.cid)
+          questions.push question
+      , includeGroups:true
+
+      options = []
+      options = _.map(questions, (row) ->
+
+        try
+          labelValue = row.getValue('label')
+        catch e
+          labelValue = ''
+
+        return {
+          value: "${#{row.getValue('name')}}"
+          text: "#{labelValue} (${#{row.getValue('name')}})"
+        }
+      )
+      # add placeholder message/option
+      options.unshift({
+        value: ''
+        text: t("No Trigger")
+      })
+      options
+    html: ->
+      @fieldTab = "active"
+      @$el.addClass("card__settings__fields--#{@fieldTab}")
+      options = @getOptions()
+
+      return viewRowDetail.Templates.dropdown @cid, @model.key, options, t("Calculation trigger")
+    afterRender: ->
+      $select = @$('select')
+      modelValue = @model.get 'value'
+      if $select.length > 0
+        if modelValue != ''
+          $select.val(modelValue)
+
+        $select.change () =>
+          @model.set 'value', $select.val()
 
   viewRowDetail

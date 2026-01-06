@@ -163,6 +163,23 @@ const AllRoutes = class AllRoutes extends React.Component {
                 }
               />
               <Route
+                path={ROUTES.NEW_LIBRARY_TEMPLATE_ITEM}
+                element={
+                  <RequireAuth>
+                    <LibraryAssetEditor />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path={ROUTES.NEW_LIBRARY_TEMPLATE_ITEM_CHILD}
+                element={
+                  <PermProtectedRoute
+                    requiredPermissions={[PERMISSIONS_CODENAMES.change_asset]}
+                    protectedComponent={LibraryAssetEditor}
+                  />
+                }
+              />
+              <Route
                 path={ROUTES.LIBRARY_ITEM}
                 element={
                   <PermProtectedRoute

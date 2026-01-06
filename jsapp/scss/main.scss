@@ -50,6 +50,9 @@
 
 @import "./formbuild/kobomatrix";
 
+// OpenClinica changes
+@import "./oc/oc_overrides";
+
 .k-invisible {
   visibility: hidden;
 }

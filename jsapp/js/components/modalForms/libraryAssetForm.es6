@@ -95,9 +95,7 @@ export class LibraryAssetFormComponent extends React.Component {
     this.setState({isPending: false});
     notify(t('##type## ##name## created').replace('##type##', this.getFormAssetType()).replace('##name##', response.name));
     stores.pageState.hideModal();
-    if (this.getFormAssetType() === ASSET_TYPES.collection.id) {
-      this.props.router.navigate(`/library/asset/${response.uid}`);
-    } else if (this.getFormAssetType() === ASSET_TYPES.template.id) {
+    if (this.getFormAssetType() === ASSET_TYPES.template.id) {
       this.props.router.navigate(`/library/asset/${response.uid}/edit`);
     }
   }
@@ -185,6 +183,10 @@ export class LibraryAssetFormComponent extends React.Component {
     return this.props.asset ? this.props.asset.asset_type : this.props.assetType;
   }
 
+  isCollection() {
+    return this.getFormAssetType() === ASSET_TYPES.collection.id;
+  }
+
   isSubmitEnabled() {
     return !this.state.isPending;
   }
@@ -224,6 +226,7 @@ export class LibraryAssetFormComponent extends React.Component {
             />
           </bem.FormModal__item>
 
+          {!this.isCollection() &&
           <bem.FormModal__item>
             <TextBox
               customModifiers='on-white'
@@ -234,7 +237,9 @@ export class LibraryAssetFormComponent extends React.Component {
               placeholder={t('Enter short description here')}
             />
           </bem.FormModal__item>
+          }
 
+          {!this.isCollection() &&
           <bem.FormModal__item>
             <TextBox
               customModifiers='on-white'
@@ -243,7 +248,9 @@ export class LibraryAssetFormComponent extends React.Component {
               label={t('Organization')}
             />
           </bem.FormModal__item>
+          }
 
+          {!this.isCollection() &&
           <bem.FormModal__item>
             <WrappedSelect
               label={t('Primary Sector')}
@@ -254,7 +261,9 @@ export class LibraryAssetFormComponent extends React.Component {
               isClearable
             />
           </bem.FormModal__item>
+          }
 
+          {!this.isCollection() &&
           <bem.FormModal__item>
             <WrappedSelect
               label={t('Country')}
@@ -266,7 +275,9 @@ export class LibraryAssetFormComponent extends React.Component {
               isClearable
             />
           </bem.FormModal__item>
+          }
 
+          {!this.isCollection() &&
           <bem.FormModal__item>
             <KoboTagsInput
               tags={this.state.fields.tags}
@@ -274,6 +285,7 @@ export class LibraryAssetFormComponent extends React.Component {
               label={t('Tags')}
             />
           </bem.FormModal__item>
+          }
         </bem.FormModal__item>
 
         <bem.Modal__footer>
