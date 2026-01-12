@@ -14,6 +14,11 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                // Notify Build Start
+                slackSend(
+                    channel: env.SLACK_CHANNEL,
+                    message: "${env.SERVICE_NAME} deploy for branch ${env.release_branch} - STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                )
                 cleanWs()
                 checkout scmGit(branches: [[name: '*/$release_branch']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-github-token-as-password', url: 'https://github.com/OpenClinica/kpi.git']])
             }
@@ -94,7 +99,7 @@ pipeline {
             slackSend(
                 channel: env.SLACK_CHANNEL,
                 color: 'good',
-                message: "${env.SERVICE_NAME} branch ${env.release_branch} was successfully deployed to EKS"
+                message:  "${env.SERVICE_NAME} deploy for branch ${env.release_branch} - SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})\nSuccessfully deployed to EKS"
             )
         }
         aborted {
@@ -102,7 +107,7 @@ pipeline {
             slackSend(
                 channel: env.SLACK_CHANNEL,
                 color: 'warning',
-                message: "${env.SERVICE_NAME} deploy for branch ${env.release_branch} was ABORTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                message: "${env.SERVICE_NAME} deploy for branch ${env.release_branch} - ABORTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
             )
         }
         failure {
@@ -112,8 +117,8 @@ pipeline {
                 if (previousBuild == null || previousBuild.result != 'FAILURE') {
                     slackSend(
                         channel: env.SLACK_CHANNEL,
-                        color:  'danger',
-                        message: "${env.SERVICE_NAME} deploy for branch ${env.release_branch} FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                        color: 'danger',
+                        message: "${env.SERVICE_NAME} deploy for branch ${env.release_branch} - FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
                     )
                 }
             }
