@@ -6,6 +6,9 @@ pipeline {
         region = "us-west-2"
         ns = "sbsdev"
         ecrauth = "aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 837577998611.dkr.ecr.us-west-2.amazonaws.com"
+
+        SLACK_CHANNEL = "#jenkins" // Centralized Slack notification channel
+        SERVICE_NAME = "Form Designer"
        }
 	   
     stages {
@@ -84,4 +87,36 @@ pipeline {
           }
       }
    }
+
+    post {
+        success {
+            // Notify Success with custom message
+            slackSend(
+                channel: env.SLACK_CHANNEL,
+                color: 'good',
+                message: "${env.SERVICE_NAME} branch ${env.release_branch} was successfully deployed to EKS"
+            )
+        }
+        aborted {
+            // Notify Aborted
+            slackSend(
+                channel: env.SLACK_CHANNEL,
+                color: 'warning',
+                message: "${env.SERVICE_NAME} deploy for branch ${env.release_branch} was ABORTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+            )
+        }
+        failure {
+            script {
+                // Notify First Failure Only
+                def previousBuild = currentBuild.previousBuild
+                if (previousBuild == null || previousBuild.result != 'FAILURE') {
+                    slackSend(
+                        channel: env.SLACK_CHANNEL,
+                        color:  'danger',
+                        message: "${env.SERVICE_NAME} deploy for branch ${env.release_branch} FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                    )
+                }
+            }
+        }
+    }
 }
