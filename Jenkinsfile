@@ -6,11 +6,19 @@ pipeline {
         region = "us-west-2"
         ns = "sbsdev"
         ecrauth = "aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 837577998611.dkr.ecr.us-west-2.amazonaws.com"
+
+        SLACK_CHANNEL = "#jenkins" // Centralized Slack notification channel
+        SERVICE_NAME = "Form Designer"
        }
 	   
     stages {
         stage('Checkout') {
             steps {
+                // Notify Build Start
+                slackSend(
+                    channel: env.SLACK_CHANNEL,
+                    message: "${env.SERVICE_NAME} deploy for branch ${env.release_branch} - STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                )
                 cleanWs()
                 checkout scmGit(branches: [[name: '*/$release_branch']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-github-token-as-password', url: 'https://github.com/OpenClinica/kpi.git']])
             }
@@ -84,4 +92,36 @@ pipeline {
           }
       }
    }
+
+    post {
+        success {
+            // Notify Success with custom message
+            slackSend(
+                channel: env.SLACK_CHANNEL,
+                color: 'good',
+                message:  "${env.SERVICE_NAME} deploy for branch ${env.release_branch} - SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})\nSuccessfully deployed to EKS"
+            )
+        }
+        aborted {
+            // Notify Aborted
+            slackSend(
+                channel: env.SLACK_CHANNEL,
+                color: 'warning',
+                message: "${env.SERVICE_NAME} deploy for branch ${env.release_branch} - ABORTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+            )
+        }
+        failure {
+            script {
+                // Notify First Failure Only
+                def previousBuild = currentBuild.previousBuild
+                if (previousBuild == null || previousBuild.result != 'FAILURE') {
+                    slackSend(
+                        channel: env.SLACK_CHANNEL,
+                        color: 'danger',
+                        message: "${env.SERVICE_NAME} deploy for branch ${env.release_branch} - FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                    )
+                }
+            }
+        }
+    }
 }
