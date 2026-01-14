@@ -167,9 +167,11 @@ class LibrarySidebar extends Reflux.Component {
           triggerLabel={t('new')}
         >
           <bem.PopoverMenu__item onClick={this.goToBlockCreator}>
+            <i className='k-icon-question' />
             {t('Question')}
           </bem.PopoverMenu__item>
           <bem.PopoverMenu__item onClick={this.goToTemplateCreator}>
+            <i className='k-icon-template' />
             {t('Template')}
           </bem.PopoverMenu__item>
           <Dropzone
@@ -179,10 +181,12 @@ class LibrarySidebar extends Reflux.Component {
             accept={validFileTypes()}
           >
             <bem.PopoverMenu__link>
+              <i className='k-icon-upload' />
               {t('Upload')}
             </bem.PopoverMenu__link>
           </Dropzone>
           <bem.PopoverMenu__item onClick={this.goToCollectionCreator}>
+            <i className='k-icon-folder' />
             {t('Collection')}
           </bem.PopoverMenu__item>
         </PopoverMenu>
