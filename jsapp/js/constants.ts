@@ -130,6 +130,8 @@ export const MODAL_TYPES = {
   LIBRARY_NEW_ITEM: 'library-new-item',
   LIBRARY_TEMPLATE: 'library-template',
   LIBRARY_COLLECTION: 'library-collection',
+  LIBRARY_COLLECTION_CREATE: 'library-collection-create',
+  LIBRARY_COLLECTION_EDIT: 'library-collection-edit',
   LIBRARY_UPLOAD: 'library-upload',
   ENKETO_PREVIEW: 'enketo-preview',
   SUBMISSION: 'submission',
