@@ -186,9 +186,9 @@ export class LibraryAssetFormComponent extends React.Component {
   }
 
   getNameTitle() {
-    let nameTitle = 'Please enter the name of your new Collection.';
+    let nameTitle = t('Please enter the name of your new Collection.');
     if (this.props.formType === MODAL_TYPES.LIBRARY_COLLECTION_CREATE) {
-      nameTitle += ' Collections can help you better organize your library.';
+      nameTitle = t('Please enter the name of your new Collection. Collections can help you better organize your library.');
     }
     return nameTitle;
   }
@@ -231,7 +231,7 @@ export class LibraryAssetFormComponent extends React.Component {
               customModifiers='on-white field-name'
               value={this.state.fields.name}
               onChange={this.onNameChange.bind(this)}
-              label={t('#label#').replace('#label#', this.getNameTitle())}
+              label={this.getNameTitle()}
               placeholder={t('Enter title of ##type## here').replace('##type##', this.getFormAssetType())}
             />
           </bem.FormModal__item>
