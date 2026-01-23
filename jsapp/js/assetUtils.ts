@@ -304,7 +304,7 @@ export function modifyDetails(asset: AssetResponse) {
   if (asset.asset_type === ASSET_TYPES.template.id) {
     modalType = MODAL_TYPES.LIBRARY_TEMPLATE;
   } else if (asset.asset_type === ASSET_TYPES.collection.id) {
-    modalType = MODAL_TYPES.LIBRARY_COLLECTION;
+    modalType = MODAL_TYPES.LIBRARY_COLLECTION_EDIT;
   }
   if (modalType) {
     stores.pageState.showModal({

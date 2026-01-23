@@ -116,6 +116,14 @@ class BigModal extends React.Component {
         this.setModalTitle(t('Collection details'));
         break;
 
+      case MODAL_TYPES.LIBRARY_COLLECTION_CREATE:
+        this.setModalTitle(t('Create Collection'));
+        break;
+
+      case MODAL_TYPES.LIBRARY_COLLECTION_EDIT:
+        this.setModalTitle(t('Edit Collection'));
+        break;
+
       case MODAL_TYPES.ASSET_TAGS:
         this.setModalTitle(t('Edit tags'));
         break;
@@ -330,11 +338,14 @@ class BigModal extends React.Component {
                 onSetModalTitle={this.setModalTitle}
               />
             }
-            { this.props.params.type === MODAL_TYPES.LIBRARY_COLLECTION &&
+            { (this.props.params.type === MODAL_TYPES.LIBRARY_COLLECTION ||
+                this.props.params.type === MODAL_TYPES.LIBRARY_COLLECTION_CREATE ||
+                this.props.params.type === MODAL_TYPES.LIBRARY_COLLECTION_EDIT) &&
               <LibraryAssetForm
                 asset={this.props.params.asset}
                 assetType={ASSET_TYPES.collection.id}
                 onSetModalTitle={this.setModalTitle}
+                formType={this.props.params.type}
               />
             }
             { this.props.params.type === MODAL_TYPES.ASSET_TAGS &&

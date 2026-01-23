@@ -92,7 +92,7 @@ class LibrarySidebar extends Reflux.Component {
     evt.preventDefault();
 
     stores.pageState.showModal({
-      type: MODAL_TYPES.LIBRARY_COLLECTION,
+      type: MODAL_TYPES.LIBRARY_COLLECTION_CREATE,
     });
   }
 

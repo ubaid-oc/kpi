@@ -97,7 +97,7 @@ class TextBox extends React.Component<TextBoxProps, {}> {
     return (
       <bem.TextBox m={modifiers}>
         {this.props.label &&
-          <bem.TextBox__label>
+          <bem.TextBox__label m={modifiers}>
             {this.props.label}
           </bem.TextBox__label>
         }

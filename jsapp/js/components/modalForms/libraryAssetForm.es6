@@ -21,6 +21,8 @@ import mixins from 'js/mixins';
 import ownedCollectionsStore from 'js/components/library/ownedCollectionsStore';
 import envStore from 'js/envStore';
 import {withRouter} from 'js/router/legacy';
+import { MODAL_TYPES } from '../../constants';
+import './libraryAssetForm.scss';
 
 /**
  * Modal for creating or updating library asset (collection or template)
@@ -183,6 +185,14 @@ export class LibraryAssetFormComponent extends React.Component {
     return this.props.asset ? this.props.asset.asset_type : this.props.assetType;
   }
 
+  getNameTitle() {
+    let nameTitle = t('Please enter the name of your new Collection.');
+    if (this.props.formType === MODAL_TYPES.LIBRARY_COLLECTION_CREATE) {
+      nameTitle = t('Please enter the name of your new Collection. Collections can help you better organize your library.');
+    }
+    return nameTitle;
+  }
+
   isCollection() {
     return this.getFormAssetType() === ASSET_TYPES.collection.id;
   }
@@ -214,14 +224,14 @@ export class LibraryAssetFormComponent extends React.Component {
     const COUNTRIES = envStore.data.country_choices;
 
     return (
-      <bem.FormModal__form className='project-settings'>
+      <bem.FormModal__form className='library-asset-form'>
         <bem.FormModal__item m='wrapper' disabled={this.state.isPending}>
           <bem.FormModal__item>
             <TextBox
-              customModifiers='on-white'
+              customModifiers='on-white field-name'
               value={this.state.fields.name}
               onChange={this.onNameChange.bind(this)}
-              label={t('Name')}
+              label={this.getNameTitle()}
               placeholder={t('Enter title of ##type## here').replace('##type##', this.getFormAssetType())}
             />
           </bem.FormModal__item>
