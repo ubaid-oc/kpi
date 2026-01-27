@@ -4,7 +4,7 @@
 [![Python Coverage Status](https://coveralls.io/repos/github/kobotoolbox/kpi/badge.svg?branch=master)](https://coveralls.io/github/kobotoolbox/kpi?branch=master)
 [![JavaScript Build Status](https://github.com/kobotoolbox/kpi/workflows/npm-test/badge.svg)](https://github.com/kobotoolbox/kpi/actions?query=workflow%3Anpm-test)
 
-We're open for [contributions](./CONTRIBUTING.md)!
+We are open for [contributions](./CONTRIBUTING.md)!
 
 ## Important notice when upgrading from any release older than [`2.020.18`](https://github.com/kobotoolbox/kpi/releases/tag/2.020.18)
 
