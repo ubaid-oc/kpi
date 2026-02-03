@@ -81,8 +81,8 @@ $z-modal-x: 10;
 
 .modal__body {
   // we use margin for bottom to make it stack with modal__footer
-  padding: 30px 30px 0;
-  margin-bottom: 30px;
+  padding: 20px 20px 0;
+  margin-bottom: 20px;
 
   // in some cases adding custom footer requires it to be inside modal__body and
   // then padding is not needed (it is partially needed when in .modal--large)
@@ -104,8 +104,8 @@ $z-modal-x: 10;
 
 .modal__header {
   min-height: 30px;
-  background: colors.$kobo-light-blue;
-  color: colors.$kobo-gray-55;
+  background: colors.$kobo-white;
+  color: colors.$kobo-gray-24;
   display: flex;
   justify-content: space-between;
 }
@@ -114,6 +114,7 @@ $z-modal-x: 10;
   margin: 0px;
   padding: 10px;
   font-size: 14px;
+  font-weight: 500;
   line-height: 22px;
 }
 
