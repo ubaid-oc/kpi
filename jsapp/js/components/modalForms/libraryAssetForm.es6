@@ -198,7 +198,7 @@ export class LibraryAssetFormComponent extends React.Component {
   }
 
   isSubmitEnabled() {
-    return !this.state.isPending;
+    return !this.state.isPending && this.state.fields.name.trim() !== '';
   }
 
   getSubmitButtonLabel() {
