@@ -312,6 +312,7 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         required=False,
         allow_null=True
     )
+    parent__name = serializers.SerializerMethodField()
     assignable_permissions = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()
     effective_permissions = serializers.SerializerMethodField()
@@ -353,6 +354,7 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
                   'owner__username',
                   'owner__subdomain',
                   'parent',
+                  'parent__name',
                   'settings',
                   'asset_type',
                   'summary',
@@ -472,6 +474,14 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         return [
             {'codename': perm} for perm in set(project_view_perms + asset_perms)
         ]
+
+    def get_parent__name(self, obj):
+        """
+        Return the parent asset's name if parent exists, otherwise None
+        """
+        if obj.parent:
+            return obj.parent.name
+        return None
 
     def get_version_count(self, obj):
         try:
@@ -918,6 +928,7 @@ class AssetListSerializer(AssetSerializer):
                   'summary',
                   'owner__username',
                   'parent',
+                  'parent__name',
                   'uid',
                   'tag_string',
                   'settings',
