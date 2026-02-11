@@ -740,6 +740,7 @@ class Asset(ObjectPermissionMixin,
             # In Django 1.9+, "select_related() prohibits non-relational fields
             # for nested relations."
             'owner',
+            'parent',
         ).prefetch_related(
             'permissions__permission',
             'permissions__user',
