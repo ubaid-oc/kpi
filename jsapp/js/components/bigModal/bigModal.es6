@@ -125,7 +125,7 @@ class BigModal extends React.Component {
         break;
 
       case MODAL_TYPES.ASSET_TAGS:
-        this.setModalTitle(t('Edit tags'));
+        this.setModalTitle(t('Edit label(s)'));
         break;
 
       case MODAL_TYPES.LIBRARY_UPLOAD:
