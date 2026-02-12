@@ -1,17 +1,16 @@
 import React from 'react';
 import autoBind from 'react-autobind';
 import bem, {makeBem} from 'js/bem';
-import AssetActionButtons from './assetActionButtons';
 import AssetName from 'js/components/common/assetName';
 import {formatTime} from 'js/utils';
 import mixins from 'js/mixins';
 import type {AssetResponse, AssetDownloads} from 'js/dataInterface';
 import {ASSET_TYPES} from 'js/constants';
 import assetUtils from 'js/assetUtils';
-import {userWithSameSubdomainAsAssetOwner} from 'js/components/permissions/utils';
 import type {AssetsTableContextName} from './assetsTableConstants';
-import {ASSETS_TABLE_CONTEXTS} from './assetsTableConstants';
+import AssetCollectionActions from './assetCollectionActions';
 import './assetActionButtons.scss';
+import './assetTableRow.scss';
 
 bem.AssetActionButtons = makeBem(null, 'asset-action-buttons', 'menu');
 bem.AssetActionButtons__button = makeBem(bem.AssetActionButtons, 'button', 'a');
@@ -133,12 +132,6 @@ class AssetsTableRow extends React.Component<AssetsTableRowProps> {
           {formatTime(this.props.asset.date_modified)}
         </bem.AssetsTableRow__column>
 
-        { this.props.asset.asset_type !== ASSET_TYPES.collection.id && (
-        <bem.AssetsTableRow__buttons>
-          <AssetActionButtons asset={this.props.asset} />
-        </bem.AssetsTableRow__buttons>
-        )}
-
         <bem.AssetsTableRow__column
           m='actions'
           className={this.props.asset.asset_type === ASSET_TYPES.collection.id ? 'no-actions-buttons' : 'with-actions-buttons' }
@@ -194,6 +187,10 @@ class AssetsTableRow extends React.Component<AssetsTableRowProps> {
                 <i className={`k-icon k-icon-file-${dl.format}`} />
               </bem.AssetActionButtons__iconButton>
             ))}
+
+            { this.props.asset.asset_type !== ASSET_TYPES.collection.id && (
+              <AssetCollectionActions asset={this.props.asset} />
+            )}
 
             {userCanEdit && (
               <bem.AssetActionButtons__iconButton
