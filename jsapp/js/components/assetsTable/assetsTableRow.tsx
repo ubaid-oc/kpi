@@ -134,7 +134,7 @@ class AssetsTableRow extends React.Component<AssetsTableRowProps> {
 
         <bem.AssetsTableRow__column
           m='actions'
-          className={this.props.asset.asset_type === ASSET_TYPES.collection.id ? 'no-actions-buttons' : 'with-actions-buttons' }
+          className={this.props.asset.asset_type === ASSET_TYPES.collection.id ? '' : 'with-actions-buttons' }
         >
 
           <bem.AssetActionButtons>

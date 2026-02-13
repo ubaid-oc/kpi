@@ -1,3 +1,5 @@
-.with-actions-buttons {
-  padding-top: 12px !important;
+.assets-table-row__column--actions {
+  &.with-actions-buttons {
+    padding-top: 12px !important;
+  }
 }
