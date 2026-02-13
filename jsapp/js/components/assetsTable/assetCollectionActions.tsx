@@ -9,40 +9,27 @@ import {ASSET_TYPES} from 'js/constants';
 import type {AssetResponse} from 'js/dataInterface';
 import ownedCollectionsStore from 'js/components/library/ownedCollectionsStore';
 import type {OwnedCollectionsStoreData} from 'js/components/library/ownedCollectionsStore';
-import {withRouter} from 'jsapp/js/router/legacy';
-import type {WithRouterProps} from 'jsapp/js/router/legacy';
 import {userCan} from 'js/components/permissions/utils';
 import './assetCollectionActions.scss';
 
 bem.AssetCollectionActions = makeBem(null, 'asset-collection-actions', 'menu');
 
-interface AssetCollectionActionsProps extends WithRouterProps {
+interface AssetCollectionActionsProps {
   asset: AssetResponse;
 }
 
 interface AssetCollectionActionsState {
   ownedCollections: AssetResponse[];
-  shouldHidePopover: boolean;
-  isPopoverVisible: boolean;
 }
 
 class AssetCollectionActions extends React.Component<
   AssetCollectionActionsProps,
   AssetCollectionActionsState
 > {
-  private unlisteners: Function[] = [];
-  hidePopoverDebounced = _.debounce(() => {
-    if (this.state.isPopoverVisible) {
-      this.setState({shouldHidePopover: true});
-    }
-  }, 500);
-
   constructor(props: AssetCollectionActionsProps) {
     super(props);
     this.state = {
       ownedCollections: ownedCollectionsStore.data.collections,
-      shouldHidePopover: false,
-      isPopoverVisible: false,
     };
     autoBind(this);
   }
@@ -54,18 +41,8 @@ class AssetCollectionActions extends React.Component<
     );
   }
 
-  componentWillUnmount() {
-    this.unlisteners.forEach((clb) => {
-      clb();
-    });
-  }
-
   onOwnedCollectionsStoreChanged(storeData: OwnedCollectionsStoreData) {
     this.setState({ownedCollections: storeData.collections});
-  }
-
-  onPopoverSetVisible() {
-    this.setState({isPopoverVisible: true});
   }
 
   /** Pass `null` to remove from collection. */
@@ -95,8 +72,6 @@ class AssetCollectionActions extends React.Component<
         {!isCollection &&
           <PopoverMenu
             triggerLabel={this.renderTrigger()}
-            clearPopover={this.state.shouldHidePopover}
-            popoverSetVisible={this.onPopoverSetVisible}
           >
             {userCanEdit &&
             assetType !== ASSET_TYPES.survey.id &&
@@ -151,4 +126,4 @@ class AssetCollectionActions extends React.Component<
   }
 }
 
-export default withRouter(AssetCollectionActions);
+export default AssetCollectionActions;
