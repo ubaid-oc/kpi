@@ -7,8 +7,8 @@ import autoBind from 'react-autobind';
 import bem from 'js/bem';
 
 interface PopoverMenuProps {
-  popoverSetVisible: () => void;
-  clearPopover: boolean;
+  popoverSetVisible?: () => void;
+  clearPopover?: boolean;
   blurEventDisabled?: boolean;
   type?: string;
   additionalModifiers?: string[];
