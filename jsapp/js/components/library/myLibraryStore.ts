@@ -115,7 +115,7 @@ class MyLibraryStore extends Reflux.Store {
    * otherwise wait until route changes to a library (see `onRouteChange`)
    */
   startupStore() {
-    if (!this.isInitialised && isAnyLibraryRoute() && !this.data.isFetchingData) {
+    if (!this.isInitialised && isAnyLibraryRoute() && !this.data.isFetchingData && sessionStore.isLoggedIn) {
       this.fetchData(true);
     }
   }

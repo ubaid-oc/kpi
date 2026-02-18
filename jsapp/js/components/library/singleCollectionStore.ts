@@ -103,7 +103,7 @@ class SingleCollectionStore extends Reflux.Store {
    * otherwise wait until route changes to a library (see `onRouteChange`)
    */
   startupStore() {
-    if (!this.isInitialised && isAnyLibraryItemRoute() && !this.data.isFetchingData) {
+    if (!this.isInitialised && isAnyLibraryItemRoute() && !this.data.isFetchingData && sessionStore.isLoggedIn) {
       this.fetchData(true);
     }
   }
