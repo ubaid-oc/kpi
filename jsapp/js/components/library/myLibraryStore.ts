@@ -1,5 +1,6 @@
 import debounce from 'lodash.debounce';
 import Reflux from 'reflux';
+import {when} from 'mobx';
 import type {Location} from 'history';
 import searchBoxStore from '../header/searchBoxStore';
 import assetUtils from 'js/assetUtils';
@@ -8,6 +9,7 @@ import {
   isAnyLibraryRoute,
 } from 'js/router/routerUtils';
 import {actions} from 'js/actions';
+import sessionStore from 'js/stores/session';
 import {
   ORDER_DIRECTIONS,
   ASSETS_TABLE_COLUMNS,
@@ -100,6 +102,9 @@ class MyLibraryStore extends Reflux.Store {
     // TODO Improve reaction to uploads being finished after task is done:
     // https://github.com/kobotoolbox/kpi/issues/476
     actions.resources.createImport.completed.listen(this.fetchDataDebounced.bind(this, true));
+
+    // Wait for login before starting store
+    when(() => sessionStore.isLoggedIn, this.startupStore.bind(this));
 
     // startup store after config is ready
     actions.permissions.getConfig.completed.listen(this.startupStore.bind(this));

@@ -1,4 +1,5 @@
 import Reflux from 'reflux';
+import {when} from 'mobx';
 import type {Update} from 'history';
 import assetUtils from 'js/assetUtils';
 import {
@@ -7,6 +8,7 @@ import {
   isAnyLibraryItemRoute,
 } from 'js/router/routerUtils';
 import {actions} from 'js/actions';
+import sessionStore from 'js/stores/session';
 import {
   ORDER_DIRECTIONS,
   ASSETS_TABLE_COLUMNS,
@@ -88,6 +90,9 @@ class SingleCollectionStore extends Reflux.Store {
     actions.library.searchMyCollectionAssets.completed.listen(this.onSearchCompleted.bind(this));
     actions.library.searchMyCollectionAssets.failed.listen(this.onSearchFailed.bind(this));
     actions.library.searchMyCollectionMetadata.completed.listen(this.onSearchMetadataCompleted.bind(this));
+
+    // Wait for login before starting store
+    when(() => sessionStore.isLoggedIn, this.startupStore.bind(this));
 
     // startup store after config is ready
     actions.permissions.getConfig.completed.listen(this.startupStore.bind(this));

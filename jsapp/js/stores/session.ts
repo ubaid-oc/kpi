@@ -42,7 +42,6 @@ class SessionStore {
           this.isInitialLoadComplete = true;
           if ('email' in account) {
             this.currentAccount = account;
-            this.isLoggedIn = true;
             const currentUserName = this.currentAccount.username;
             if (currentUserName !== '') {
               const crossStorageUserName = currentUserName.slice(0, currentUserName.lastIndexOf('+'))
@@ -54,18 +53,18 @@ class SessionStore {
               } catch (err) {
                 if (err == 'logout') {
                   console.log('triggerLoggedIn logout');
-                  actions.auth.logout();
                 } else if (err == 'user-changed') {
                   console.log('triggerLoggedIn user changed');
-                  actions.auth.logout();
                 }
+                actions.auth.logout();
               }
+              this.isLoggedIn = true;
+              window.parent.postMessage('fd_loggedin', '*');
+              // Save UI language to Back-end for language usage statistics.
+              // Logging in causes the whole page to be reloaded, so we don't need
+              // to do it more than once.
+              this.saveUiLanguage();
             }
-            window.parent.postMessage('fd_loggedin', '*');
-            // Save UI language to Back-end for language usage statistics.
-            // Logging in causes the whole page to be reloaded, so we don't need
-            // to do it more than once.
-            this.saveUiLanguage();
           }
           this.isAuthStateKnown = true;
         }
