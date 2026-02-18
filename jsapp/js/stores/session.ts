@@ -57,6 +57,7 @@ class SessionStore {
                   console.log('triggerLoggedIn user changed');
                 }
                 actions.auth.logout();
+                return;
               }
               this.isLoggedIn = true;
               window.parent.postMessage('fd_loggedin', '*');
