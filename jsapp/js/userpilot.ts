@@ -3,7 +3,7 @@
  * Handles initialization and user identification for UserPilot SDK (npm package)
  */
 import {Userpilot} from 'userpilot';
-import {AccountResponse} from "js/dataInterface";
+import {AccountResponse} from 'js/dataInterface';
 
 class UserPilotService {
   private readonly userPilotSdkToken: string | null = null;
@@ -40,7 +40,7 @@ class UserPilotService {
       return;
     }
     const userUuid = accountResp.user_uuid;
-    if(!userUuid) {
+    if (!userUuid) {
       console.warn('[Userpilot] User UUID is not present. Skipping Identification');
       return;
     }
@@ -61,7 +61,7 @@ class UserPilotService {
    * Reload UserPilot content
    */
   reload(url: string): void {
-    if(!this.userPilotSdkToken) {
+    if (!this.userPilotSdkToken) {
       return;
     }
     try {

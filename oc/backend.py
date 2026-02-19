@@ -445,7 +445,7 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
             )
             user_uuid = user_context.get('userUuid')
         except Exception as e:
-            LOGGER.warning('Failed to extract userUuid from access token')
+            LOGGER.warning('Failed to extract userUuid from access token: %s', e)
             return
 
         if not user_uuid:
@@ -468,7 +468,7 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
             )
             customer_uuid = user_context.get('customerUuid')
         except Exception as e:
-            LOGGER.warning('Failed to extract customerUuid from access token')
+            LOGGER.warning('Failed to extract customerUuid from access token: %s', e)
             return
 
         if not customer_uuid:
@@ -480,13 +480,13 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
         )
         headers = {'Authorization': 'Bearer {}'.format(access_token)}
         try:
-            response = requests.get(customer_url, headers=headers)
+            response = requests.get(customer_url, headers=headers, timeout=10)
             response.raise_for_status()
             customer_name = response.json().get('name')
         except Exception as e:
             LOGGER.warning(
-                'Failed to retrieve customer name for customerUuid: %s',
-                customer_uuid,
+                'Failed to retrieve customer name for customerUuid: %s, %s',
+                customer_uuid, e
             )
             return
 
