@@ -445,11 +445,11 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
             )
             user_uuid = user_context.get('userUuid')
         except Exception as e:
-            LOGGER.warning('Failed to extract userUuid from access token: %s', e)
+            LOGGER.error('Failed to extract userUuid from access token: %s', e)
             return
 
         if not user_uuid:
-            LOGGER.warning('Empty userUuid is received from access_token')
+            LOGGER.error('Empty userUuid is received from access_token')
             return
 
         self.request.session['oc_user_uuid'] = user_uuid
@@ -468,11 +468,11 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
             )
             customer_uuid = user_context.get('customerUuid')
         except Exception as e:
-            LOGGER.warning('Failed to extract customerUuid from access token: %s', e)
+            LOGGER.error('Failed to extract customerUuid from access token: %s', e)
             return
 
         if not customer_uuid:
-            LOGGER.warning('Empty customerUuid is received from access_token')
+            LOGGER.error('Empty customerUuid is received from access_token')
             return
 
         customer_url = '{}/customer-service/api/customers/{}'.format(
@@ -484,7 +484,7 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
             response.raise_for_status()
             customer_name = response.json().get('name')
         except Exception as e:
-            LOGGER.warning(
+            LOGGER.error(
                 'Failed to retrieve customer name for customerUuid: %s, %s',
                 customer_uuid, e
             )

@@ -792,7 +792,6 @@ if USER_PILOT_SDK_TOKEN:
     CSP_SCRIPT_SRC.extend(['https://*.userpilot.io'])
     CSP_CONNECT_SRC.extend(['https://*.userpilot.io', 'wss://*.userpilot.io'])
     CSP_IMG_SRC.extend([
-        'https://storage.googleapis.com',
         'https://www.meddra.org',
         'https://*.userpilot.io'
     ])
