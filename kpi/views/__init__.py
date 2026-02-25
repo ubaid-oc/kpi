@@ -1,7 +1,5 @@
 # coding: utf-8
 
-import os
-import environ
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.template.response import TemplateResponse
@@ -14,24 +12,14 @@ from kpi.models import AuthorizedApplication
 from kpi.models.authorized_application import ApplicationTokenAuthentication
 from kpi.serializers import AuthorizedApplicationUserSerializer
 
-env = environ.Env()
 
 def home(request):
-    response = TemplateResponse(request, "index.html")
-    # Delete old cookies that may have been set with a different domain, to prevent confusion after a user logs in
-    old_session_cookie_domain = env.str('OLD_SESSION_COOKIE_DOMAIN', default=None)
-    old_csrf_cookie_domain = env.str('OLD_CSRF_COOKIE_DOMAIN', default=None)
-    if old_session_cookie_domain:
-        session_cookie_name = getattr(settings, 'SESSION_COOKIE_NAME', 'kobonaut')
-        response.delete_cookie(session_cookie_name, domain=old_session_cookie_domain)
-    if old_csrf_cookie_domain:
-        csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'occsrftoken')
-        response.delete_cookie(csrf_cookie_name, domain=old_csrf_cookie_domain)
-    return response
+    return TemplateResponse(request, "index.html")
 
 
 def browser_tests(request):
     return TemplateResponse(request, "browser_tests.html")
+
 
 def modern_browsers(request):
     return TemplateResponse(request, "modern_browsers.html")
