@@ -9,7 +9,6 @@ import {ASSET_TYPES} from 'js/constants';
 import type {AssetResponse} from 'js/dataInterface';
 import ownedCollectionsStore from 'js/components/library/ownedCollectionsStore';
 import type {OwnedCollectionsStoreData} from 'js/components/library/ownedCollectionsStore';
-import {userCan} from 'js/components/permissions/utils';
 import './assetCollectionActions.scss';
 
 bem.AssetCollectionActions = makeBem(null, 'asset-collection-actions', 'menu');
