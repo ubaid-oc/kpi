@@ -1,4 +1,7 @@
 # coding: utf-8
+
+import os
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.template.response import TemplateResponse
 from rest_framework import exceptions
@@ -12,7 +15,17 @@ from kpi.serializers import AuthorizedApplicationUserSerializer
 
 
 def home(request):
-    return TemplateResponse(request, "index.html")
+    response = TemplateResponse(request, "index.html")
+    # Delete old cookies that may have been set with a different domain, to prevent confusion after a user logs in
+    old_session_cookie_domain = os.environ.get('OLD_SESSION_COOKIE_DOMAIN')
+    old_csrf_cookie_domain = os.environ.get('OLD_CSRF_COOKIE_DOMAIN')
+    if old_session_cookie_domain:
+        session_cookie_name = getattr(settings, 'SESSION_COOKIE_NAME', 'kobonaut')
+        response.delete_cookie(session_cookie_name, domain=old_session_cookie_domain)
+    if old_csrf_cookie_domain:
+        csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'occsrftoken')
+        response.delete_cookie(csrf_cookie_name, domain=old_csrf_cookie_domain)
+    return response
 
 
 def browser_tests(request):
