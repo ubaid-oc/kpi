@@ -1,4 +1,6 @@
 # coding: utf-8
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.template.response import TemplateResponse
 from rest_framework import exceptions
@@ -17,6 +19,7 @@ def home(request):
 
 def browser_tests(request):
     return TemplateResponse(request, "browser_tests.html")
+
 
 def modern_browsers(request):
     return TemplateResponse(request, "modern_browsers.html")

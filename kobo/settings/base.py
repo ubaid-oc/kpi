@@ -51,20 +51,18 @@ USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", False)
 # Domain must not exclude KoBoCAT when sharing sessions
 # NOTE: For multi-tenant setups with separate subdomains, keep cookie domains as None
 # to ensure each subdomain has its own isolated session and CSRF tokens
-SESSION_COOKIE_DOMAIN = None
-SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'kobonaut')
-CSRF_COOKIE_DOMAIN = None
-CSRF_TRUSTED_ORIGINS = [
-    ".openclinica.io",
-    ".openclinica-dev.io",
-    ".openclinica-dev-eks.io",
-    ".openclinica-staging.io",
-    ".openclinica-staging-2.io",
-    ".kobo.local",
-    ".localhost.io",
-]
-CSRF_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_NAME = 'occsrftoken'
+ALLOWED_DOMAINS = env.list('ALLOWED_DOMAINS', default=[
+    '.openclinica.io',
+    '.openclinica-dev.io',
+])
+
+SESSION_COOKIE_DOMAIN = None # always None for tenant isolation
+SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'kobonaut_v2')
+
+CSRF_COOKIE_DOMAIN = None # always None for tenant isolation
+CSRF_TRUSTED_ORIGINS = ALLOWED_DOMAINS
+CSRF_COOKIE_NAME = env.str('CSRF_COOKIE_NAME', 'occsrftoken_v2')
+CSRF_COOKIE_SAMESITE = env.str('CSRF_COOKIE_SAMESITE', 'None')
 
 SESSION_SAVE_EVERY_REQUEST = True
 
@@ -72,13 +70,12 @@ ENKETO_CSRF_COOKIE_NAME = env.str('ENKETO_CSRF_COOKIE_NAME', '__csrf')
 
 # Instances of this model will be treated as allowed origins; see
 # https://github.com/ottoyiu/django-cors-headers#cors_model
-CORS_ORIGIN_REGEX_WHITELIST = (
-    r'^(https?://)?([A-Za-z0-9-]+\.){1,4}openclinica\.io$',
-    r'^(https?://)?([A-Za-z0-9-]+\.){1,4}openclinica-dev\.io$',
-    r'^(https?://)?([A-Za-z0-9-]+\.){1,4}openclinica-dev-eks\.io$',
-    r'^(https?://)?([A-Za-z0-9-]+\.){1,4}openclinica-staging\.io$',
-    r'^(https?://)?([A-Za-z0-9-]+\.){1,4}openclinica-staging-2\.io$'
-)
+CORS_ALLOWED_DOMAINS = ALLOWED_DOMAINS
+CORS_ORIGIN_REGEX_WHITELIST = [
+    rf'^(https?://)?([A-Za-z0-9-]+\.){{1,4}}{re.escape(domain.lstrip("."))}$'
+    for domain in CORS_ALLOWED_DOMAINS
+]
+
 CORS_ALLOW_CREDENTIALS = True
 # Limit sessions to 1 week (the default is 2 weeks)
 SESSION_COOKIE_AGE = env.int('DJANGO_SESSION_COOKIE_AGE', 604800)
@@ -810,16 +807,15 @@ if USER_PILOT_SDK_TOKEN:
         'https://*.userpilot.io'
     ])
 
+def is_local_domain(domain):
+    return 'localhost' in domain or 'local' in domain
+
 CSP_OC_SITES = [
-    'https://*.openclinica-dev.io',
-    'https://*.openclinica-staging.io',
-    'https://*.openclinica-staging-2.io',
-    'https://*.openclinica.io',
-    'https://*.staging.openclinica.io',
-    'https://*.openclinica-dev-eks.io',
-    'https://*.cloudfront.net',
-]
-CSP_ENV_SITES = env.url('CSP_ENV_SITES', [])
+    f'https://*{domain}' if not is_local_domain(domain) else f'http://*{domain}'
+    for domain in ALLOWED_DOMAINS
+] + ['https://*.cloudfront.net']
+
+CSP_ENV_SITES = env.list('CSP_ENV_SITES', default=[])
 CSP_FRAME_ANCESTORS = CSP_OC_SITES + CSP_ENV_SITES
 CSP_CONNECT_SRC = CSP_CONNECT_SRC + CSP_OC_SITES + CSP_ENV_SITES
 CSP_FRAME_SRC = CSP_FRAME_SRC + CSP_OC_SITES + CSP_ENV_SITES
