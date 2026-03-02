@@ -9,7 +9,6 @@ import {ASSET_TYPES} from 'js/constants';
 import type {AssetResponse} from 'js/dataInterface';
 import ownedCollectionsStore from 'js/components/library/ownedCollectionsStore';
 import type {OwnedCollectionsStoreData} from 'js/components/library/ownedCollectionsStore';
-import {userCan} from 'js/components/permissions/utils';
 import './assetCollectionActions.scss';
 
 bem.AssetCollectionActions = makeBem(null, 'asset-collection-actions', 'menu');
@@ -65,7 +64,6 @@ class AssetCollectionActions extends React.Component<
 
     const assetType = this.props.asset.asset_type;
     const isCollection = assetType === ASSET_TYPES.collection.id;
-    const userCanEdit = userCan('change_asset', this.props.asset);
 
     return (
       <bem.AssetCollectionActions>
@@ -73,10 +71,9 @@ class AssetCollectionActions extends React.Component<
           <PopoverMenu
             triggerLabel={this.renderTrigger()}
           >
-            {userCanEdit &&
-            assetType !== ASSET_TYPES.survey.id &&
-            assetType !== ASSET_TYPES.collection.id &&
-            this.props.asset.parent !== null && (
+            {assetType !== ASSET_TYPES.survey.id &&
+              assetType !== ASSET_TYPES.collection.id &&
+              this.props.asset.parent !== null && (
               <bem.PopoverMenu__link
                 onClick={this.moveToCollection.bind(this, null)}
               >
@@ -85,8 +82,7 @@ class AssetCollectionActions extends React.Component<
               </bem.PopoverMenu__link>
             )}
 
-            {userCanEdit &&
-              assetType !== ASSET_TYPES.survey.id &&
+            {assetType !== ASSET_TYPES.survey.id &&
               assetType !== ASSET_TYPES.collection.id &&
               this.state.ownedCollections.length > 0 && [
                 <bem.PopoverMenu__heading key='heading'>
