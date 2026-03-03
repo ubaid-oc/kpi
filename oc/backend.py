@@ -431,7 +431,7 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
         return None
 
     def store_user_info(self, access_token):
-        """Extract userUuid and userType from the access token's userContext claim and store
+        """Extract userUuid from the access token's userContext claim and store
         them in the session.
         Args:
             access_token (str): Raw (encoded) OIDC access token
@@ -443,7 +443,7 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
             )
             user_uuid = user_context.get('userUuid')
         except Exception as e:
-            LOGGER.error('Failed to extract userUuid and userType from access_token: %s', e)
+            LOGGER.error('Failed to extract userUuid from access_token: %s', e)
             return
 
         if not user_uuid:
