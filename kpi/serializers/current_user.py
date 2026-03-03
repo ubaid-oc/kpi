@@ -37,7 +37,9 @@ class CurrentUserSerializer(serializers.ModelSerializer):
     user_type = serializers.SerializerMethodField()
     subdomain = serializers.SerializerMethodField()
     user_uuid = serializers.SerializerMethodField()
+    user_type = serializers.SerializerMethodField()
     customer_name = serializers.SerializerMethodField()
+    customer_shared_infra = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -61,7 +63,9 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             'user_type',
             'subdomain',
             'user_uuid',
-            'customer_name'
+            'user_type',
+            'customer_name',
+            'customer_shared_infra'
         )
         read_only_fields = ('email',)
 
@@ -107,11 +111,23 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             return None
         return request.session.get('oc_user_uuid')
 
+    def get_user_type(self, obj):
+        request = self.context.get('request', False)
+        if not request:
+            return None
+        return request.session.get('oc_user_type')
+
     def get_customer_name(self, obj):
         request = self.context.get('request', False)
         if not request:
             return None
         return request.session.get('oc_customer_name')
+
+    def get_customer_shared_infra(self, obj):
+        request = self.context.get('request', False)
+        if not request:
+            return None
+        return request.session.get('oc_customer_shared_infra')
 
 
     def to_representation(self, obj):

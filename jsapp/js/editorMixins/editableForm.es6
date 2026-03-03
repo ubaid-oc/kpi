@@ -27,6 +27,8 @@ import bem, {makeBem} from 'js/bem';
 import {stores} from '../stores';
 import {actions} from '../actions';
 import dkobo_xlform from '../../xlform/src/_xlform.init';
+import sessionStore from 'js/stores/session';
+import {OC_USER_TYPES} from 'js/constants';
 import {dataInterface} from '../dataInterface';
 import assetUtils from 'js/assetUtils';
 import FormLockedMessage from 'js/components/locking/formLockedMessage';
@@ -560,6 +562,18 @@ export default assign({
     });
   },
 
+  isSharedInfraEnabled() {
+    return sessionStore.currentAccount.customer_shared_infra === true;
+  },
+
+  isUserAdmin() {
+    return sessionStore.currentAccount.user_type === OC_USER_TYPES.BUSINESS_ADMIN;
+  },
+
+  canAddToLibrary() {
+    return !this.isSharedInfraEnabled() || this.isUserAdmin();
+  },
+
   /**
    * The de facto function that is running our Form Builder survey editor app.
    * It builds `dkobo_xlform.view.SurveyApp` using asset data and then appends
@@ -606,11 +620,13 @@ export default assign({
         rawSurvey: rawAssetContent,
         assetType: getFormBuilderAssetType(this.state.asset.asset_type, this.state.desiredAssetType),
       });
-      this.app = new dkobo_xlform.view.SurveyApp({
-        survey: survey,
-        stateStore: stores.surveyState,
-        ngScope: skp,
-      });
+        this.app = new dkobo_xlform.view.SurveyApp({
+          survey: survey,
+          stateStore: stores.surveyState,
+          ngScope: skp,
+          isUserAdmin: this.isUserAdmin(),
+          isSharedInfraEnabled: this.isSharedInfraEnabled(),
+        });
       this.app.$el.appendTo(ReactDOM.findDOMNode(this.refs['form-wrap']));
       this.app.render();
       survey.rows.on('change', this.onSurveyChange);
@@ -841,17 +857,19 @@ export default assign({
               <i className='k-icon-duplicate' />
             </bem.FormBuilderHeader__button>
 
-            <bem.FormBuilderHeader__button
-              m={['group', {groupable: groupable}]}
-              onClick={this.addQuestionsToLibrary}
-              disabled={!groupable}
-              data-tip={groupable ? t('Add selected questions to library') : t('Add selected questions to library disabled. Please select at least one question.')}
-              className='add-questions-to-library'
-            >
-              <i class='k-icon-folder'>
-                <i className='k-icon-plus' />
-              </i>
-            </bem.FormBuilderHeader__button>
+            {this.canAddToLibrary() &&
+              <bem.FormBuilderHeader__button
+                m={['group', {groupable: groupable}]}
+                onClick={this.addQuestionsToLibrary}
+                disabled={!groupable}
+                data-tip={groupable ? t('Add selected questions to library') : t('Add selected questions to library disabled. Please select at least one question.')}
+                className='add-questions-to-library'
+              >
+                <i class='k-icon-folder'>
+                  <i className='k-icon-plus' />
+                </i>
+              </bem.FormBuilderHeader__button>
+            }
 
           </bem.FormBuilderHeader__cell>
 
