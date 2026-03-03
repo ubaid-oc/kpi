@@ -135,8 +135,7 @@ module.exports = do ->
       @warnings = options.warnings || []
       @__rowViews = new Backbone.Model()
       @ngScope = options.ngScope
-      @isUserAdmin = options.isUserAdmin or false
-      @isSharedInfraEnabled = options.isSharedInfraEnabled or false
+      @canAddToLibrary = options.canAddToLibrary or false
       @surveyStateStore = options.stateStore || {trigger:$.noop, setState:$.noop}
 
       $(document).on 'click', @deselect_rows
@@ -189,8 +188,6 @@ module.exports = do ->
         @onEscapeKeydown(evt) if evt.keyCode is 27
 
       @isAlertifyDialogShown = false
-
-    canAddToLibrary: -> !@isSharedInfraEnabled || @isUserAdmin
 
     getView: (cid)->
       @__rowViews.get(cid)

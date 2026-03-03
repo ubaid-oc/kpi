@@ -116,7 +116,7 @@ module.exports = do ->
       """
       if surveyView.features.multipleQuestions
         template += """<span class="card__buttons__button card__buttons__button--copy card__buttons__button--blue js-clone-question" data-button-name="duplicate"><i class="k-icon k-icon-duplicate"></i></span>"""
-        if surveyView.canAddToLibrary()
+        if surveyView.canAddToLibrary
           template += """<span class="card__buttons__button card__buttons__button--add card__buttons__button--teal js-add-to-question-library" data-button-name="add-to-library"><i class="k-icon k-icon-folder-plus"></i></span>"""
 
       return template + """
@@ -129,7 +129,7 @@ module.exports = do ->
   # Empty js-group-icon is only sometimes used, but we need to reserve space for it
   groupView = (surveyView)->
     addToLibraryButton = ''
-    if surveyView.canAddToLibrary()
+    if surveyView.canAddToLibrary
       addToLibraryButton = """
           <span class="card__buttons__button card__buttons__button--add card__buttons__button--green js-add-group-to-library" data-button-name="add-group-to-library">
             <i class="k-icon k-icon-folder-plus"></i>

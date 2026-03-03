@@ -624,8 +624,7 @@ export default assign({
           survey: survey,
           stateStore: stores.surveyState,
           ngScope: skp,
-          isUserAdmin: this.isUserAdmin(),
-          isSharedInfraEnabled: this.isSharedInfraEnabled(),
+          canAddToLibrary: this.canAddToLibrary(),
         });
       this.app.$el.appendTo(ReactDOM.findDOMNode(this.refs['form-wrap']));
       this.app.render();
