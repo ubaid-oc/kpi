@@ -442,17 +442,15 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
                 'https://www.openclinica.com/userContext', {}
             )
             user_uuid = user_context.get('userUuid')
-            user_type = user_context.get('userType')
         except Exception as e:
             LOGGER.error('Failed to extract userUuid and userType from access_token: %s', e)
             return
 
-        if not user_uuid or not user_type:
-            LOGGER.error('Empty userUuid or userType is received from access_token')
+        if not user_uuid:
+            LOGGER.error('Empty userUuid is received from access_token')
             return
 
         self.request.session['oc_user_uuid'] = user_uuid
-        self.request.session['oc_user_type'] = user_type
 
     def store_customer_info(self, access_token):
         """Fetch customer information from customer-service using the customerUuid
@@ -482,8 +480,9 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
         try:
             response = requests.get(customer_url, headers=headers, timeout=10)
             response.raise_for_status()
-            customer_name = response.json().get('name')
-            customer_shared_infra = response.json().get('sharedInfra', False)
+            customer_data = response.json()
+            customer_name = customer_data.get('name')
+            customer_shared_infra = customer_data.get('sharedInfra', False)
         except Exception as e:
             LOGGER.error(
                 'Failed to retrieve customer info for customerUuid: %s, %s',
