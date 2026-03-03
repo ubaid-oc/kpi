@@ -494,7 +494,7 @@ module.exports = do ->
 
     render: ->
       if !@already_rendered
-        @$el.html $viewTemplates.row.groupView(@model)
+        @$el.html $viewTemplates.row.groupView(@surveyView)
         @$card = @$el.find('> .card').eq(0)
         @$rows = @$card.find('> .group__rows').eq(0)
         @$header = @$card.find('> .card__header, > .group__header').eq(0)

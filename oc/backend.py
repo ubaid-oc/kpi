@@ -36,7 +36,6 @@ from kpi.utils.log import logging as kpi_logging
 from oc.utils import get_subdomain
 
 import requests
-import json
 import logging
 
 LOGGER = logging.getLogger(__name__)
@@ -147,7 +146,7 @@ def get_user_with_id(access_token, userinfo, subdomain=None):
     usersubdomain = subdomain
     username = userinfo['preferred_username'] + "+" + usersubdomain
     usertype = userinfo['https://www.openclinica.com/userContext']['userType']
-    
+
     check_username(username)
 
     # Some OP may actually choose to withhold some information, so we must test if it is present
@@ -324,7 +323,7 @@ def get_realm_name(request):
 
     if isinstance(allowed_connections_response, requests.Response):
         realm_name = allowed_connections_response.json()[0]
-    
+
     return realm_name
 
 def get_client_secret(realm_name):
@@ -336,7 +335,7 @@ def get_client_secret(realm_name):
 
     token = master_realm_client.client_credentials()
     access_token = token['access_token']
-    
+
     admin_client = master_realm.admin
     admin_client.set_token(access_token)
 
@@ -347,18 +346,18 @@ def get_client_secret(realm_name):
         if client['clientId'] == clientId:
             client_id = client['id']
             break
-    
+
     client_secret = None
     if client_id is not None:
         client_secret = admin_client.realms.by_name(realm_name).clients.by_id(client_id).client_secret()['value']
-    
+
     return client_secret
 
 class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
     """Subclass of the Django OIDC Backend that makes use of our get_user_by_id
     implementation
     """
-    
+
     def configure(self, request):
         realm_name = get_realm_name(request)
         if isinstance(realm_name, str):
@@ -369,7 +368,7 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
                 self.OIDC_OP_USER_ENDPOINT = '{}/auth/realms/{}/protocol/openid-connect/userinfo'.format(settings.KEYCLOAK_AUTH_URI, realm_name)
                 self.OIDC_OP_JWKS_ENDPOINT = '{}/auth/realms/{}/protocol/openid-connect/certs'.format(settings.KEYCLOAK_AUTH_URI, realm_name)
                 self.OIDC_RP_CLIENT_SECRET = client_secret
-    
+
     def __init__(self, *args, **kwargs):
         """Initialize settings."""
         self.OIDC_OP_TOKEN_ENDPOINT = self.get_settings("OIDC_OP_TOKEN_ENDPOINT", None)
@@ -381,13 +380,12 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
         self.OIDC_RP_IDP_SIGN_KEY = self.get_settings("OIDC_RP_IDP_SIGN_KEY", None)
 
         self.UserModel = get_user_model()
-    
-    
+
     def authenticate(self, request, **kwargs):
         """Authenticates a user based on the OIDC code flow."""
-        
+
         if self.OIDC_OP_TOKEN_ENDPOINT is None:
-            self.configure(request)        
+            self.configure(request)
 
         self.request = request
         if not self.request:
@@ -422,8 +420,8 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
 
         if payload:
             self.store_tokens(access_token, id_token)
-            self.store_user_uuid(access_token)
-            self.store_customer_name(access_token)
+            self.store_user_info(access_token)
+            self.store_customer_info(access_token)
             try:
                 return self.get_or_create_user(access_token, id_token, payload, get_subdomain(request))
             except SuspiciousOperation as exc:
@@ -432,9 +430,9 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
 
         return None
 
-    def store_user_uuid(self, access_token):
+    def store_user_info(self, access_token):
         """Extract userUuid from the access token's userContext claim and store
-        it in the session.
+        them in the session.
         Args:
             access_token (str): Raw (encoded) OIDC access token
         """
@@ -445,7 +443,7 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
             )
             user_uuid = user_context.get('userUuid')
         except Exception as e:
-            LOGGER.error('Failed to extract userUuid from access token: %s', e)
+            LOGGER.error('Failed to extract userUuid from access_token: %s', e)
             return
 
         if not user_uuid:
@@ -454,8 +452,8 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
 
         self.request.session['oc_user_uuid'] = user_uuid
 
-    def store_customer_name(self, access_token):
-        """Fetch customer name from customer-service using the customerUuid
+    def store_customer_info(self, access_token):
+        """Fetch customer information from customer-service using the customerUuid
         from the access token and store it in the session.
 
         Args:
@@ -468,7 +466,7 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
             )
             customer_uuid = user_context.get('customerUuid')
         except Exception as e:
-            LOGGER.error('Failed to extract customerUuid from access token: %s', e)
+            LOGGER.error('Failed to extract customerUuid from access_token: %s', e)
             return
 
         if not customer_uuid:
@@ -482,15 +480,18 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
         try:
             response = requests.get(customer_url, headers=headers, timeout=10)
             response.raise_for_status()
-            customer_name = response.json().get('name')
+            customer_data = response.json()
+            customer_name = customer_data.get('name')
+            customer_shared_infra = customer_data.get('sharedInfra', False)
         except Exception as e:
             LOGGER.error(
-                'Failed to retrieve customer name for customerUuid: %s, %s',
+                'Failed to retrieve customer info for customerUuid: %s, %s',
                 customer_uuid, e
             )
             return
 
         self.request.session['oc_customer_name'] = customer_name
+        self.request.session['oc_customer_shared_infra'] = customer_shared_infra
 
     def retrieve_matching_jwk(self, token):
         """Get the signing key by exploring the JWKS endpoint of the OP.

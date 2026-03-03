@@ -37,6 +37,11 @@ export const ANON_USERNAME = 'AnonymousUser';
 export const ANON_USER_TYPE = 'AnonymousUserType';
 export const ANON_USER_SUBDOMAIN = 'AnonymousSubdomain';
 
+export const OC_USER_TYPES = Object.freeze({
+  BUSINESS_ADMIN: 'Business Admin',
+  USER: 'User',
+});
+
 export type PermissionCodename =
   | 'add_submissions'
   | 'change_asset'

@@ -115,8 +115,9 @@ module.exports = do ->
             <span class="card__buttons__button card__buttons__button--delete card__buttons__button--red js-delete-row" data-button-name="delete"><i class="k-icon k-icon-trash"></i></span>
       """
       if surveyView.features.multipleQuestions
-        template += """<span class="card__buttons__button card__buttons__button--copy card__buttons__button--blue js-clone-question" data-button-name="duplicate"><i class="k-icon k-icon-duplicate"></i></span>
-                  <span class="card__buttons__button card__buttons__button--add card__buttons__button--teal js-add-to-question-library" data-button-name="add-to-library"><i class="k-icon k-icon-folder-plus"></i></i></span>"""
+        template += """<span class="card__buttons__button card__buttons__button--copy card__buttons__button--blue js-clone-question" data-button-name="duplicate"><i class="k-icon k-icon-duplicate"></i></span>"""
+        if surveyView.canAddToLibrary
+          template += """<span class="card__buttons__button card__buttons__button--add card__buttons__button--teal js-add-to-question-library" data-button-name="add-to-library"><i class="k-icon k-icon-folder-plus"></i></span>"""
 
       return template + """
           </div>
@@ -126,7 +127,14 @@ module.exports = do ->
       """
 
   # Empty js-group-icon is only sometimes used, but we need to reserve space for it
-  groupView = ()->
+  groupView = (surveyView)->
+    addToLibraryButton = ''
+    if surveyView.canAddToLibrary
+      addToLibraryButton = """
+          <span class="card__buttons__button card__buttons__button--add card__buttons__button--green js-add-group-to-library" data-button-name="add-group-to-library">
+            <i class="k-icon k-icon-folder-plus"></i>
+          </span>
+      """
     """
     <div class="survey__row__item survey__row__item--group group card js-select-row">
       <header class="group__header">
@@ -148,9 +156,7 @@ module.exports = do ->
             <i class="k-icon k-icon-duplicate"></i>
           </span>
 
-          <span class="card__buttons__button card__buttons__button--add card__buttons__button--green js-add-group-to-library" data-button-name="add-group-to-library">
-            <i class="k-icon k-icon-folder-plus"></i>
-          </span>
+          #{addToLibraryButton}
         </div>
       </header>
       <ul class="group__rows"></ul>
