@@ -115,8 +115,7 @@ class OwnedCollectionsStore extends Reflux.Store {
     this.trigger(this.data);
 
     actions.library.getCollections({
-      owner: sessionStore.currentAccount.username,
-      pageSize: 0 // zero gives all results with no limit
+      pageSize: 0, // zero gives all results with no limit
     });
   }
 
