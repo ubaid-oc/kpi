@@ -172,7 +172,7 @@ def get_user_with_id(access_token, userinfo, subdomain=None):
     try: # try to lookup by keycloak UID first
         kc_user = KeycloakModel.objects.get(UID = uid, subdomain = usersubdomain)
         user = kc_user.user
-        # Always sync user_type from the token so user type changes in Keycloak are reflected on the next login
+        # Always sync user_type so user type changes in Keycloak are reflected on the next login
         if kc_user.user_type != usertype:
             kc_user.user_type = usertype
             kc_user.save()
