@@ -450,6 +450,25 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
             exclude = exclude.strip()
             if exclude in fields:
                 fields.pop(exclude)
+
+        # Restrict the parent field queryset to collections within the
+        # caller's subdomain so that out-of-scope collections are treated as
+        # "not found" by DRF rather than resolving the object and leaking its
+        # existence through a different validation error.
+        try:
+            kc_user = KeycloakModel.objects.get(
+                user=self.context['request'].user
+            )
+            subdomain_user_ids = KeycloakModel.objects.filter(
+                subdomain=kc_user.subdomain
+            ).values_list('user_id', flat=True)
+            fields['parent'].queryset = Asset.objects.filter(
+                asset_type=ASSET_TYPE_COLLECTION,
+                owner__in=subdomain_user_ids,
+            )
+        except KeycloakModel.DoesNotExist:
+            fields['parent'].queryset = Asset.objects.none()
+
         return fields
 
     def get_advanced_submission_schema(self, obj):
@@ -842,20 +861,8 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         return data_sharing
 
     def validate_parent(self, parent: Asset | None) -> Asset | None:
-        user = get_database_user(self.context['request'].user)
-        # Only user with the same subdomain as the parent owner can move the asset to another parent.
-        # It is consistent with the logic in `AssetViewSet.get_queryset()`.
-        if parent is not None:
-            error = serializers.ValidationError(
-                t('You cannot move this asset to the selected parent.')
-            )
-            try:
-                kc_user = KeycloakModel.objects.get(user=user)
-                kc_owner = KeycloakModel.objects.get(user=parent.owner)
-            except KeycloakModel.DoesNotExist:
-                raise error
-            if kc_user.subdomain != kc_owner.subdomain:
-                raise error
+        # Subdomain restriction is enforced by the parent field's queryset in
+        # get_fields(); any out-of-scope collection won't resolve this far.
         return parent
 
     def validate_settings(self, settings: dict) -> dict:
