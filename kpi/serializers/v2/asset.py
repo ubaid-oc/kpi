@@ -68,7 +68,7 @@ from kpi.utils.project_views import (
 from .asset_version import AssetVersionListSerializer
 from .asset_permission_assignment import AssetPermissionAssignmentSerializer
 from .asset_export_settings import AssetExportSettingsSerializer
-
+from kpi.utils.log import logging as kpi_logging
 
 class AssetBulkActionsSerializer(serializers.Serializer):
     SUPPORTED_ACTIONS = ['archive', 'unarchive', 'delete', 'undelete']
@@ -843,27 +843,7 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         return data_sharing
 
     def validate_parent(self, parent: Asset) -> Asset:
-        user = get_database_user(self.context['request'].user)
-        # Validate first if user can update the current parent
-        if self.instance and self.instance.parent is not None:
-            if not self.instance.parent.has_perm(user, PERM_CHANGE_ASSET):
-                raise serializers.ValidationError(
-                    t('User cannot update current parent collection'))
-
-        # Target collection is `None`, no need to check permissions
-        if parent is None:
-            return parent
-
-        # `user` must have write access to target parent before being able to
-        # move the asset.
-        parent_perms = parent.get_perms(user)
-        if PERM_VIEW_ASSET not in parent_perms:
-            raise serializers.ValidationError(t('Target collection not found'))
-
-        if PERM_CHANGE_ASSET not in parent_perms:
-            raise serializers.ValidationError(
-                t('User cannot update target parent collection'))
-
+        # `user` always able to move the asset to another parent.
         return parent
 
     def validate_settings(self, settings: dict) -> dict:
