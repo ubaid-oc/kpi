@@ -841,8 +841,22 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
 
         return data_sharing
 
-    def validate_parent(self, parent: Asset) -> Asset:
-        # `user` always able to move the asset to another parent.
+    def validate_parent(self, parent: Asset | None) -> Asset | None:
+        user = get_database_user(self.context['request'].user)
+        # Only user with the same subdomain as the parent owner can move the asset to another parent.
+        # It is consistent with the logic in `AssetViewSet.get_queryset()`.
+        if parent is not None:
+            try:
+                kc_user = KeycloakModel.objects.get(user=user)
+                kc_owner = KeycloakModel.objects.get(user=parent.owner)
+            except KeycloakModel.DoesNotExist:
+                raise serializers.ValidationError(
+                    t('You cannot move this asset to the selected parent.')
+                )
+            if kc_user.subdomain != kc_owner.subdomain:
+                raise serializers.ValidationError(
+                    t('You cannot move this asset to the selected parent.')
+                )
         return parent
 
     def validate_settings(self, settings: dict) -> dict:
