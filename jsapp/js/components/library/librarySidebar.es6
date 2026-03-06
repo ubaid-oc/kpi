@@ -14,7 +14,7 @@ import assetUtils from 'js/assetUtils';
 import myLibraryStore from './myLibraryStore';
 import libraryTypeFilterStore from './libraryTypeFilterStore';
 import ownedCollectionsStore from 'js/components/library/ownedCollectionsStore';
-import { actions } from 'js/actions';
+import dataInterface from 'js/dataInterface';
 import { routerIsActive, withRouter } from '../../router/legacy';
 import {ROUTES} from 'js/router/routerConstants';
 import {NavLink} from 'react-router-dom';
@@ -47,7 +47,7 @@ class LibrarySidebar extends Reflux.Component {
     this.listenTo(libraryTypeFilterStore, this.libraryTypeFilterStoreChanged);
     this.setState({
       isLoading: false,
-      libraryTotalCount: myLibraryStore.getCurrentUserTotalAssetsWithoutCollection(),
+      libraryTotalCount: myLibraryStore.getCurrentUserRootAssets(),
       sidebarCollections: ownedCollectionsStore.getCollections(),
     });
   }
@@ -103,7 +103,7 @@ class LibrarySidebar extends Reflux.Component {
   myLibraryStoreChanged() {
     this.setState({
       isLoading: false,
-      libraryTotalCount: myLibraryStore.getCurrentUserTotalAssetsWithoutCollection(),
+      libraryTotalCount: myLibraryStore.getCurrentUserRootAssets(),
     });
   }
 
@@ -118,12 +118,12 @@ class LibrarySidebar extends Reflux.Component {
     if (myLibraryStore.getCollectionUid() !== null) {
       const filterType = libraryTypeFilterStore.getFilterType();
       const searchPhrase = searchBoxStore.getSearchPhrase();
-      actions.library.searchMyLibraryAssets({
+      dataInterface.searchMyLibraryAssets({
         searchPhrase: searchPhrase,
         filterType: filterType,
         pageSize: 1,
         page: 0,
-      }).then((response) => {
+      }).then((response: {results: never[], count: number}) => {
         this.setState({libraryTotalCount: response.count});
       });
     }
