@@ -104,7 +104,7 @@ class MyLibraryStore extends Reflux.Store {
     actions.resources.deleteAsset.completed.listen(this.onDeleteAssetCompleted.bind(this));
     // TODO Improve reaction to uploads being finished after task is done:
     // https://github.com/kobotoolbox/kpi/issues/476
-    actions.resources.createImport.completed.listen(this.fetchDataDebounced.bind(this));
+    actions.resources.createImport.completed.listen(this.fetchDataDebounced.bind(this, true));
 
     // Wait for login before starting store
     when(() => sessionStore.isLoggedIn, this.startupStore.bind(this));
