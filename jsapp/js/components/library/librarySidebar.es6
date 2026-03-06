@@ -4,6 +4,7 @@ import reactMixin from 'react-mixin';
 import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import {stores} from 'js/stores';
+import searchBoxStore from 'js/components/header/searchBoxStore';
 import sessionStore from 'js/stores/session';
 import bem from 'js/bem';
 import mixins from 'js/mixins';
@@ -11,7 +12,9 @@ import PopoverMenu from 'js/popoverMenu';
 import {MODAL_TYPES, ASSET_TYPES} from 'js/constants';
 import assetUtils from 'js/assetUtils';
 import myLibraryStore from './myLibraryStore';
+import libraryTypeFilterStore from './libraryTypeFilterStore';
 import ownedCollectionsStore from 'js/components/library/ownedCollectionsStore';
+import { actions } from 'js/actions';
 import { routerIsActive, withRouter } from '../../router/legacy';
 import {ROUTES} from 'js/router/routerConstants';
 import {NavLink} from 'react-router-dom';
@@ -30,7 +33,7 @@ class LibrarySidebar extends Reflux.Component {
   constructor(props){
     super(props);
     this.state = {
-      myLibraryCount: 0,
+      libraryTotalCount: 0,
       // default is template
       desiredType: TEMPLATE_TYPE,
       sidebarCollections: [],
@@ -41,9 +44,10 @@ class LibrarySidebar extends Reflux.Component {
   componentDidMount() {
     this.listenTo(myLibraryStore, this.myLibraryStoreChanged);
     this.listenTo(ownedCollectionsStore, this.ownedCollectionsStoreChanged);
+    this.listenTo(libraryTypeFilterStore, this.libraryTypeFilterStoreChanged);
     this.setState({
       isLoading: false,
-      myLibraryCount: myLibraryStore.getCurrentUserTotalAssets(),
+      libraryTotalCount: myLibraryStore.getCurrentUserTotalAssetsWithoutCollection(),
       sidebarCollections: ownedCollectionsStore.getCollections(),
     });
   }
@@ -99,7 +103,7 @@ class LibrarySidebar extends Reflux.Component {
   myLibraryStoreChanged() {
     this.setState({
       isLoading: false,
-      myLibraryCount: myLibraryStore.getCurrentUserTotalAssets(),
+      libraryTotalCount: myLibraryStore.getCurrentUserTotalAssetsWithoutCollection(),
     });
   }
 
@@ -108,6 +112,21 @@ class LibrarySidebar extends Reflux.Component {
       isLoading: false,
       sidebarCollections: ownedCollectionsStore.getCollections(),
     });
+  }
+
+  libraryTypeFilterStoreChanged() {
+    if (myLibraryStore.getCollectionUid() !== null) {
+      const filterType = libraryTypeFilterStore.getFilterType();
+      const searchPhrase = searchBoxStore.getSearchPhrase();
+      actions.library.searchMyLibraryAssets({
+        searchPhrase: searchPhrase,
+        filterType: filterType,
+        pageSize: 1,
+        page: 0,
+      }).then((response) => {
+        this.setState({libraryTotalCount: response.count});
+      });
+    }
   }
 
   showLibraryNewModal(evt) {
@@ -199,7 +218,7 @@ class LibrarySidebar extends Reflux.Component {
           >
             <i className='k-icon k-icon-library'/>
             <bem.FormSidebar__labelText>{t('Library')}</bem.FormSidebar__labelText>
-            <bem.FormSidebar__labelCount>{this.state.myLibraryCount}</bem.FormSidebar__labelCount>
+            <bem.FormSidebar__labelCount>{this.state.libraryTotalCount}</bem.FormSidebar__labelCount>
           </bem.FormSidebar__label>
 
           { this.state.sidebarCollections &&

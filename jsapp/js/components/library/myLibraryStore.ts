@@ -41,6 +41,7 @@ interface MyLibraryStoreData {
   filterColumnId: string | null;
   filterValue: string | null;
   collectionUid: string | null;
+  totalUserAssetsAllCollections: number | null;
 }
 
 class MyLibraryStore extends Reflux.Store {
@@ -75,6 +76,7 @@ class MyLibraryStore extends Reflux.Store {
     filterColumnId: null,
     filterValue: null,
     collectionUid: null,
+    totalUserAssetsAllCollections: null,
   };
 
   fetchDataDebounced?: () => void;
@@ -240,6 +242,10 @@ class MyLibraryStore extends Reflux.Store {
     if (this.data.totalUserAssets === null || searchBoxStore.getSearchPhrase() === '') {
       this.data.totalUserAssets = this.data.totalSearchAssets;
     }
+    // track total count when no collection filter
+    if (this.data.collectionUid === null) {
+      this.data.totalUserAssetsAllCollections = this.data.totalSearchAssets;
+    }
     this.data.isFetchingData = false;
     this.isInitialised = true;
     this.trigger(this.data);
@@ -265,6 +271,11 @@ class MyLibraryStore extends Reflux.Store {
         this.data.totalUserAssets++;
       } else if (this.data.totalUserAssets !== null) {
         this.data.totalUserAssets--;
+      }
+      if (this.data.totalUserAssetsAllCollections !== null && asset.parent === null) {
+        this.data.totalUserAssetsAllCollections++;
+      } else if (this.data.totalUserAssetsAllCollections !== null) {
+        this.data.totalUserAssetsAllCollections--;
       }
       this.fetchData(true);
     }
@@ -304,6 +315,9 @@ class MyLibraryStore extends Reflux.Store {
       if (this.data.totalUserAssets !== null) {
         this.data.totalUserAssets++;
       }
+      if (this.data.totalUserAssetsAllCollections !== null) {
+        this.data.totalUserAssetsAllCollections++;
+      }
       this.fetchData(true);
     }
   }
@@ -314,6 +328,9 @@ class MyLibraryStore extends Reflux.Store {
       if (found) {
         if (this.data.totalUserAssets !== null) {
           this.data.totalUserAssets--;
+        }
+        if (this.data.totalUserAssetsAllCollections !== null) {
+          this.data.totalUserAssetsAllCollections--;
         }
         this.fetchData(true);
       }
@@ -372,6 +389,10 @@ class MyLibraryStore extends Reflux.Store {
 
   getCurrentUserTotalAssets() {
     return this.data.totalUserAssets;
+  }
+
+  getCurrentUserTotalAssetsWithoutCollection() {
+    return this.data.totalUserAssetsAllCollections;
   }
 
   findAsset(uid: string) {
