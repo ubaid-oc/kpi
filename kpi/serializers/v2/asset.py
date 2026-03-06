@@ -68,7 +68,6 @@ from kpi.utils.project_views import (
 from .asset_version import AssetVersionListSerializer
 from .asset_permission_assignment import AssetPermissionAssignmentSerializer
 from .asset_export_settings import AssetExportSettingsSerializer
-from kpi.utils.log import logging as kpi_logging
 
 class AssetBulkActionsSerializer(serializers.Serializer):
     SUPPORTED_ACTIONS = ['archive', 'unarchive', 'delete', 'undelete']
