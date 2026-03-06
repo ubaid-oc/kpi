@@ -41,7 +41,7 @@ interface MyLibraryStoreData {
   filterColumnId: string | null;
   filterValue: string | null;
   collectionUid: string | null;
-  totalUserAssetsAllCollections: number | null;
+  totalUserRootAssets: number | null;
 }
 
 class MyLibraryStore extends Reflux.Store {
@@ -76,7 +76,7 @@ class MyLibraryStore extends Reflux.Store {
     filterColumnId: null,
     filterValue: null,
     collectionUid: null,
-    totalUserAssetsAllCollections: null,
+    totalUserRootAssets: null,
   };
 
   fetchDataDebounced?: () => void;
@@ -244,7 +244,7 @@ class MyLibraryStore extends Reflux.Store {
     }
     // track total count when no collection filter
     if (this.data.collectionUid === null) {
-      this.data.totalUserAssetsAllCollections = this.data.totalSearchAssets;
+      this.data.totalUserRootAssets = this.data.totalSearchAssets;
     }
     this.data.isFetchingData = false;
     this.isInitialised = true;
@@ -272,10 +272,10 @@ class MyLibraryStore extends Reflux.Store {
       } else if (this.data.totalUserAssets !== null) {
         this.data.totalUserAssets--;
       }
-      if (this.data.totalUserAssetsAllCollections !== null && asset.parent === null) {
-        this.data.totalUserAssetsAllCollections++;
-      } else if (this.data.totalUserAssetsAllCollections !== null) {
-        this.data.totalUserAssetsAllCollections--;
+      if (this.data.totalUserRootAssets !== null && asset.parent === null) {
+        this.data.totalUserRootAssets++;
+      } else if (this.data.totalUserRootAssets !== null) {
+        this.data.totalUserRootAssets--;
       }
       this.fetchData(true);
     }
@@ -315,8 +315,8 @@ class MyLibraryStore extends Reflux.Store {
       if (this.data.totalUserAssets !== null) {
         this.data.totalUserAssets++;
       }
-      if (this.data.totalUserAssetsAllCollections !== null) {
-        this.data.totalUserAssetsAllCollections++;
+      if (this.data.totalUserRootAssets !== null && asset.parent === null) {
+        this.data.totalUserRootAssets++;
       }
       this.fetchData(true);
     }
@@ -329,8 +329,8 @@ class MyLibraryStore extends Reflux.Store {
         if (this.data.totalUserAssets !== null) {
           this.data.totalUserAssets--;
         }
-        if (this.data.totalUserAssetsAllCollections !== null) {
-          this.data.totalUserAssetsAllCollections--;
+        if (this.data.totalUserRootAssets !== null && found.parent === null) {
+          this.data.totalUserRootAssets--;
         }
         this.fetchData(true);
       }
@@ -391,8 +391,8 @@ class MyLibraryStore extends Reflux.Store {
     return this.data.totalUserAssets;
   }
 
-  getCurrentUserTotalAssetsWithoutCollection() {
-    return this.data.totalUserAssetsAllCollections;
+  getCurrentUserRootAssets() {
+    return this.data.totalUserRootAssets;
   }
 
   findAsset(uid: string) {
