@@ -846,17 +846,16 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         # Only user with the same subdomain as the parent owner can move the asset to another parent.
         # It is consistent with the logic in `AssetViewSet.get_queryset()`.
         if parent is not None:
+            error = serializers.ValidationError(
+                t('You cannot move this asset to the selected parent.')
+            )
             try:
                 kc_user = KeycloakModel.objects.get(user=user)
                 kc_owner = KeycloakModel.objects.get(user=parent.owner)
             except KeycloakModel.DoesNotExist:
-                raise serializers.ValidationError(
-                    t('You cannot move this asset to the selected parent.')
-                )
+                raise error
             if kc_user.subdomain != kc_owner.subdomain:
-                raise serializers.ValidationError(
-                    t('You cannot move this asset to the selected parent.')
-                )
+                raise error
         return parent
 
     def validate_settings(self, settings: dict) -> dict:
