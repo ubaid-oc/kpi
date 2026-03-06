@@ -17,6 +17,9 @@ import {
 import type {OrderDirection} from 'js/projects/projectViews/constants';
 import {ROUTES} from 'js/router/routerConstants';
 import { history } from "js/router/historyRouter";
+import {
+  DEFAULT_PAGE_SIZE,
+} from 'js/dataInterface';
 import type {
   AssetResponse,
   AssetsResponse,
@@ -52,7 +55,7 @@ class MyLibraryStore extends Reflux.Store {
   previousPath = getCurrentPath();
   previousSearchPhrase = searchBoxStore.getSearchPhrase();
   previousFilterType = libraryTypeFilterStore.getFilterType();
-  PAGE_SIZE = 100;
+  PAGE_SIZE = DEFAULT_PAGE_SIZE;
   DEFAULT_ORDER_COLUMN = ASSETS_TABLE_COLUMNS['date-modified'];
 
   isInitialised = false;
@@ -101,7 +104,7 @@ class MyLibraryStore extends Reflux.Store {
     actions.resources.deleteAsset.completed.listen(this.onDeleteAssetCompleted.bind(this));
     // TODO Improve reaction to uploads being finished after task is done:
     // https://github.com/kobotoolbox/kpi/issues/476
-    actions.resources.createImport.completed.listen(this.fetchDataDebounced.bind(this, true));
+    actions.resources.createImport.completed.listen(this.fetchDataDebounced.bind(this));
 
     // Wait for login before starting store
     when(() => sessionStore.isLoggedIn, this.startupStore.bind(this));

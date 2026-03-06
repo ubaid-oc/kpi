@@ -762,7 +762,7 @@ interface AssetSnapshotResponse {
   source: AssetContent;
 }
 
-const DEFAULT_PAGE_SIZE = 200;
+export const DEFAULT_PAGE_SIZE = 200;
 
 interface ExternalServiceRequestData {
   name: string;
