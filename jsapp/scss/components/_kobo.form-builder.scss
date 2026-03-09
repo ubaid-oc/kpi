@@ -39,8 +39,8 @@ $s-form-builder-content-width: 1024px;
 
 .form-wrap {
   width: 100%;
-  max-width: $s-form-builder-content-width;
   margin: 0 auto;
+  padding: 45px 75px; // Similar with the previous FD
 
   input,
   textarea {
