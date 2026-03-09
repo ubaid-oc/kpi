@@ -513,7 +513,7 @@ django.conf.locale.LANG_INFO.update(EXTRA_LANG_INFO)
 DJANGO_LANGUAGE_CODES = env.str(
     'DJANGO_LANGUAGE_CODES',
     default=(
-        'en '  # English
+        'en'  # English
     )
 )
 LANGUAGES = [
