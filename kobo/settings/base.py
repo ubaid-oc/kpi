@@ -513,24 +513,7 @@ django.conf.locale.LANG_INFO.update(EXTRA_LANG_INFO)
 DJANGO_LANGUAGE_CODES = env.str(
     'DJANGO_LANGUAGE_CODES',
     default=(
-        'am '  # Amharic
-        'ar '  # Arabic
-        'cs '  # Czech
-        'de '  # German
         'en '  # English
-        'es '  # Spanish
-        'fa '  # Persian/Farsi
-        'fr '  # French
-        'hi '  # Hindi
-        'hu '  # Hungarian
-        'ja '  # Japanese
-        'ku '  # Kurdish
-        'pl '  # Polish
-        'pt '  # Portuguese
-        'ru '  # Russian
-        'tr '  # Turkish
-        'uk '  # Ukrainian
-        'zh-hans'  # Chinese Simplified
     )
 )
 LANGUAGES = [
@@ -544,9 +527,9 @@ TIME_ZONE = 'UTC'
 
 LOCALE_PATHS = (os.path.join(BASE_DIR, 'locale'),)
 
-USE_I18N = True
+USE_I18N = False
 
-USE_L10N = True
+USE_L10N = False
 
 USE_TZ = True
 
