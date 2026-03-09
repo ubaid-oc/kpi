@@ -10,16 +10,11 @@
 import moment from 'moment';
 import type {Toast, ToastOptions} from 'react-hot-toast';
 import {toast} from 'react-hot-toast';
-import {Cookies} from 'react-cookie';
 // importing whole constants, as we override ROOT_URL in tests
 import constants from 'js/constants';
 import type {FailResponse} from './dataInterface';
 
-export const LANGUAGE_COOKIE_NAME = 'django_language';
-
 export const assign = require('object-assign');
-
-const cookies = new Cookies();
 
 /**
  * Pop up a notification with react-hot-toast
