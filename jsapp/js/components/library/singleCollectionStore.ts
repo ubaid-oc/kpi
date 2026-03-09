@@ -14,6 +14,10 @@ import {
   ASSETS_TABLE_COLUMNS,
 } from 'js/components/assetsTable/assetsTableConstants';
 import type {OrderDirection} from 'js/projects/projectViews/constants';
+import {
+  DEFAULT_PAGE_SIZE,
+} from 'js/dataInterface';
+
 import type {
   AssetResponse,
   AssetsResponse,
@@ -49,7 +53,7 @@ class SingleCollectionStore extends Reflux.Store {
    */
   abortFetchData?: Function;
   previousPath = getCurrentPath();
-  PAGE_SIZE = 100;
+  PAGE_SIZE = DEFAULT_PAGE_SIZE;
   DEFAULT_ORDER_COLUMN = ASSETS_TABLE_COLUMNS['date-modified'];
 
   isInitialised = false;
