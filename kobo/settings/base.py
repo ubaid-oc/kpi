@@ -36,6 +36,10 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY', '@25)**hc^rjaiagb4#&q*84hr*uscsxwr-cv#
 # SECURITY WARNING: If enabled, outer web server must filter out the `X-Forwarded-Proto` header.
 SECURE_PROXY_SSL_HEADER = env.tuple("SECURE_PROXY_SSL_HEADER", str, None)
 
+if env.str('PUBLIC_REQUEST_SCHEME', '').lower() == 'https' or SECURE_PROXY_SSL_HEADER:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool('SECURE_HSTS_INCLUDE_SUBDOMAINS', False)
 SECURE_HSTS_PRELOAD = env.bool('SECURE_HSTS_PRELOAD', False)
 SECURE_HSTS_SECONDS = env.int('SECURE_HSTS_SECONDS', 0)
@@ -50,7 +54,6 @@ USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", False)
 ALLOWED_DOMAINS = env.list('ALLOWED_DOMAINS', default=[
     '.openclinica.io',
     '.openclinica-dev.io',
-    '.localhost.io',
 ])
 
 SESSION_COOKIE_DOMAIN = None # always None for tenant isolation
@@ -59,7 +62,7 @@ SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'kobonaut_v2')
 CSRF_COOKIE_DOMAIN = None # always None for tenant isolation
 CSRF_TRUSTED_ORIGINS = ALLOWED_DOMAINS
 CSRF_COOKIE_NAME = env.str('CSRF_COOKIE_NAME', 'occsrftoken_v2')
-CSRF_COOKIE_SAMESITE = env.str('CSRF_COOKIE_SAMESITE', 'Lax')
+CSRF_COOKIE_SAMESITE = env.str('CSRF_COOKIE_SAMESITE', 'None')
 
 SESSION_SAVE_EVERY_REQUEST = True
 
@@ -737,9 +740,7 @@ local_unsafe_allows = [
     "'unsafe-eval'",
     'http://localhost:3000',
     'http://kf.kobo.local:3000',
-    'ws://kf.kobo.local:3000',
-    'http://ahilman.formdesigner.localhost.io:3000',
-    'ws://ahilman.formdesigner.localhost.io:3000',
+    'ws://kf.kobo.local:3000'
 ]
 CSP_DEFAULT_SRC = env.list('CSP_EXTRA_DEFAULT_SRC', str, []) + ["'self'", KOBOCAT_URL, ENKETO_URL]
 if env.str("FRONTEND_DEV_MODE", None) == "host":
@@ -1284,7 +1285,6 @@ SERVICE_ACCOUNT = {
 # OpenClinica Keycloak Settings
 X_OPENROSA_ACCEPT_CONTENT_LENGTH_DEFAULT = os.environ.get('X_OPENROSA_ACCEPT_CONTENT_LENGTH_DEFAULT', '100000000')
 OC_BUILD_URL = os.environ.get('OC_BUILD_URL', '')
-LOCAL_OC_BUILD_URL = os.environ.get('LOCAL_OC_BUILD_URL', '')
 
 OIDC_RP_CLIENT_ID = os.environ.get('KEYCLOAK_CLIENT_ID', 'formdesigner')
 OIDC_RP_SCOPES = 'openid profile email'
