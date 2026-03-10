@@ -241,11 +241,12 @@ class MyLibraryStore extends Reflux.Store {
     // update total count for the first time and the ones that will get a full count
     if (this.data.totalUserAssets === null || searchBoxStore.getSearchPhrase() === '') {
       this.data.totalUserAssets = this.data.totalSearchAssets;
+      // track total count when no collection filter
+      if (this.data.collectionUid === null) {
+        this.data.totalUserRootAssets = this.data.totalSearchAssets;
+      }
     }
-    // track total count when no collection filter
-    if (this.data.collectionUid === null) {
-      this.data.totalUserRootAssets = this.data.totalSearchAssets;
-    }
+
     this.data.isFetchingData = false;
     this.isInitialised = true;
     this.trigger(this.data);
