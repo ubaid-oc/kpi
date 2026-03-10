@@ -117,15 +117,24 @@ class BigModal extends React.Component {
         break;
 
       case MODAL_TYPES.LIBRARY_COLLECTION_CREATE:
-        this.setModalTitle(t('Create Collection'));
+        this.setState({
+          title: t('Create Collection'),
+          modalClass: 'modal--slightly-upper',
+        });
         break;
 
       case MODAL_TYPES.LIBRARY_COLLECTION_EDIT:
-        this.setModalTitle(t('Edit Collection'));
+        this.setState({
+          title: t('Edit Collection'),
+          modalClass: 'modal--slightly-upper',
+        });
         break;
 
       case MODAL_TYPES.ASSET_TAGS:
-        this.setModalTitle(t('Edit label(s)'));
+        this.setState({
+          title: t('Edit label(s)'),
+          modalClass: 'modal--slightly-upper',
+        });
         break;
 
       case MODAL_TYPES.LIBRARY_UPLOAD:
