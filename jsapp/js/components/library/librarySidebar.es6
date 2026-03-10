@@ -44,7 +44,6 @@ class LibrarySidebar extends Reflux.Component {
   componentDidMount() {
     this.listenTo(myLibraryStore, this.myLibraryStoreChanged);
     this.listenTo(ownedCollectionsStore, this.ownedCollectionsStoreChanged);
-    this.listenTo(libraryTypeFilterStore, this.libraryTypeFilterStoreChanged);
     this.setState({
       isLoading: false,
       libraryTotalCount: myLibraryStore.getCurrentUserRootAssets(),
@@ -112,21 +111,6 @@ class LibrarySidebar extends Reflux.Component {
       isLoading: false,
       sidebarCollections: ownedCollectionsStore.getCollections(),
     });
-  }
-
-  libraryTypeFilterStoreChanged() {
-    if (myLibraryStore.getCollectionUid() !== null) {
-      const filterType = libraryTypeFilterStore.getFilterType();
-      const searchPhrase = searchBoxStore.getSearchPhrase();
-      dataInterface.searchMyLibraryAssets({
-        searchPhrase: searchPhrase,
-        filterType: filterType,
-        pageSize: 1,
-        page: 0,
-      }).then((response: {results: never[], count: number}) => {
-        this.setState({libraryTotalCount: response.count});
-      });
-    }
   }
 
   showLibraryNewModal(evt) {
