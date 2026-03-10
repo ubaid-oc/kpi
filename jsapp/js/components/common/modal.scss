@@ -41,7 +41,8 @@ $z-modal-x: 10;
   }
 
   &.modal--slightly-upper {
-    top: 25%;
+    top: 15%;
+    transform: translate(-50%, 0);
   }
 
   &.modal--large {
@@ -154,7 +155,7 @@ $z-modal-x: 10;
 .modal__subheader {
   background: colors.$kobo-gray-96;
   padding: 20px 30px;
-  margin: -30px -30px 20px;
+  margin: 0 -30px 20px;
   color: colors.$kobo-gray-40;
 
   i {
