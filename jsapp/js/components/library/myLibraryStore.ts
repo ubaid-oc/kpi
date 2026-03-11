@@ -273,11 +273,6 @@ class MyLibraryStore extends Reflux.Store {
       } else if (this.data.totalUserAssets !== null) {
         this.data.totalUserAssets--;
       }
-      if (this.data.totalUserRootAssets !== null && asset.parent === null) {
-        this.data.totalUserRootAssets++;
-      } else if (this.data.totalUserRootAssets !== null) {
-        this.data.totalUserRootAssets--;
-      }
       this.fetchData(true);
     }
   }
