@@ -44,6 +44,7 @@ interface MyLibraryStoreData {
   filterColumnId: string | null;
   filterValue: string | null;
   collectionUid: string | null;
+  totalUserRootAssets: number | null;
 }
 
 class MyLibraryStore extends Reflux.Store {
@@ -78,6 +79,7 @@ class MyLibraryStore extends Reflux.Store {
     filterColumnId: null,
     filterValue: null,
     collectionUid: null,
+    totalUserRootAssets: null,
   };
 
   fetchDataDebounced?: () => void;
@@ -242,7 +244,12 @@ class MyLibraryStore extends Reflux.Store {
     // update total count for the first time and the ones that will get a full count
     if (this.data.totalUserAssets === null || searchBoxStore.getSearchPhrase() === '') {
       this.data.totalUserAssets = this.data.totalSearchAssets;
+      // track total count when no collection filter
+      if (this.data.collectionUid === null) {
+        this.data.totalUserRootAssets = this.data.totalSearchAssets;
+      }
     }
+
     this.data.isFetchingData = false;
     this.isInitialised = true;
     this.trigger(this.data);
@@ -307,6 +314,9 @@ class MyLibraryStore extends Reflux.Store {
       if (this.data.totalUserAssets !== null) {
         this.data.totalUserAssets++;
       }
+      if (this.data.totalUserRootAssets !== null && asset.parent === null) {
+        this.data.totalUserRootAssets++;
+      }
       this.fetchData(true);
     }
   }
@@ -317,6 +327,9 @@ class MyLibraryStore extends Reflux.Store {
       if (found) {
         if (this.data.totalUserAssets !== null) {
           this.data.totalUserAssets--;
+        }
+        if (this.data.totalUserRootAssets !== null && found.parent === null) {
+          this.data.totalUserRootAssets--;
         }
         this.fetchData(true);
       }
@@ -375,6 +388,10 @@ class MyLibraryStore extends Reflux.Store {
 
   getCurrentUserTotalAssets() {
     return this.data.totalUserAssets;
+  }
+
+  getCurrentUserRootAssets() {
+    return this.data.totalUserRootAssets;
   }
 
   findAsset(uid: string) {
