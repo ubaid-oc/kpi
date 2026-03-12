@@ -1177,7 +1177,7 @@ else:
     except ValueError:  # db_url is unable to parse replica set strings
         mongo_db_name = env.str('MONGO_DB_NAME', 'formhub')
 
-MONGO_TIMEOUT_MS = env.int('MONGO_TIMEOUT_MS', 2000) # 2 seconds
+MONGO_TIMEOUT_MS = env.int('MONGO_TIMEOUT_MS', 2000)  # 2 seconds
 
 mongo_client = MongoClient(
     MONGO_DB_URL, connect=False, journal=True, tz_aware=True,
