@@ -1,3 +1,4 @@
+@use 'scss/breakpoints';
 @use 'scss/z-indexes';
 @use '~kobo-common/src/styles/colors';
 
@@ -18,7 +19,7 @@ $s-form-builder-content-width: 1024px;
   overflow-y: scroll;
   margin-right: 0;
   transition: margin $t-form-builder-aside-open;
-  padding: 20px 40px;
+  padding: 10px;
   width: auto;
 
   .form-builder-message-box {
@@ -28,7 +29,7 @@ $s-form-builder-content-width: 1024px;
   }
 }
 
-@media screen and (min-width: 1100px) {
+@media screen and (min-width: breakpoints.$b1100) {
   .form-builder-aside--visible + .form-builder,
   .lib-nav--visible + .form-builder {
     .form-builder__contents {
@@ -86,6 +87,12 @@ $s-form-builder-content-width: 1024px;
         }
       }
     }
+  }
+}
+
+@media screen and (max-width: breakpoints.$b1280) {
+  .form-wrap {
+    padding: 20px;
   }
 }
 
