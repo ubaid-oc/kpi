@@ -1,3 +1,4 @@
+@use 'scss/breakpoints';
 @use '~kobo-common/src/styles/colors';
 
 .table-meta {
@@ -31,7 +32,7 @@
     white-space: nowrap;
   }
 
-  @media screen and (max-width: 1100px) {
+  @media screen and (max-width: breakpoints.$b1100) {
     .table-meta__additional-text {
       display: none;
     }
