@@ -9,7 +9,10 @@ from django.core.mail import send_mail
 from kobo.celery import celery_app
 
 
-@celery_app.task
+@celery_app.task(
+    soft_time_limit=settings.CELERY_TASK_SOFT_TIME_LIMIT,
+    time_limit=settings.CELERY_TASK_TIME_LIMIT,
+)
 def import_in_background(import_task_uid):
     from kpi.models.import_export_task import ImportTask  # avoid circular imports
 
