@@ -74,6 +74,9 @@ from kpi.utils.strings import to_str
 from kpi.zip_importer import HttpContentParse
 
 
+IMPORT_TASK_REQUEST_TIMEOUT = 120  # seconds
+
+
 def utcnow(*args, **kwargs):
     """
     Stupid, and exists only to facilitate mocking during unit testing.
@@ -118,8 +121,9 @@ class ImportExportTask(models.Model):
         asynchronous task runner (Celery)
         """
         with transaction.atomic():
-            # FIXME: use `select_for_update`
-            _refetched_self = self._meta.model.objects.get(pk=self.pk)
+            _refetched_self = (
+                self._meta.model.objects.select_for_update().get(pk=self.pk)
+            )
             self.status = _refetched_self.status
             del _refetched_self
             if self.status == self.COMPLETE:
@@ -273,7 +277,10 @@ class ImportTask(ImportExportTask):
             # TODO: merge with `url` handling above; currently kept separate
             # because `_load_assets_from_url()` uses complex logic to deal with
             # multiple XLS files in a directory structure within a ZIP archive
-            response = requests.get(self.data['single_xls_url'])
+            response = requests.get(
+                self.data['single_xls_url'],
+                timeout=IMPORT_TASK_REQUEST_TIMEOUT,
+            )
             response.raise_for_status()
             encoded_xls = to_str(base64.b64encode(response.content))
 
@@ -315,7 +322,11 @@ class ImportTask(ImportExportTask):
     def _load_assets_from_url(self, url, messages, **kwargs):
         destination = kwargs.get('destination', False)
         has_necessary_perm = kwargs.get('has_necessary_perm', False)
-        req = requests.get(url, allow_redirects=True)
+        req = requests.get(
+            url,
+            allow_redirects=True,
+            timeout=IMPORT_TASK_REQUEST_TIMEOUT,
+        )
         fif = HttpContentParse(request=req).parse()
         fif.remove_invalid_assets()
         fif.remove_empty_collections()
