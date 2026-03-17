@@ -360,15 +360,6 @@ module.exports = do ->
       @defaultRowDetailParent = @cardSettingsWrap.find('.js-card-settings-row-options').eq(0)
       for [key, val] in @model.attributesArray() when key in ['label', 'hint', 'type']
         view = new $viewRowDetail.DetailView(model: val, rowView: @)
-        if key is 'label' and
-           (@getRawType() is 'calculate' or
-            @getRawType() is constants.QUESTION_TYPES['xml-external'])
-          if @getRawType() is 'calculate'
-            view.model = @model.get('calculation')
-          else if @getRawType() is constants.QUESTION_TYPES['xml-external']
-            view.model = @model.get('name')
-          @model.finalize()
-          val.set('value', '')
         view.render().insertInDOM(@)
 
       # Initialize the mandatory asterisk
