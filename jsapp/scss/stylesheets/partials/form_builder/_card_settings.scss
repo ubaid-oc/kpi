@@ -151,12 +151,12 @@
   }
 
   &.input-error {
-    color: colors.$kobo-light-red;
+    color: $cool-red;
 
     input.text,
     select,
     textarea {
-      border-color: colors.$kobo-light-red;
+      border-color: $cool-red;
     }
   }
 }
