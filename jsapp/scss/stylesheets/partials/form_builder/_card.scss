@@ -106,10 +106,9 @@
             color: colors.$kobo-gray-24;
           }
 
-        // we use placeholder as error message, as empty title is not welcomed
-         &::placeholder {
-            color: colors.$kobo-red;
-            background-color: rgba(colors.$kobo-red, 0.075);
+        &::placeholder {
+            color: inherit;
+            opacity: 0.6;
         }
     }
 
