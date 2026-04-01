@@ -89,7 +89,17 @@ module.exports = do ->
           </li>
         </ul>
         <div class="card__settings__content">
-          <ul class="js-card-settings-row-options card__settings__fields card__settings__fields--active"></ul>
+          <button class="card__settings__back js-toggle-card-settings">
+            <i class="k-icon k-icon-arrow-left"></i>
+          </button>
+          <div class="js-card-settings-row-options card__settings__fields card__settings__fields--active card__settings__row-options">
+            <div class="card__settings__fields-grid js-card-settings-row-options-primary"></div>
+            <div class="card__settings__advanced-toggle js-card-settings-advanced-toggle">
+              <span>#{t('Advanced options')}</span>
+              <i class="k-icon k-icon-angle-down card__settings__advanced-toggle__icon"></i>
+            </div>
+            <div class="card__settings__fields-grid js-card-settings-row-options-advanced is-collapsed"></div>
+          </div>
           <ul class="js-card-settings-skip-logic card__settings__fields"></ul>
           <ul class="js-card-settings-validation-criteria card__settings__fields"></ul>
           <ul class="js-card-settings-locked-features card__settings__fields locking__ui-hidden"></ul>

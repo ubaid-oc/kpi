@@ -136,7 +136,26 @@ module.exports = do ->
     _insertInDOM: (where, how) ->
       where[how || 'append'](@el)
     insertInDOM: (rowView)->
-      @_insertInDOM rowView.defaultRowDetailParent
+      normalizedKey = (key) ->
+        if key == 'bind::oc:itemgroup' then 'oc_item_group'
+        else if key == 'bind::oc:external' then 'oc_external'
+        else if key == 'bind::oc:briefdescription' then 'oc_briefdescription'
+        else if key == 'bind::oc:description' then 'oc_description'
+        else key
+
+      advancedKeys = [
+        'default'
+        'oc_item_group'
+        'calculation'
+        'trigger'
+        'readonly'
+      ]
+
+      target = rowView.defaultRowDetailParent
+      if rowView.advancedRowDetailParent? and (normalizedKey(@model.key) in advancedKeys)
+        target = rowView.advancedRowDetailParent
+
+      @_insertInDOM target
 
     makeFieldCheckCondition: (opts={}) ->
       el = opts.el || @$('input').get(0) || @$('textarea').get(0)
@@ -248,7 +267,7 @@ module.exports = do ->
     field: (input, cid, key_label) ->
       """
       <div class="card__settings__fields__field">
-        <label for="#{cid}">#{key_label}:</label>
+        <label for="#{cid}">#{key_label} :</label>
         <span class="settings__input">
           #{input}
         </span>
@@ -423,14 +442,9 @@ module.exports = do ->
       else
         viewRowDetail.Templates.textbox @cid, @model.key, t("Item Name"), 'text', 'Enter variable name', '40'
     afterRender: ->
-      @listenForInputChange(transformFn: (value)=>
-        value_chars = value.split('')
-        if !/[\w_]/.test(value_chars[0])
-          value_chars.unshift('_')
-
-        @model.set 'value', value
-        @model.deduplicate @model.getSurvey(), @model.getSurvey().rowItemNameMaxLength
-      )
+      $input = @$('input').eq(0)
+      $input.prop('readonly', true)
+      $input.attr('aria-readonly', 'true')
       @model.on 'change:value', () =>
         @changeHeaderName()
 
@@ -548,7 +562,7 @@ module.exports = do ->
       @fieldTab = "active"
       @$el.addClass("card__settings__fields--#{@fieldTab}")
       label = if @model.key == 'default' then t("Default value") else @model.key.replace(/_/g, ' ')
-      viewRowDetail.Templates.textarea @cid, @model.key, label, 'text'
+      viewRowDetail.Templates.textarea @cid, @model.key, label, 'text', t('Enter Text')
     changeModelValue: () ->
       $textarea = $(@$('textarea').get(0))
       $elVal = $textarea.val().replace(/\n/g, "")
@@ -1044,7 +1058,7 @@ module.exports = do ->
     html: ->
       @fieldTab = "active"
       @$el.addClass("card__settings__fields--#{@fieldTab}")
-      viewRowDetail.Templates.textbox @cid, @model.key, t("Item Brief Description"), 'text', 'Enter variable title (may be used in display table column headers) (optional)', '40'
+      viewRowDetail.Templates.textbox @cid, @model.key, t("Item Brief Description"), 'text', t('Enter Text'), '40'
     afterRender: ->
       @listenForInputChange()
 
@@ -1052,7 +1066,7 @@ module.exports = do ->
     html: ->
       @fieldTab = "active"
       @$el.addClass("card__settings__fields--#{@fieldTab}")
-      viewRowDetail.Templates.textbox @cid, @model.key, t("Item Description"), 'text', 'Enter variable definition (e.g., CDASH data definition) (optional)', '3999'
+      viewRowDetail.Templates.textbox @cid, @model.key, t("Item Description"), 'text', t('Enter Text'), '3999'
     afterRender: ->
       @listenForInputChange()
 
@@ -1231,7 +1245,7 @@ module.exports = do ->
     html: ->
       @fieldTab = "active"
       @$el.addClass("card__settings__fields--#{@fieldTab}")
-      viewRowDetail.Templates.textarea @cid, @model.key, t("Calculation"), 'text'
+      viewRowDetail.Templates.textarea @cid, @model.key, t("Calculation"), 'text', t('Enter Text')
     changeModelValue: () ->
       $textarea = $(@$('textarea').get(0))
       $elVal = $textarea.val().replace(/\n/g, "")
