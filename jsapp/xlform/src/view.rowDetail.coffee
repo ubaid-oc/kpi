@@ -34,6 +34,7 @@ module.exports = do ->
       else if modelKey == 'bind::oc:description'
         modelKey = 'oc_description'
 
+      @modelKey = modelKey
       @extraClass = "xlf-dv-#{modelKey}"
       _.extend(@, viewRowDetail.DetailViewMixins[modelKey] || viewRowDetail.DetailViewMixins.default)
       @$el.addClass(@extraClass)
@@ -136,13 +137,6 @@ module.exports = do ->
     _insertInDOM: (where, how) ->
       where[how || 'append'](@el)
     insertInDOM: (rowView)->
-      normalizedKey = (key) ->
-        if key == 'bind::oc:itemgroup' then 'oc_item_group'
-        else if key == 'bind::oc:external' then 'oc_external'
-        else if key == 'bind::oc:briefdescription' then 'oc_briefdescription'
-        else if key == 'bind::oc:description' then 'oc_description'
-        else key
-
       advancedKeys = [
         'default'
         'oc_item_group'
@@ -152,7 +146,7 @@ module.exports = do ->
       ]
 
       target = rowView.defaultRowDetailParent
-      if rowView.advancedRowDetailParent? and (normalizedKey(@model.key) in advancedKeys)
+      if rowView.advancedRowDetailParent? and (@modelKey in advancedKeys)
         target = rowView.advancedRowDetailParent
 
       @_insertInDOM target
@@ -267,7 +261,7 @@ module.exports = do ->
     field: (input, cid, key_label) ->
       """
       <div class="card__settings__fields__field">
-        <label for="#{cid}">#{key_label} :</label>
+        <label for="#{cid}">#{key_label}:</label>
         <span class="settings__input">
           #{input}
         </span>
@@ -442,9 +436,14 @@ module.exports = do ->
       else
         viewRowDetail.Templates.textbox @cid, @model.key, t("Item Name"), 'text', 'Enter variable name', '40'
     afterRender: ->
-      $input = @$('input').eq(0)
-      $input.prop('readonly', true)
-      $input.attr('aria-readonly', 'true')
+      @listenForInputChange(transformFn: (value)=>
+        value_chars = value.split('')
+        if !/[\w_]/.test(value_chars[0])
+          value_chars.unshift('_')
+
+        @model.set 'value', value
+        @model.deduplicate @model.getSurvey(), @model.getSurvey().rowItemNameMaxLength
+      )
       @model.on 'change:value', () =>
         @changeHeaderName()
 

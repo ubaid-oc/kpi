@@ -89,16 +89,16 @@ module.exports = do ->
           </li>
         </ul>
         <div class="card__settings__content">
-          <button class="card__settings__back js-toggle-card-settings">
-            <i class="k-icon k-icon-arrow-left"></i>
+          <button type="button" class="card__settings__back js-toggle-card-settings" aria-label="#{t('Back')}">
+            <i class="k-icon k-icon-arrow-left" aria-hidden="true"></i>
           </button>
           <div class="js-card-settings-row-options card__settings__fields card__settings__fields--active card__settings__row-options">
             <div class="card__settings__fields-grid js-card-settings-row-options-primary"></div>
-            <div class="card__settings__advanced-toggle js-card-settings-advanced-toggle">
+            <div class="card__settings__advanced-toggle js-card-settings-advanced-toggle" aria-expanded="false" aria-controls="js-card-settings-row-options-advanced">
               <span>#{t('Advanced options')}</span>
-              <i class="k-icon k-icon-angle-down card__settings__advanced-toggle__icon"></i>
+              <i class="k-icon k-icon-angle-down card__settings__advanced-toggle__icon" aria-hidden="true"></i>
             </div>
-            <div class="card__settings__fields-grid js-card-settings-row-options-advanced is-collapsed"></div>
+            <div id="js-card-settings-row-options-advanced" class="card__settings__fields-grid js-card-settings-row-options-advanced is-collapsed"></div>
           </div>
           <ul class="js-card-settings-skip-logic card__settings__fields"></ul>
           <ul class="js-card-settings-validation-criteria card__settings__fields"></ul>

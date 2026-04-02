@@ -676,9 +676,11 @@ module.exports = do ->
         if isCollapsed
           $advanced.removeClass('is-collapsed')
           $toggle.addClass('is-expanded')
+          $toggle.attr('aria-expanded', 'true')
         else
           $advanced.addClass('is-collapsed')
           $toggle.removeClass('is-expanded')
+          $toggle.attr('aria-expanded', 'false')
       questionType = @model.get('type').get('typeId')
 
       # don't display columns that start with a $
