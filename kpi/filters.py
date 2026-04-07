@@ -120,8 +120,14 @@ class KpiObjectPermissionsFilter:
                 # elif model_name == 'collection':
                 #     subdomain_collectionIds = Collection.objects.filter(owner__in=subdomain_userIds).values_list('id', flat=True)
                 #     return queryset.filter(pk__in=subdomain_collectionIds)
-            except Exception:
+            except KeycloakModel.DoesNotExist:
+                # User has no Keycloak record; fall through to standard filtering
                 pass
+            except Exception:
+                logging.exception(
+                    'Unexpected error while filtering queryset by subdomain '
+                    'for user %s', user
+                )
 
         if user.is_superuser and view.action != 'list':
             # For a list, we won't deluge the superuser with everyone else's
