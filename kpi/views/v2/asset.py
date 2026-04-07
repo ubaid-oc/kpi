@@ -62,6 +62,7 @@ from kpi.utils.hash import calculate_hash
 from kpi.serializers.v2.reports import ReportsDetailSerializer
 from kpi.utils.kobo_to_xlsform import to_xlsform_structure
 from kpi.utils.ss_structure_to_mdtable import ss_structure_to_mdtable
+from kpi.utils.permissions import get_subdomain_user_ids
 from kpi.utils.object_permission import (
     get_database_user,
     get_objects_for_user,
@@ -870,18 +871,14 @@ class AssetViewSet(
         else:
             source_version = original_asset.asset_versions.first()
 
-        kc_user = None
         try:
-            kc_user = KeycloakModel.objects.get(user=self.request.user)
+            subdomain_user_ids = get_subdomain_user_ids(self.request.user)
         except KeycloakModel.DoesNotExist:
             raise Http404
 
-        if kc_user is not None:
-            subdomain = kc_user.subdomain
-            subdomain_userIds = KeycloakModel.objects.filter(subdomain=subdomain).values_list('user_id', flat=True)
-            if original_asset.owner.id not in subdomain_userIds:
-                raise Http404
-        
+        if original_asset.owner.id not in subdomain_user_ids:
+            raise Http404
+
         partial_update = isinstance(current_asset, Asset)
         cloned_data = self._prepare_cloned_data(original_asset, source_version, partial_update)
         if partial_update:
