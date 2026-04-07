@@ -1077,16 +1077,16 @@ module.exports = do ->
       $select = @$('select')
       $select.closest('div').addClass(fieldClass)
       if $select.siblings('.message').length is 0
-        $message = $('<div/>').addClass('message').text(_t(message))
+        $message = $('<div/>').addClass('message').text(message)
         $select.after($message)
 
     showErrorMessage: () ->
-      errorMessage = "Constraint / Constraint Message is not empty"
+      errorMessage = t("Constraint / Constraint Message is not empty")
       errorFieldClass = 'input-error'
       @showMessage(errorMessage, errorFieldClass)
 
     showSignatureMessage: () ->
-      signatureMessage = "Signature items must be Select Multiple questions with one option"
+      signatureMessage = t("Signature items must be Select Multiple questions with one option")
       fieldClass = ''
       if (@model.getSurvey().errorMessage?)
         signatureMessage = @model.getSurvey().errorMessage
