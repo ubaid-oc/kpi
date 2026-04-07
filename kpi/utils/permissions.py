@@ -2,7 +2,21 @@
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
+from django.db.models import Q, QuerySet
+
+
+def get_subdomain_user_ids(user) -> QuerySet:
+    """
+    Returns a QuerySet of user_ids belonging to the same Keycloak subdomain
+    as `user`. Raises KeycloakModel.DoesNotExist if `user` has no Keycloak
+    record.
+    """
+    from bossoidc2.models import Keycloak as KeycloakModel
+
+    kc_user = KeycloakModel.objects.get(user=user)
+    return KeycloakModel.objects.filter(
+        subdomain=kc_user.subdomain
+    ).values_list('user_id', flat=True)
 
 """
 `import`s inside functions are there to avoid circular dependencies. They
