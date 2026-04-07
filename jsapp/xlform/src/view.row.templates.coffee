@@ -51,7 +51,7 @@ module.exports = do ->
       <section class="card__settings  row-extras row-extras--depr">
         <i class="card__settings-close k-icon k-icon-close js-toggle-card-settings"></i>
         <ul class="card__settings__tabs">
-          <li class="heading"><i class="k-icon k-icon-settings"></i> #{t("Settings")}</li>
+          <li class="heading"><i class="k-icon k-icon-edit"></i> #{t("Edit")}</li>
           <li data-card-settings-tab-id="row-options" class="card__settings__tabs__tab card__settings__tabs__tab--active">
             #{t("All group settings")}
           </li>
@@ -74,7 +74,7 @@ module.exports = do ->
       <section class="card__settings  row-extras row-extras--depr">
         <i class="card__settings-close k-icon k-icon-close js-toggle-card-settings"></i>
         <ul class="card__settings__tabs">
-          <li class="heading"><i class="k-icon k-icon-settings"></i> #{t("Settings")}</li>
+          <li class="heading"><i class="k-icon k-icon-edit"></i> #{t("Edit")}</li>
           <li data-card-settings-tab-id="row-options" class="card__settings__tabs__tab--active">
             #{t("Question Options")}
           </li>
@@ -111,7 +111,7 @@ module.exports = do ->
             <input type="text" placeholder="#{t("Enter question hint (optional)")}" class="card__header-hint js-card-hint js-cancel-select-row js-cancel-sort">
           </div>
           <div class="card__buttons">
-            <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings" data-button-name="settings"><i class="k-icon k-icon-settings"></i></span>
+            <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings" data-button-name="settings"><i class="k-icon k-icon-edit"></i></span>
             <span class="card__buttons__button card__buttons__button--delete card__buttons__button--red js-delete-row" data-button-name="delete"><i class="k-icon k-icon-trash"></i></span>
       """
       if surveyView.features.multipleQuestions
@@ -145,7 +145,7 @@ module.exports = do ->
         <input type="text" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort">
         <div class="card__buttons">
           <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings">
-            <i class="k-icon k-icon-settings"></i>
+            <i class="k-icon k-icon-edit"></i>
           </span>
 
           <span class="card__buttons__button card__buttons__button--delete card__buttons__button--red js-delete-group">
