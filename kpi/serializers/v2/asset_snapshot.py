@@ -7,7 +7,7 @@ from bossoidc2.models import Keycloak as KeycloakModel
 from kpi.constants import PERM_VIEW_ASSET
 from kpi.fields import RelativePrefixHyperlinkedRelatedField, WritableJSONField
 from kpi.models import Asset, AssetSnapshot
-from kpi.utils.permissions import get_subdomain_user_ids
+from kpi.utils.permissions import get_subdomain_user_ids, is_owner_in_subdomain
 
 
 class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
@@ -53,17 +53,16 @@ class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
     def check_subdomain_permission(self, asset):
         # Check if asset owner id in subdomain userIds
         user = self.context['request'].user
-        try:
-            subdomain_user_ids = get_subdomain_user_ids(user)
-        except KeycloakModel.DoesNotExist:
-            raise exceptions.PermissionDenied
 
         if isinstance(asset, dict) and 'owner' in asset:
             asset_owner = asset['owner']
         else:
             asset_owner = asset.owner
 
-        if asset_owner.id not in subdomain_user_ids:
+        try:
+            if not is_owner_in_subdomain(user, asset_owner.id):
+                raise exceptions.PermissionDenied
+        except KeycloakModel.DoesNotExist:
             raise exceptions.PermissionDenied
 
     def create(self, validated_data):
