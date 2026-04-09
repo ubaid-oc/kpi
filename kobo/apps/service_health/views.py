@@ -66,32 +66,17 @@ def service_health(request):
     postgres_time = time.time() - t0
 
     t0 = time.time()
-    failure, kobocat_message, kobocat_content = get_response(settings.KOBOCAT_INTERNAL_URL + '/service_health/')
-    any_failure = True if failure else any_failure
-    kobocat_time = time.time() - t0
 
     output = (
         '{} KPI\r\n\r\n'
         'Postgres: {} in {:.3} seconds\r\n'
-        'KoBoCAT [{}]: {} in {:.3} seconds\r\n'
     ).format(
         'FAIL' if any_failure else 'OK',
         postgres_message, postgres_time,
-        settings.KOBOCAT_INTERNAL_URL, kobocat_message, kobocat_time
     )
 
     if mongo_message is not None:
         output += 'Mongo: {} in {:.3} seconds\r\n'.format(mongo_message, mongo_time)
-
-    if kobocat_content:
-        output += (
-            '\r\n'
-            '----BEGIN KOBOCAT RESPONSE----\r\n'
-            '{}\r\n'
-            '---- END KOBOCAT RESPONSE ----\r\n'
-        ).format(
-            kobocat_content
-        )
 
     return HttpResponse(
         output, status=(500 if any_failure else 200), content_type='text/plain'
