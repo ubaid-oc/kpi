@@ -7,7 +7,7 @@ from bossoidc2.models import Keycloak as KeycloakModel
 from kpi.constants import PERM_VIEW_ASSET
 from kpi.fields import RelativePrefixHyperlinkedRelatedField, WritableJSONField
 from kpi.models import Asset, AssetSnapshot
-from kpi.utils.permissions import get_subdomain_user_ids, is_owner_in_subdomain
+from kpi.utils.permissions import is_owner_in_subdomain
 
 
 class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):

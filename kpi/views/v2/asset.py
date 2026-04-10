@@ -62,7 +62,7 @@ from kpi.utils.hash import calculate_hash
 from kpi.serializers.v2.reports import ReportsDetailSerializer
 from kpi.utils.kobo_to_xlsform import to_xlsform_structure
 from kpi.utils.ss_structure_to_mdtable import ss_structure_to_mdtable
-from kpi.utils.permissions import get_subdomain_user_ids, is_owner_in_subdomain
+from kpi.utils.permissions import is_owner_in_subdomain
 from kpi.utils.object_permission import (
     get_database_user,
     get_objects_for_user,
