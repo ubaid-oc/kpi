@@ -36,9 +36,16 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY', '@25)**hc^rjaiagb4#&q*84hr*uscsxwr-cv#
 # SECURITY WARNING: If enabled, outer web server must filter out the `X-Forwarded-Proto` header.
 SECURE_PROXY_SSL_HEADER = env.tuple("SECURE_PROXY_SSL_HEADER", str, None)
 
-if env.str('PUBLIC_REQUEST_SCHEME', '').lower() == 'https' or SECURE_PROXY_SSL_HEADER:
+COOKIES_ARE_SECURE = (
+    env.str('PUBLIC_REQUEST_SCHEME', '').lower() == 'https'
+    or bool(SECURE_PROXY_SSL_HEADER)
+)
+if COOKIES_ARE_SECURE:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# SameSite=None requires the Secure flag; fall back to 'Lax' when not serving over HTTPS
+_default_samesite = 'None' if COOKIES_ARE_SECURE else 'Lax'
 
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool('SECURE_HSTS_INCLUDE_SUBDOMAINS', False)
 SECURE_HSTS_PRELOAD = env.bool('SECURE_HSTS_PRELOAD', False)
@@ -58,12 +65,21 @@ ALLOWED_DOMAINS = env.list('ALLOWED_DOMAINS', default=[
 
 SESSION_COOKIE_DOMAIN = None # always None for tenant isolation
 SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'kobonaut_v2')
-SESSION_COOKIE_SAMESITE = env.str('SESSION_COOKIE_SAMESITE', 'None')
+SESSION_COOKIE_SAMESITE = env.str('SESSION_COOKIE_SAMESITE', _default_samesite)
 
 CSRF_COOKIE_DOMAIN = None # always None for tenant isolation
 CSRF_TRUSTED_ORIGINS = ALLOWED_DOMAINS
 CSRF_COOKIE_NAME = env.str('CSRF_COOKIE_NAME', 'occsrftoken_v2')
-CSRF_COOKIE_SAMESITE = env.str('CSRF_COOKIE_SAMESITE', 'None')
+CSRF_COOKIE_SAMESITE = env.str('CSRF_COOKIE_SAMESITE', _default_samesite)
+
+# Safety net: if SameSite=None was set explicitly via env var despite no HTTPS
+# detection, enforce Secure=True to prevent browsers from rejecting the cookie
+if SESSION_COOKIE_SAMESITE == 'None':
+    SESSION_COOKIE_SECURE = True
+    COOKIES_ARE_SECURE = True
+if CSRF_COOKIE_SAMESITE == 'None':
+    CSRF_COOKIE_SECURE = True
+    COOKIES_ARE_SECURE = True
 
 SESSION_SAVE_EVERY_REQUEST = True
 
