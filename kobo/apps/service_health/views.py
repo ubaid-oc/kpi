@@ -1,5 +1,4 @@
 # coding: utf-8
-import requests
 import time
 
 from django.conf import settings
@@ -7,34 +6,6 @@ from django.http import HttpResponse
 
 from kpi.models import Asset
 
-
-def get_response(url_):
-
-    message = "OK"
-    failure = False
-    content = None
-
-    try:
-        # response timeout changed to 10 seconds from 45 as requested in
-        # issue linked here https://github.com/kobotoolbox/kpi/issues/2642
-        response_ = requests.get(url_, timeout=10)
-        response_.raise_for_status()
-        content = response_.text
-    except Exception as e:
-        response_ = None
-        message = repr(e)
-        failure = True
-    else:
-        # Response can be something else than 200. We need to validate this.
-        # For example: if domain name doesn't match, nginx returns a 204 status code.
-        status_code = response_.status_code
-        if status_code != 200:
-            response_ = None
-            content = None
-            failure = True
-            message = "Response status code is {}".format(status_code)
-
-    return failure, message, content
 
 
 def service_health(request):
@@ -64,8 +35,6 @@ def service_health(request):
     else:
         postgres_message = 'OK'
     postgres_time = time.time() - t0
-
-    t0 = time.time()
 
     output = (
         '{} KPI\r\n\r\n'
