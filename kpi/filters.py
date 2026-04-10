@@ -128,6 +128,7 @@ class KpiObjectPermissionsFilter:
                     'Unexpected error while filtering queryset by subdomain '
                     'for user %s', user
                 )
+                raise
 
         if user.is_superuser and view.action != 'list':
             # For a list, we won't deluge the superuser with everyone else's
