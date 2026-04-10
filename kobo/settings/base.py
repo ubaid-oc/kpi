@@ -58,6 +58,7 @@ ALLOWED_DOMAINS = env.list('ALLOWED_DOMAINS', default=[
 
 SESSION_COOKIE_DOMAIN = None # always None for tenant isolation
 SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'kobonaut_v2')
+SESSION_COOKIE_SAMESITE = env.str('SESSION_COOKIE_SAMESITE', 'None')
 
 CSRF_COOKIE_DOMAIN = None # always None for tenant isolation
 CSRF_TRUSTED_ORIGINS = ALLOWED_DOMAINS
