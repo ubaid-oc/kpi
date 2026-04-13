@@ -65,25 +65,25 @@ do ->
           expect(@row.get(key).get('value'))
       it 'text is required', ->
         @populateRow(type: 'text')
-        @expectValue('required').toBe(false)
+        @expectValue('required').toBe('false')
       it 'select one is required', ->
         @populateRow(type: 'select_one')
-        @expectValue('required').toBe(false)
+        @expectValue('required').toBe('false')
       it 'integer is required', ->
         @populateRow(type: 'integer')
-        @expectValue('required').toBe(false)
+        @expectValue('required').toBe('false')
       it 'geopoint is not required', ->
         @populateRow(type: 'geopoint')
-        @expectValue('required').toBe(false)
+        @expectValue('required').toBe('false')
       it 'geotrace is not required', ->
         @populateRow(type: 'geotrace')
-        @expectValue('required').toBe(false)
+        @expectValue('required').toBe('false')
       it 'geoshape is not required', ->
         @populateRow(type: 'geoshape')
-        @expectValue('required').toBe(false)
+        @expectValue('required').toBe('false')
       it 'note is not required', ->
         @populateRow(type: 'note')
-        @expectValue('required').toBe(false)
+        @expectValue('required').toBe('false')
 
     it 'has a valid empty survey', ->
       expect(@survey.toCSV()).toBeDefined()
