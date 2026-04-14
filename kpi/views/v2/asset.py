@@ -403,6 +403,13 @@ class AssetViewSet(
         'uid__icontains',
     ]
 
+    def get_permissions(self):
+        # The XML format of a single asset is publicly accessible without
+        # authentication, mirroring how AssetSnapshotViewSet treats .xml
+        if self.action == 'retrieve' and self.kwargs.get('format') == 'xml':
+            return []
+        return super().get_permissions()
+
     def get_object(self):
         if self.request.method in ['PATCH', 'GET']:
             try:
