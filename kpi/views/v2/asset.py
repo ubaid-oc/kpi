@@ -405,8 +405,13 @@ class AssetViewSet(
 
     def get_permissions(self):
         # The XML format of a single asset is publicly accessible without
-        # authentication, mirroring how AssetSnapshotViewSet treats .xml
-        if self.action == 'retrieve' and self.kwargs.get('format') == 'xml':
+        # authentication, mirroring how AssetSnapshotViewSet treats .xml.
+        # Keying off accepted_renderer covers all negotiation paths:
+        # URL suffix (.xml), ?format=xml, and Accept: application/xml.
+        if (
+            self.action == 'retrieve'
+            and self.request.accepted_renderer.format == 'xml'
+        ):
             return []
         return super().get_permissions()
 
