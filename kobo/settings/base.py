@@ -61,7 +61,7 @@ USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", False)
 ALLOWED_DOMAINS = [
     d.strip() for d in env.list('ALLOWED_DOMAINS', default=[
         '.localhost.io',
-    ])
+    ]) if d.strip()
 ]
 
 SESSION_COOKIE_DOMAIN = None # always None for tenant isolation
