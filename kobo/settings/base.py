@@ -58,10 +58,11 @@ USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", False)
 # Domain must not exclude KoBoCAT when sharing sessions
 # NOTE: For multi-tenant setups with separate subdomains, keep cookie domains as None
 # to ensure each subdomain has its own isolated session and CSRF tokens
-ALLOWED_DOMAINS = env.list('ALLOWED_DOMAINS', default=[
-    '.openclinica.io',
-    '.openclinica-dev.io',
-])
+ALLOWED_DOMAINS = [
+    d.strip() for d in env.list('ALLOWED_DOMAINS', default=[
+        '.localhost.io',
+    ]) if d.strip()
+]
 
 SESSION_COOKIE_DOMAIN = None # always None for tenant isolation
 SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'kobonaut_v2')

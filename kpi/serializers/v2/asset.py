@@ -456,16 +456,18 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         # caller's subdomain so that out-of-scope collections are treated as
         # "not found" by DRF rather than resolving the object and leaking its
         # existence through a different validation error.
-        try:
-            subdomain_user_ids = get_subdomain_user_ids(
-                self.context['request'].user
-            )
-            fields['parent'].queryset = Asset.objects.filter(
-                asset_type=ASSET_TYPE_COLLECTION,
-                owner__in=subdomain_user_ids,
-            )
-        except KeycloakModel.DoesNotExist:
+        user = self.context['request'].user
+        if user.is_anonymous:
             fields['parent'].queryset = Asset.objects.none()
+        else:
+            try:
+                subdomain_user_ids = get_subdomain_user_ids(user)
+                fields['parent'].queryset = Asset.objects.filter(
+                    asset_type=ASSET_TYPE_COLLECTION,
+                    owner__in=subdomain_user_ids,
+                )
+            except KeycloakModel.DoesNotExist:
+                fields['parent'].queryset = Asset.objects.none()
 
         return fields
 
