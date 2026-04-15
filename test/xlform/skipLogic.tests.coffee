@@ -120,12 +120,12 @@ do ->
     it 'serializes selected()', ->
       op = new $skipLogic.SelectMultipleSkipLogicOperator('=')
       result = op.serialize('colours', 'red')
-      expect(result).toBe("selected(\${colours}, 'red')")
+      expect(result).toBe("selected(${colours}, 'red')")
 
     it 'wraps in not() when negated', ->
       op = new $skipLogic.SelectMultipleSkipLogicOperator('!=')
       result = op.serialize('colours', 'red')
-      expect(result).toBe("not(selected(\${colours}, 'red'))")
+      expect(result).toBe("not(selected(${colours}, 'red'))")
 
   describe 'skipLogic: EmptyOperator.serialize()', ->
 
@@ -242,13 +242,13 @@ do ->
   describe 'skipLogic: parser — select_multiple criterion', ->
 
     it 'parses selected(${q}, \'val\') as multiplechoice_selected', ->
-      result = $skipLogicParser("selected(\${colours}, 'red')")
+      result = $skipLogicParser("selected(${colours}, 'red')")
       expect(result.criteria[0].name).toBe('colours')
       expect(result.criteria[0].operator).toBe('multiplechoice_selected')
       expect(result.criteria[0].response_value).toBe('red')
 
     it 'parses not(selected(...)) as multiplechoice_notselected', ->
-      result = $skipLogicParser("not(selected(\${colours}, 'red'))")
+      result = $skipLogicParser("not(selected(${colours}, 'red'))")
       expect(result.criteria[0].operator).toBe('multiplechoice_notselected')
       expect(result.criteria[0].response_value).toBe('red')
 

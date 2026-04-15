@@ -140,10 +140,16 @@ do ->
       expect(idx >= 0).toBe(true)
 
     it 'columnOrder() appends an unknown key and returns its index', ->
-      before = $configs.columns.length
-      $configs.columnOrder('__brand_new_test_key__')
-      after = $configs.columns.length
-      expect(after).toBe(before + 1)
+      originalColumns = $configs.columns.slice()
+      try
+        before = $configs.columns.length
+        $configs.columnOrder('__brand_new_test_key__')
+        after = $configs.columns.length
+        expect(after).toBe(before + 1)
+      finally
+        $configs.columns.length = 0
+        for col in originalColumns
+          $configs.columns.push(col)
 
     it 'calling columnOrder() twice for the same key returns the same index', ->
       idx1 = $configs.columnOrder('readonly')

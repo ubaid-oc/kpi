@@ -1,5 +1,6 @@
 {expect} = require('../helper/fauxChai')
 $ = require('jquery')
+window.t ?= (str) -> str
 
 $viewRowSelector = require('../../jsapp/xlform/src/view.rowSelector')
 $model = require('../../jsapp/xlform/src/_model')
