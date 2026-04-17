@@ -1,6 +1,7 @@
 # coding: utf-8
 # 😬
 import copy
+import traceback
 
 from django.db import models
 from django.conf import settings as django_settings
@@ -359,6 +360,8 @@ class AssetSnapshot(
         details = {}
         xml = ''
         generation_error = None
+        generation_traceback = None
+        formpack_error = None  # original FormPack error, kept for context if fallback also fails
 
         # Step 1: try FormPack to generate XML
         try:
@@ -366,7 +369,8 @@ class AssetSnapshot(
                            root_node_name=root_node_name,
                            id_string=id_string,
                            title=form_title)[0].to_xml(warnings=warnings)
-        except PyXFormError:
+        except PyXFormError as formpack_err:
+            formpack_error = formpack_err
             # Step 2: FormPack failed; fall back to pyxform directly
             try:
                 self._prepare_for_xml_pyxform_generation(source_copy, id_string=id_string)
@@ -375,8 +379,10 @@ class AssetSnapshot(
                 xml = survey.to_xml()
             except Exception as err:
                 generation_error = err
+                generation_traceback = traceback.format_exc()
         except Exception as err:
             generation_error = err
+            generation_traceback = traceback.format_exc()
 
         # Step 3: update details based on whether generation succeeded or failed
         if generation_error:
@@ -386,12 +392,17 @@ class AssetSnapshot(
                 'id_string': id_string,
                 'uid': self.uid,
                 '_msg': err_message,
+                'traceback': generation_traceback,
+                # Include the original FormPack error so the root cause is not lost
+                'formpack_error': str(formpack_error) if formpack_error else None,
                 'warnings': warnings,
             })
             details.update({
                 'status': 'failure',
                 'error_type': type(generation_error).__name__,
                 'error': err_message,
+                # Expose the original FormPack error in the response details too
+                'formpack_error': str(formpack_error) if formpack_error else None,
                 'warnings': warnings,
             })
         else:
