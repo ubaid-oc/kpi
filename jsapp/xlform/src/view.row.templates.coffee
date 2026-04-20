@@ -93,7 +93,10 @@ module.exports = do ->
             <i class="k-icon k-icon-arrow-left" aria-hidden="true"></i>
           </button>
           <div class="js-card-settings-row-options card__settings__fields card__settings__fields--active card__settings__row-options">
-            <div class="card__settings__fields-grid js-card-settings-row-options-primary"></div>
+            <div class="card__settings__fields-grid js-card-settings-row-options-primary">
+              <div class="card__settings__fields-col js-card-settings-col-left"></div>
+              <div class="card__settings__fields-col js-card-settings-col-right"></div>
+            </div>
             <div class="card__settings__advanced-toggle js-card-settings-advanced-toggle" aria-expanded="false" aria-controls="js-card-settings-row-options-advanced">
               <span>#{t('Advanced options')}</span>
               <i class="k-icon k-icon-angle-down card__settings__advanced-toggle__icon" aria-hidden="true"></i>

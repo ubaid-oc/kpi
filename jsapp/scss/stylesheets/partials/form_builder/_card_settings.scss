@@ -116,7 +116,13 @@
     }
   }
 
-  &.xlf-dv-oc_external,
+  &.xlf-dv-oc_external {
+    label {
+      vertical-align: top;
+      padding-top: 7px;
+    }
+  }
+
   &.xlf-dv-_isRepeat {
     label {
       vertical-align: middle;
@@ -273,36 +279,46 @@
   }
 }
 
-.card__settings__fields-grid {
+.card__settings__fields-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+
+  // Enforce fixed visual order regardless of DOM insertion order
+  .xlf-dv-appearance      { order: 1; }
+  .xlf-dv-oc_description  { order: 2; }
+  .xlf-dv-oc_external     { order: 3; }
+}
+
+// Primary layout: CSS Grid outer — one row, two independent columns
+// Each column wrapper stacks its own items without any row-track synchronization
+.js-card-settings-row-options-primary {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  row-gap: 12px;
+  align-items: start;
   column-gap: 8px;
+}
+
+// Advanced layout: grid for consistent 2-column placement
+.js-card-settings-row-options-advanced {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 8px;
+  row-gap: 12px;
+  align-items: start;
+
+  .xlf-dv-default       { grid-column: 1; grid-row: 1; }
+  .xlf-dv-calculation   { grid-column: 2; grid-row: 1; }
+  .xlf-dv-oc_item_group { grid-column: 1; grid-row: 2; }
+  .xlf-dv-trigger       { grid-column: 2; grid-row: 2; }
+  .xlf-dv-readonly      { grid-column: 2; grid-row: 3; }
 }
 
 .card__settings__row-options {
   background: $oc-settings-bg;
   padding: 0 60px 24px 32px;
   border-radius: 6px;
-}
-
-// Primary grid: explicit visual order
-.js-card-settings-row-options-primary {
-  .xlf-dv-name            { order: 1; }
-  .xlf-dv-appearance      { order: 2; }
-  .xlf-dv-oc_briefdescription { order: 3; }
-  .xlf-dv-oc_description  { order: 4; }
-  .mandatory-setting      { order: 5; }
-  .xlf-dv-oc_external     { order: 6; }
-}
-
-// Advanced grid: explicit visual order
-.js-card-settings-row-options-advanced {
-  .xlf-dv-default         { order: 1; }
-  .xlf-dv-calculation     { order: 2; }
-  .xlf-dv-oc_item_group   { order: 3; }
-  .xlf-dv-trigger         { order: 4; }
-  .xlf-dv-readonly        { order: 6; grid-column: 2; }
 }
 
 .card__settings__fields-grid.is-collapsed {
@@ -344,14 +360,18 @@
 }
 
 @media screen and (max-width: breakpoints.$b1280) {
-  .card__settings__fields-grid {
+  .js-card-settings-row-options-primary {
     grid-template-columns: 1fr;
   }
 
   .js-card-settings-row-options-advanced {
-    .xlf-dv-readonly {
-      grid-column: 1;
-    }
+    grid-template-columns: 1fr;
+
+    .xlf-dv-default       { grid-column: 1; grid-row: auto; }
+    .xlf-dv-calculation   { grid-column: 1; grid-row: auto; }
+    .xlf-dv-oc_item_group { grid-column: 1; grid-row: auto; }
+    .xlf-dv-trigger       { grid-column: 1; grid-row: auto; }
+    .xlf-dv-readonly      { grid-column: 1; grid-row: auto; }
   }
 }
 

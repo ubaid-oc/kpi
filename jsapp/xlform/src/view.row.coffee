@@ -665,8 +665,10 @@ module.exports = do ->
       @$header.after($viewTemplates.row.rowSettingsView())
       @cardSettingsWrap = @$('.card__settings').eq(0)
       @primaryRowDetailParent = @cardSettingsWrap.find('.js-card-settings-row-options-primary').eq(0)
+      @primaryRowDetailParentLeft = @cardSettingsWrap.find('.js-card-settings-col-left').eq(0)
+      @primaryRowDetailParentRight = @cardSettingsWrap.find('.js-card-settings-col-right').eq(0)
       @advancedRowDetailParent = @cardSettingsWrap.find('.js-card-settings-row-options-advanced').eq(0)
-      @defaultRowDetailParent = @primaryRowDetailParent
+      @defaultRowDetailParent = @primaryRowDetailParentLeft
       @cardSettingsWrap.off('click.advancedToggle')
       @cardSettingsWrap.on 'click.advancedToggle', '.js-card-settings-advanced-toggle', (evt) =>
         evt.preventDefault()

@@ -145,9 +145,17 @@ module.exports = do ->
         'readonly'
       ]
 
+      rightColumnKeys = [
+        'appearance'
+        'oc_description'
+        'oc_external'
+      ]
+
       target = rowView.defaultRowDetailParent
       if rowView.advancedRowDetailParent? and (@modelKey in advancedKeys)
         target = rowView.advancedRowDetailParent
+      else if rowView.primaryRowDetailParentRight? and (@modelKey in rightColumnKeys)
+        target = rowView.primaryRowDetailParentRight
 
       @_insertInDOM target
 
