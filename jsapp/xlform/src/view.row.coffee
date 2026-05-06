@@ -22,6 +22,7 @@ getGroupFeatures = require('js/components/locking/lockingUtils').getGroupFeature
 LOCKING_RESTRICTIONS = require('js/components/locking/lockingConstants').LOCKING_RESTRICTIONS
 LOCKING_UI_CLASSNAMES = require('js/components/locking/lockingConstants').LOCKING_UI_CLASSNAMES
 $icons = require('./view.icons')
+econsentSignature = require('../../js/components/formBuilder/econsentSignature')
 # TODO: port this and others from alertify.dialog to new modal system
 # https://github.com/kobotoolbox/kpi/issues/3977
 multiConfirm = require('js/alertify').multiConfirm
@@ -343,13 +344,14 @@ module.exports = do ->
         @$label.prop('placeholder', t('Label not needed for Calculate questions'))
 
       if 'getList' of @model and (cl = @model.getList())
-        @$card.addClass('card--selectquestion card--expandedchoices')
-        @is_expanded = true
-        isSortableDisabled = (
-          @isLockable() and
-          @hasRestriction(LOCKING_RESTRICTIONS.choice_order_edit.name)
-        )
-        @listView = new $viewChoices.ListView(model: cl, rowView: @).render(isSortableDisabled)
+        if !econsentSignature.isEConsentSignatureRow(@model)
+          @$card.addClass('card--selectquestion card--expandedchoices')
+          @is_expanded = true
+          isSortableDisabled = (
+            @isLockable() and
+            @hasRestriction(LOCKING_RESTRICTIONS.choice_order_edit.name)
+          )
+          @listView = new $viewChoices.ListView(model: cl, rowView: @).render(isSortableDisabled)
 
       if @model.getValue('name')?
         name_detail = @model.get('name')
@@ -684,12 +686,13 @@ module.exports = do ->
           $toggle.removeClass('is-expanded')
           $toggle.attr('aria-expanded', 'false')
       questionType = @model.get('type').get('typeId')
+      isEConsentSig = econsentSignature.isEConsentSignatureRow(@model)
 
       # don't display columns that start with a $
       hiddenFields = ['label', 'hint', 'type', 'select_from_list_name', 'kobo--matrix_list', 'parameters', 'tags', 'instance::oc:contactdata', 'instance::oc:identifier']
       for [key, val] in @model.attributesArray() when !key.match(/^\$/) and key not in hiddenFields
         if key is 'required'
-          if questionType isnt 'note'
+          if questionType isnt 'note' and !isEConsentSig
             @mandatorySetting = new $viewMandatorySetting.MandatorySettingView({
               model: @model.get('required')
             }).render().insertInDOM(@)
@@ -707,14 +710,63 @@ module.exports = do ->
               new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
           else
             if key isnt 'select_one_from_file_filename'
+              if isEConsentSig and key in [
+                'bind::oc:itemgroup'
+                'bind::oc:external'
+                'appearance'
+                'readonly'
+                'default'
+                'calculation'
+                'trigger'
+                'constraint'
+                'constraint_message'
+              ]
+                continue
               new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
+
+      if isEConsentSig
+        # Hide the entire Response List pane (if present in DOM)
+        @$card.removeClass('card--selectquestion card--expandedchoices')
+        @is_expanded = false
+        @$('.card--selectquestion__expansion').remove()
+        @$('.card__buttons__multioptions').remove()
+
+        # Hide Validation Criteria tab
+        @$("li[data-card-settings-tab-id='validation-criteria']").hide()
+
+        # Add Signature checkbox label field (required)
+        placeholder = 'Enter text to appear next to signature field, (e.g. "I have read the information above and agree to participate.")'
+        fieldHtml = $viewRowDetail.Templates.textbox(@model.cid + '-siglabel', 'oc_signature_checkbox_label', t('Signature checkbox label'), 'text', placeholder)
+        $field = $(fieldHtml)
+        $input = $field.find('input').eq(0)
+        $input.val(econsentSignature.getEConsentSignatureCheckboxLabel(@model) || '')
+
+        showOrHideRequired = =>
+          val = ($input.val() || '').trim()
+          $wrap = $input.closest('div')
+          $wrap.removeClass('input-error')
+          $input.siblings('.message').remove()
+          if val == ''
+            $wrap.addClass('input-error')
+            $message = $('<div/>').addClass('message').text(t('This field is required'))
+            $input.after($message)
+          return
+
+        $input.on 'blur keyup change', =>
+          showOrHideRequired()
+          val = ($input.val() || '').trim()
+          econsentSignature.ensureEConsentSignatureStructure(@model, val)
+          @model.getSurvey()?.trigger('change')
+
+        showOrHideRequired()
+        @defaultRowDetailParent.append($field)
 
       if (
         $configs.questionParams[questionType] and
         'getParameters' of @model and
         questionType isnt 'range'
       )
-        if questionType not in ['select_one', 'select_multiple']
+        if questionType not in ['select_one', 'select_multiple'] and !isEConsentSig
           @paramsView = new $viewParams.ParamsView({
             rowView: @,
             parameters: @model.getParameters(),

@@ -5,3 +5,16 @@
     text-transform: uppercase;
   }
 }
+
+// OpenClinica: eConsent signature icon (exact provided bitmap)
+// We render it via CSS background to avoid relying on font glyph generation.
+.k-icon-econsent-signature::before {
+  content: '';
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAeCAIAAADRv8uKAAACdklEQVR4AeyVO4siQRDHTxHBNz7RQBEVFcHI+JL7TsbH5Sr4AQw2MxUzUVAQDBQxE7MF329F8QHq3Z/rceydcWZHYdxkm6Ko7q6aX1d1zYzy7xcN5Y8vGt/glxVexlKfz+derzcajVarFT8fucCXy2U4HGq1WrPZvN1uXwdGoqBaLJbpdDqfzx8GV6vVP/9HKpVqNpuc+PF4fLeMyFWtVoPa7/cHg0EgEOAEYipW6kKhUCqV4ATZbDb5fL5Wq8EmcjgcdrsdwIvFgqwQjdOoVCqbzQYkwJFIRKfTkS1aC4JBojEkBkchBjSKCe12u4FfLpewIZPJRKFQ2O12ULvdLqh6vR7rfBEE370YxKOM0BB0DTKD4XK50D7r9RpU9JTD4UCi6GcRKqIEwXgutvliMBjIoslkQjYkb6fTiQrv93sYyBWHC4fDrCfx52hBMJ6Ls3O8kRxg7CIOp9FogETq6CCPx0OowWDQaDSybncNQTC8o9EoNC2xWIyewkbrooGRolKpxAlQAClUBIqBfT4fPGjxer30lNhoYLAbjQbu1e/3i1eYhECLgfFEeNBitVrpKWvDE7VF5XFB7KK4wQWfTqf366jX65zgcrl83XxHJ9O7qDDSpVfE7Q/gXC6XSCTerqNYLHKCK5XKdfMtmUxms1mOg/TpDZzJZFqt1vF4lB7c6XTS6bR0f9qTAbfbbbQGvSHRxidToifHjQHPZjPOhtxTBiw3hv98BoyPFH6f/G35VhhwKBSKx+O/nxrPHY4BIxgvKPuqSDfwZiP2CbmBEQz2o4Ko5+QGxh3/fHwIfUQ/Pc0NjP769fjg/8E+RRKHG5jMX6b/AQAA//+yL6ttAAAABklEQVQDANiN+tTTgm0xAAAAAElFTkSuQmCC');
+}

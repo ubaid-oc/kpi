@@ -14,6 +14,7 @@ $skipLogicHelpers = require './mv.skipLogicHelpers'
 readParameters = require('../../js/components/formBuilder/formBuilderUtils').readParameters
 writeParameters = require('../../js/components/formBuilder/formBuilderUtils').writeParameters
 notify = require('js/utils').notify
+econsentSignature = require('../../js/components/formBuilder/econsentSignature')
 
 module.exports = do ->
   row = {}
@@ -101,6 +102,9 @@ module.exports = do ->
       survey_arr.push @toJSON2()
 
     toJSON2: ->
+      if @constructor.kls is 'Row' and econsentSignature.isEConsentSignatureRow(@)
+        econsentSignature.ensureEConsentSignatureStructure(@, econsentSignature.getEConsentSignatureCheckboxLabel(@))
+
       outObj = {}
       for [key, val] in @attributesArray()
         if key is 'type' and val.get('typeId') in ['select_one', 'select_multiple']
