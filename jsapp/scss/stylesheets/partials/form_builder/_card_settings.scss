@@ -279,6 +279,11 @@
   &.input-error {
     color: colors.$kobo-red;
 
+    > label {
+      vertical-align: top;
+      margin-top: 7px;
+    }
+
     input.text,
     select,
     textarea {

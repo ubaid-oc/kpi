@@ -56,7 +56,18 @@ export function getEConsentSignatureCheckboxLabel(row: any): string {
   try {
     const list = row?.getList?.();
     const opt = list?.options?.at?.(0);
-    return (opt?.get?.('label') ?? '') as string;
+    if (!opt) return '';
+    // Prefer the base 'label'; fall back to the first label::<lang> key found
+    // so translated forms don't lose their display text.
+    const base = opt.get?.('label');
+    if (base != null && base !== '') return base as string;
+    const attrs: Record<string, unknown> = opt.attributes ?? {};
+    for (const key of Object.keys(attrs)) {
+      if (key.startsWith('label::') && attrs[key] !== '') {
+        return attrs[key] as string;
+      }
+    }
+    return '';
   } catch {
     return '';
   }
@@ -105,12 +116,19 @@ export function ensureEConsentSignatureStructure(row: any, checkboxLabel: string
   }
   if (!list?.options) return;
 
-  const trimmed = (checkboxLabel ?? '').trim();
-  const label = trimmed; // required field; empty is allowed temporarily but should fail UI validation
+  const label = (checkboxLabel ?? '').trim();
 
-  list.options.reset([{label, name: '1'}]);
-  const opt = list.options.at?.(0);
-  opt?.set?.('name', '1');
-  opt?.set?.('label', label);
+  // Mutate the existing first option in-place to preserve translation columns
+  // and other metadata. Remove any extra options beyond the first.
+  const existing = list.options.at?.(0);
+  if (existing) {
+    existing.set?.('name', '1');
+    existing.set?.('label', label);
+    const extras = list.options.slice?.(1);
+    if (extras?.length) list.options.remove?.(extras);
+  } else {
+    list.options.add?.({label, name: '1'});
+    list.options.at?.(0)?.set?.('name', '1');
+  }
 }
 

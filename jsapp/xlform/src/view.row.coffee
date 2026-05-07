@@ -752,11 +752,17 @@ module.exports = do ->
             $input.after($message)
           return
 
-        $input.on 'blur keyup change', =>
+        $input.on 'keyup', =>
+          showOrHideRequired()
+
+        lastVal = ($input.val() || '').trim()
+        $input.on 'blur change', =>
           showOrHideRequired()
           val = ($input.val() || '').trim()
-          econsentSignature.ensureEConsentSignatureStructure(@model, val)
-          @model.getSurvey()?.trigger('change')
+          if val isnt lastVal
+            lastVal = val
+            econsentSignature.ensureEConsentSignatureStructure(@model, val)
+            @model.getSurvey()?.trigger('change')
 
         showOrHideRequired()
         @defaultRowDetailParent.append($field)
