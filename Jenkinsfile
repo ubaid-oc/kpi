@@ -41,7 +41,7 @@ pipeline {
                             sh """
                                 set -eu
                                 apt-get update
-                                apt-get install -y --no-install-recommends chromium
+                                apt-get install -y --no-install-recommends chromium python-is-python3
                                 npm install -g npm@8.5.5
 
                                 test "\$(node --version)" = "v16.15.0"
