@@ -764,7 +764,6 @@ module.exports = do ->
             econsentSignature.ensureEConsentSignatureStructure(@model, val)
             @model.getSurvey()?.trigger('change')
 
-        showOrHideRequired()
         @defaultRowDetailParent.append($field)
 
       if (
