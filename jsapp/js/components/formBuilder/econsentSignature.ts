@@ -6,34 +6,15 @@ export function isEConsentEnabledStatus(status: EConsentModuleStatus | null | un
   return status === 'ACTIVE' || status === 'PENDING';
 }
 
-function readMetaContent(name: string): string | null {
-  const el = document?.head?.querySelector?.(`meta[name="${name}"]`) as HTMLMetaElement | null;
-  return el?.content ?? null;
-}
-
 /**
- * Best-effort read of study eConsent module status.
+ * Read study eConsent module status from the URL query parameter `econsent`.
  *
- * Sources (first found wins):
- * - meta[name="oc-econsent-module-status"]
- * - window.OC_ECONSENT_MODULE_STATUS (string)
- * - window.parent.OC_ECONSENT_MODULE_STATUS (string) (if same-origin)
+ * The parent application (wekan-oc) appends `?econsent=<STATUS>` to the
+ * form designer URL before loading this page in an iframe.
  */
 export function getStudyEConsentModuleStatus(): string | null {
-  const fromMeta = readMetaContent('oc-econsent-module-status');
-  if (fromMeta) return fromMeta;
-
-  const w = window as any;
-  if (typeof w?.OC_ECONSENT_MODULE_STATUS === 'string') return w.OC_ECONSENT_MODULE_STATUS;
-
-  try {
-    const wp = (window as any)?.parent;
-    if (wp && typeof wp.OC_ECONSENT_MODULE_STATUS === 'string') return wp.OC_ECONSENT_MODULE_STATUS;
-  } catch {
-    // cross-origin; ignore
-  }
-
-  return null;
+  const params = new URLSearchParams(window.location.search);
+  return params.get('econsent');
 }
 
 /**
