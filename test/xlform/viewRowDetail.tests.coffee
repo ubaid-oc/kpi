@@ -397,13 +397,13 @@ do ->
       result = @mixin_ctx.html()
       expect(result.indexOf('type="text"')).not.toBe(-1)
 
-    it 'oc_briefdescription html() renders "Item Brief Description" label', ->
+    it 'oc_briefdescription html() renders "Short Display Name" label', ->
       result = @mixin_ctx.html()
-      expect(result.indexOf('Item Brief Description')).not.toBe(-1)
+      expect(result.indexOf('Short Display Name')).not.toBe(-1)
 
     it 'oc_briefdescription html() renders the correct placeholder', ->
       result = @mixin_ctx.html()
-      expect(result.indexOf('Enter Text')).not.toBe(-1)
+      expect(result.indexOf('column header')).not.toBe(-1)
 
     it 'oc_briefdescription html() renders maxlength="40"', ->
       result = @mixin_ctx.html()
@@ -435,9 +435,9 @@ do ->
       result = @mixin_ctx.html()
       expect(result.indexOf('Item Description')).not.toBe(-1)
 
-    it 'oc_description html() renders the Enter Text placeholder', ->
+    it 'oc_description html() renders the correct placeholder', ->
       result = @mixin_ctx.html()
-      expect(result.indexOf('Enter Text')).not.toBe(-1)
+      expect(result.indexOf('Enter item definition')).not.toBe(-1)
 
     it 'oc_description html() renders maxlength="3999"', ->
       result = @mixin_ctx.html()
