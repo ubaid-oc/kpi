@@ -232,7 +232,7 @@ do ->
     it 'calculate row also has a trigger RowDetail', ->
       expect(@row.get('trigger')).toBeDefined()
 
-    it 'trigger getOptions() includes "No Trigger" as first option', ->
+    it 'trigger getOptions() includes "Select" placeholder first and "No Trigger" second', ->
       viewRowDetail = require('../../jsapp/xlform/src/view.rowDetail')
       detail = @row.get('trigger')
       mixin = viewRowDetail.DetailViewMixins.trigger
@@ -244,7 +244,6 @@ do ->
         Templates: viewRowDetail.Templates
       })
       opts = mixin_ctx.getOptions()
-      # options include a "Select" placeholder first, then "No Trigger"
       expect(opts[0].value).toBe('select')
       expect(opts[0].text).toBe('Select')
       expect(opts[1].value).toBe('')
@@ -268,9 +267,10 @@ do ->
         Templates: viewRowDetail.Templates
       })
       opts = mixin_ctx.getOptions()
-      # Options include a "Select" placeholder first, then "No Trigger",
-      # then other questions as trigger sources.
+      # First option is "Select" placeholder, second is "No Trigger", then prev_q should be listed
       expect(opts.length).toBe(3)
+      expect(opts[1].value).toBe('')
+      expect(opts[1].text).toBe('No Trigger')
       expect(opts[2].value).toBe('${prev_q}')
       window.xlfHideWarnings = false
 
