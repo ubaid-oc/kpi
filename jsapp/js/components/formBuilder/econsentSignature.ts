@@ -8,12 +8,12 @@ export function isEConsentEnabledStatus(status: EConsentModuleStatus | null | un
 
 /**
  * Read study eConsent module status from the URL query parameter `econsent`.
- *
- * The parent application (wekan-oc) appends `?econsent=<STATUS>` to the
- * form designer URL before loading this page in an iframe.
  */
 export function getStudyEConsentModuleStatus(): string | null {
-  const params = new URLSearchParams(window.location.search);
+  const hash = window.location.hash; // e.g. "#/forms/uid/edit?econsent=ACTIVE"
+  const queryIndex = hash.indexOf('?');
+  if (queryIndex === -1) return null;
+  const params = new URLSearchParams(hash.slice(queryIndex));
   return params.get('econsent');
 }
 
