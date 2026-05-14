@@ -11,6 +11,10 @@
       .text-box {
         margin-top: 5px;
         display: block;
+
+        input[type="text"] {
+          background-color: colors.$kobo-white;
+        }
       }
 
       input[type='radio']:not(:checked) ~ .text-box {
@@ -21,10 +25,10 @@
       }
 
       .input-error {
-        color: colors.$kobo-light-red;
-    
+        color: colors.$kobo-red;
+
         input[type="text"] {
-          border-color: colors.$kobo-light-red;
+          border-color: colors.$kobo-red;
         }
       }
     }
