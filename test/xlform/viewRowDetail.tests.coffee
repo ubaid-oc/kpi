@@ -663,3 +663,65 @@ do ->
       result = survey.toJSON()
       row = result.survey.find((r) -> r.name is 'pii_q')
       expect(row['bind::oc:external']).toBeUndefined()
+
+    it 'exports instance::oc:contactdata (contact_data_type) in survey JSON when set', ->
+      $model = require('../../jsapp/xlform/src/_model')
+      survey = new $model.Survey()
+      survey.rows.add(type: 'text', name: 'pii_q', label: 'Patient Name')
+      row = survey.rows.at(0)
+      row.get('bind::oc:external').set('value', 'contactdata')
+      row.get('instance::oc:contactdata').set('value', 'email')
+      result = survey.toJSON()
+      exportedRow = result.survey[0]
+      expect(exportedRow['instance::oc:contactdata']).toBe('email')
+
+  ###############################################################
+  # OC-26560 — Use External Value hidden for PII (Encrypted) items
+  ###############################################################
+  describe 'view.rowDetail: PII — oc_external html() hidden for contactdata value', ->
+    beforeEach ->
+      window.xlfHideWarnings = true
+      @viewRowDetail = require('../../jsapp/xlform/src/view.rowDetail')
+      $model = require('../../jsapp/xlform/src/_model')
+      survey = new $model.Survey()
+      survey.rows.add(type: 'text', name: 'pii_q', label: 'Patient Name')
+      @row = survey.rows.at(0)
+      @detail = @row.get('bind::oc:external')
+      @detail.set('value', 'contactdata')
+      @mixin = @viewRowDetail.DetailViewMixins.oc_external
+      @mixin_ctx = $.extend({}, @mixin, {
+        cid: 'cid_ext_pii'
+        $el: $('<div/>')
+        model: @detail
+        rowView: {model: @row}
+        Templates: @viewRowDetail.Templates
+      })
+    afterEach ->
+      window.xlfHideWarnings = false
+
+    it 'html() renders a Contact Data Type <select> for a PII item', ->
+      result = @mixin_ctx.html()
+      expect(result.indexOf('<select')).not.toBe(-1)
+      expect(result.indexOf('contact-data-type')).not.toBe(-1)
+
+    it 'html() renders "Contact Data Type" label for a PII item', ->
+      result = @mixin_ctx.html()
+      expect(result.indexOf('Contact Data Type')).not.toBe(-1)
+
+    it 'html() renders a settings__input container for a PII item', ->
+      result = @mixin_ctx.html()
+      expect(result.indexOf('settings__input')).not.toBe(-1)
+
+    it 'html() does NOT render "Use External Value" label for a PII item', ->
+      result = @mixin_ctx.html()
+      expect(result.indexOf('Use External Value')).toBe(-1)
+
+    it 'html() still renders <select> for a text item with empty bind::oc:external', ->
+      @detail.set('value', '')
+      result = @mixin_ctx.html()
+      expect(result.indexOf('<select')).not.toBe(-1)
+
+    it 'html() still renders "Use External Value" label for non-PII text item', ->
+      @detail.set('value', '')
+      result = @mixin_ctx.html()
+      expect(result.indexOf('Use External Value')).not.toBe(-1)
