@@ -294,7 +294,7 @@ module.exports = do ->
           iconClassName = "k-icon k-icon-lock"
           iconLabel = t("PII (Encrypted)")
         else if externalValue is 'signature'
-          iconClassName = "k-icon k-icon-econsent-signature"
+          iconClassName = "k-icon k-icon-qt-econsent-signature"
           iconLabel = t("eConsent Signature")
         else
           iconClassName = $icons.get(typeStr)?.get("iconClassName")
@@ -321,7 +321,7 @@ module.exports = do ->
           $headerIcon.addClass("k-icon k-icon-lock")
           $indicatorIcon.attr("data-tip", t("PII (Encrypted)"))
         else if senderValue is 'signature'
-          $headerIcon.addClass("k-icon k-icon-econsent-signature")
+          $headerIcon.addClass("k-icon k-icon-qt-econsent-signature")
           $indicatorIcon.attr("data-tip", t("eConsent Signature"))
         else
           if iconDef

@@ -331,7 +331,7 @@ export const QUESTION_TYPES: QuestionTypes = Object.freeze({
   date: {label: t('Date'), icon: 'qt-date', id: QuestionTypeName.date},
   datetime: {label: t('Date & time'), icon: 'qt-date-time', id: QuestionTypeName.datetime},
   decimal: {label: t('Decimal'), icon: 'qt-decimal', id: QuestionTypeName.decimal},
-  econsent_signature: {label: t('eConsent Signature'), icon: 'econsent-signature' as IconName, id: QuestionTypeName.econsent_signature},
+  econsent_signature: {label: t('eConsent Signature'), icon: 'qt-econsent-signature', id: QuestionTypeName.econsent_signature},
   'xml-external': {label: t('External XML'), icon: 'qt-external-xml', id: QuestionTypeName['xml-external']},
   file: {label: t('File Upload'), icon: 'qt-file', id: QuestionTypeName.file},
   geopoint: {label: t('Point'), icon: 'qt-point', id: QuestionTypeName.geopoint},
