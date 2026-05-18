@@ -1199,6 +1199,16 @@ module.exports = do ->
       @fieldTab = "active"
       @$el.addClass("card__settings__fields--#{@fieldTab}")
 
+      # For PII (Encrypted) items, the "Use External Value" dropdown is always
+      # "contactdata" and must never be shown or edited. Render a properly
+      # structured Contact Data Type field instead.
+      if @model.get('value') is 'contactdata'
+        return viewRowDetail.Templates.field(
+          "<select id=\"#{@cid}\" name=\"#{@model.key}\" class=\"contact-data-type\"></select>",
+          @cid,
+          t("Contact Data Type")
+        )
+
       if @model_type() in ['calculate', 'text'] or (@model_type() == 'select_multiple' and @model._parent.isConsentItem())
         options = @getOptions()
         if options?
@@ -1289,6 +1299,48 @@ module.exports = do ->
         @rowView.model.attributes['instance::oc:identifier'].set 'value', ''
 
       modelValue = @model.get 'value'
+
+      # PII (Encrypted) items: The "Use External Value" dropdown is hidden and
+      # replaced with a "Contact Data Type" dropdown rendered by html().
+      # Handle this case FIRST before the general $select.length check.
+      if modelValue is 'contactdata'
+        $contactDataSelect = @$('select.contact-data-type')
+        if $contactDataSelect.length > 0
+          Backbone.trigger('ocCustomEvent', { sender: @model, value: 'contactdata' })
+
+          for opt in @contact_data_type_options
+            $('<option />', {value: opt.value, text: opt.label}).appendTo($contactDataSelect)
+
+          syncContactDataTypeToItemType = () =>
+            selectedContactDataType = $contactDataSelect.val()
+            typeDetail = @rowView.model.get('type')
+            return  unless typeDetail?
+
+            isExternalContactData = @rowView.model.getValue?('bind::oc:external') is 'contactdata'
+            return  unless isExternalContactData
+
+            if selectedContactDataType is 'fulldob'
+              if typeDetail.get('typeId') is 'text'
+                typeDetail.set('value', 'date')
+            else
+              if typeDetail.get('typeId') is 'date'
+                typeDetail.set('value', 'text')
+
+          instance_contactdata_value = @rowView.model.attributes['instance::oc:contactdata'].get 'value'
+          contact_data_values = (opt.value for opt in @contact_data_type_options)
+          if instance_contactdata_value != '' and (instance_contactdata_value in contact_data_values)
+            $contactDataSelect.val(instance_contactdata_value)
+          else
+            $contactDataSelect.val('firstname')
+            @rowView.model.attributes['instance::oc:contactdata'].set 'value', 'firstname'
+
+          syncContactDataTypeToItemType()
+
+          $contactDataSelect.change () =>
+            @rowView.model.attributes['instance::oc:contactdata'].set 'value', $contactDataSelect.val()
+            syncContactDataTypeToItemType()
+          return
+
       if $select.length > 0
         if modelValue == ''
           if @model._parent.isConsentItem()

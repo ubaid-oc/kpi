@@ -397,13 +397,13 @@ do ->
       result = @mixin_ctx.html()
       expect(result.indexOf('type="text"')).not.toBe(-1)
 
-    it 'oc_briefdescription html() renders "Item Brief Description" label', ->
+    it 'oc_briefdescription html() renders "Short Display Name" label', ->
       result = @mixin_ctx.html()
-      expect(result.indexOf('Item Brief Description')).not.toBe(-1)
+      expect(result.indexOf('Short Display Name')).not.toBe(-1)
 
     it 'oc_briefdescription html() renders the correct placeholder', ->
       result = @mixin_ctx.html()
-      expect(result.indexOf('Enter Text')).not.toBe(-1)
+      expect(result.indexOf('column header')).not.toBe(-1)
 
     it 'oc_briefdescription html() renders maxlength="40"', ->
       result = @mixin_ctx.html()
@@ -435,9 +435,9 @@ do ->
       result = @mixin_ctx.html()
       expect(result.indexOf('Item Description')).not.toBe(-1)
 
-    it 'oc_description html() renders the Enter Text placeholder', ->
+    it 'oc_description html() renders the correct placeholder', ->
       result = @mixin_ctx.html()
-      expect(result.indexOf('Enter Text')).not.toBe(-1)
+      expect(result.indexOf('Enter item definition')).not.toBe(-1)
 
     it 'oc_description html() renders maxlength="3999"', ->
       result = @mixin_ctx.html()
@@ -663,3 +663,60 @@ do ->
       result = survey.toJSON()
       row = result.survey.find((r) -> r.name is 'pii_q')
       expect(row['bind::oc:external']).toBeUndefined()
+
+  describe 'view.rowDetail: PII — fulldob type switching via Contact Data Type dropdown', ->
+    beforeEach ->
+      window.xlfHideWarnings = true
+      @viewRowDetail = require('../../jsapp/xlform/src/view.rowDetail')
+      $model = require('../../jsapp/xlform/src/_model')
+
+      @survey = new $model.Survey()
+      @survey.rows.add(
+        type: 'text'
+        name: 'pii_dob'
+        label: 'Date of Birth'
+        'bind::oc:external': 'contactdata'
+        'instance::oc:contactdata': 'firstname'
+      )
+      @row = @survey.rows.at(0)
+      @detail = @row.get('bind::oc:external')
+      @mixin = @viewRowDetail.DetailViewMixins.oc_external
+
+      # Create DOM element with contact-data-type select rendered by html()
+      htmlResult = @mixin.html.call({
+        fieldTab: 'active'
+        $el: { addClass: -> }
+        model: @detail
+        cid: 'cid_dob'
+      })
+      @$el = $('<div/>').html(htmlResult)
+
+      @mixin_ctx = $.extend({}, @mixin, {
+        cid: 'cid_dob'
+        $el: @$el
+        $: (selector) => @$el.find(selector)
+        model: @detail
+        rowView: { model: @row }
+        contact_data_type_options: [
+          {value: 'firstname', label: 'firstname'}
+          {value: 'fulldob', label: 'fulldob'}
+        ]
+      })
+
+    afterEach ->
+      window.xlfHideWarnings = false
+
+    it 'selecting "fulldob" changes row type from text to date', ->
+      expect(@row.getValue('type')).toBe('text')
+      @mixin_ctx.afterRender.call(@mixin_ctx)
+      $contactDataSelect = @$el.find('select.contact-data-type')
+      $contactDataSelect.val('fulldob').trigger('change')
+      expect(@row.getValue('type')).toBe('date')
+
+    it 'selecting another type after fulldob changes row type back to text', ->
+      @row.get('type').set('value', 'date')
+      expect(@row.getValue('type')).toBe('date')
+      @mixin_ctx.afterRender.call(@mixin_ctx)
+      $contactDataSelect = @$el.find('select.contact-data-type')
+      $contactDataSelect.val('firstname').trigger('change')
+      expect(@row.getValue('type')).toBe('text')

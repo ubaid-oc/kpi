@@ -123,6 +123,7 @@ module.exports = do ->
         rowDetails.type = 'text'
         rowDetails['bind::oc:external'] = 'contactdata'
         rowDetails['bind::oc:itemgroup'] = ''
+        rowDetails['instance::oc:contactdata'] = 'firstname'
 
       rowDetails.label = questionLabelValue
 
