@@ -1204,7 +1204,7 @@ module.exports = do ->
       # structured Contact Data Type field instead.
       if @model.get('value') is 'contactdata'
         return viewRowDetail.Templates.field(
-          '<select class="contact-data-type"></select>',
+          "<select id=\"#{@cid}\" name=\"#{@model.key}\" class=\"contact-data-type\"></select>",
           @cid,
           t("Contact Data Type")
         )

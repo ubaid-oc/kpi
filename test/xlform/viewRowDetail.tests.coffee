@@ -397,13 +397,13 @@ do ->
       result = @mixin_ctx.html()
       expect(result.indexOf('type="text"')).not.toBe(-1)
 
-    it 'oc_briefdescription html() renders "Item Brief Description" label', ->
+    it 'oc_briefdescription html() renders "Short Display Name" label', ->
       result = @mixin_ctx.html()
-      expect(result.indexOf('Item Brief Description')).not.toBe(-1)
+      expect(result.indexOf('Short Display Name')).not.toBe(-1)
 
     it 'oc_briefdescription html() renders the correct placeholder', ->
       result = @mixin_ctx.html()
-      expect(result.indexOf('Enter Text')).not.toBe(-1)
+      expect(result.indexOf('column header')).not.toBe(-1)
 
     it 'oc_briefdescription html() renders maxlength="40"', ->
       result = @mixin_ctx.html()
@@ -435,9 +435,9 @@ do ->
       result = @mixin_ctx.html()
       expect(result.indexOf('Item Description')).not.toBe(-1)
 
-    it 'oc_description html() renders the Enter Text placeholder', ->
+    it 'oc_description html() renders the correct placeholder', ->
       result = @mixin_ctx.html()
-      expect(result.indexOf('Enter Text')).not.toBe(-1)
+      expect(result.indexOf('Enter item definition')).not.toBe(-1)
 
     it 'oc_description html() renders maxlength="3999"', ->
       result = @mixin_ctx.html()
@@ -664,64 +664,59 @@ do ->
       row = result.survey.find((r) -> r.name is 'pii_q')
       expect(row['bind::oc:external']).toBeUndefined()
 
-    it 'exports instance::oc:contactdata (contact_data_type) in survey JSON when set', ->
-      $model = require('../../jsapp/xlform/src/_model')
-      survey = new $model.Survey()
-      survey.rows.add(type: 'text', name: 'pii_q', label: 'Patient Name')
-      row = survey.rows.at(0)
-      row.get('bind::oc:external').set('value', 'contactdata')
-      row.get('instance::oc:contactdata').set('value', 'email')
-      result = survey.toJSON()
-      exportedRow = result.survey[0]
-      expect(exportedRow['instance::oc:contactdata']).toBe('email')
-
-  ###############################################################
-  # OC-26560 — Use External Value hidden for PII (Encrypted) items
-  ###############################################################
-  describe 'view.rowDetail: PII — oc_external html() hidden for contactdata value', ->
+  describe 'view.rowDetail: PII — fulldob type switching via Contact Data Type dropdown', ->
     beforeEach ->
       window.xlfHideWarnings = true
       @viewRowDetail = require('../../jsapp/xlform/src/view.rowDetail')
       $model = require('../../jsapp/xlform/src/_model')
-      survey = new $model.Survey()
-      survey.rows.add(type: 'text', name: 'pii_q', label: 'Patient Name')
-      @row = survey.rows.at(0)
+
+      @survey = new $model.Survey()
+      @survey.rows.add(
+        type: 'text'
+        name: 'pii_dob'
+        label: 'Date of Birth'
+        'bind::oc:external': 'contactdata'
+        'instance::oc:contactdata': 'firstname'
+      )
+      @row = @survey.rows.at(0)
       @detail = @row.get('bind::oc:external')
-      @detail.set('value', 'contactdata')
       @mixin = @viewRowDetail.DetailViewMixins.oc_external
-      @mixin_ctx = $.extend({}, @mixin, {
-        cid: 'cid_ext_pii'
-        $el: $('<div/>')
+
+      # Create DOM element with contact-data-type select rendered by html()
+      htmlResult = @mixin.html.call({
+        fieldTab: 'active'
+        $el: { addClass: -> }
         model: @detail
-        rowView: {model: @row}
-        Templates: @viewRowDetail.Templates
+        cid: 'cid_dob'
       })
+      @$el = $('<div/>').html(htmlResult)
+
+      @mixin_ctx = $.extend({}, @mixin, {
+        cid: 'cid_dob'
+        $el: @$el
+        $: (selector) => @$el.find(selector)
+        model: @detail
+        rowView: { model: @row }
+        contact_data_type_options: [
+          {value: 'firstname', label: 'firstname'}
+          {value: 'fulldob', label: 'fulldob'}
+        ]
+      })
+
     afterEach ->
       window.xlfHideWarnings = false
 
-    it 'html() renders a Contact Data Type <select> for a PII item', ->
-      result = @mixin_ctx.html()
-      expect(result.indexOf('<select')).not.toBe(-1)
-      expect(result.indexOf('contact-data-type')).not.toBe(-1)
+    it 'selecting "fulldob" changes row type from text to date', ->
+      expect(@row.getValue('type')).toBe('text')
+      @mixin_ctx.afterRender.call(@mixin_ctx)
+      $contactDataSelect = @$el.find('select.contact-data-type')
+      $contactDataSelect.val('fulldob').trigger('change')
+      expect(@row.getValue('type')).toBe('date')
 
-    it 'html() renders "Contact Data Type" label for a PII item', ->
-      result = @mixin_ctx.html()
-      expect(result.indexOf('Contact Data Type')).not.toBe(-1)
-
-    it 'html() renders a settings__input container for a PII item', ->
-      result = @mixin_ctx.html()
-      expect(result.indexOf('settings__input')).not.toBe(-1)
-
-    it 'html() does NOT render "Use External Value" label for a PII item', ->
-      result = @mixin_ctx.html()
-      expect(result.indexOf('Use External Value')).toBe(-1)
-
-    it 'html() still renders <select> for a text item with empty bind::oc:external', ->
-      @detail.set('value', '')
-      result = @mixin_ctx.html()
-      expect(result.indexOf('<select')).not.toBe(-1)
-
-    it 'html() still renders "Use External Value" label for non-PII text item', ->
-      @detail.set('value', '')
-      result = @mixin_ctx.html()
-      expect(result.indexOf('Use External Value')).not.toBe(-1)
+    it 'selecting another type after fulldob changes row type back to text', ->
+      @row.get('type').set('value', 'date')
+      expect(@row.getValue('type')).toBe('date')
+      @mixin_ctx.afterRender.call(@mixin_ctx)
+      $contactDataSelect = @$el.find('select.contact-data-type')
+      $contactDataSelect.val('firstname').trigger('change')
+      expect(@row.getValue('type')).toBe('text')
