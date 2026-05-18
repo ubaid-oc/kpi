@@ -15,6 +15,7 @@ require('./xlform/inputParser.tests');
 require('./xlform/questionTypeForms.tests');
 require('./xlform/rowDetail.tests');
 require('./xlform/rowSelector.tests');
+require('./xlform/econsentSignature.tests');
 require('./xlform/rowSelectorTemplates.tests');
 require('./xlform/skipLogic.tests');
 require('./xlform/translations.tests');

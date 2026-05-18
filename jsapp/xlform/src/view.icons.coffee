@@ -34,6 +34,7 @@ module.exports = do ->
   # row 4
   addIconToRow(constants.QUESTION_TYPES.select_one_from_file, "r4")
   addIconToRow(constants.QUESTION_TYPES.pii_encrypted, "r4")
+  addIconToRow(constants.QUESTION_TYPES.econsent_signature, "r4")
   
   class QtypeIcon extends Backbone.Model
     defaults: {

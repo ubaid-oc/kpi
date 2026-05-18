@@ -141,6 +141,13 @@ do ->
       @selector.onSelectNewQuestionType(buildPickerEvent('select_multiple'))
       expect(@survey.rows.at(0).toJSON().type).toBe('select_multiple')
 
+    it 'creates an eConsent signature item as a select_multiple with bind::oc:external = signature', ->
+      @setQuestionText('Consent')
+      @selector.onSelectNewQuestionType(buildPickerEvent('econsent_signature'))
+      row = @survey.rows.at(0)
+      expect(row.get('type').get('typeId')).toBe('select_multiple')
+      expect(row.getValue('bind::oc:external')).toBe('signature')
+
     it 'adding multiple questions increases rows.length each time', ->
       @setQuestionText('First')
       @selector.onSelectNewQuestionType(buildPickerEvent('text'))

@@ -9,9 +9,9 @@ do ->
     # Total count
     ###
     describe 'collection size', ->
-      it 'has 14 question type icons in total', ->
-        # r1(4) + r2(4) + r3(4) + r4(2: select_one_from_file + pii_encrypted) = 14
-        expect($icons.length).toBe(14)
+      it 'has 15 question type icons in total', ->
+        # r1(4) + r2(4) + r3(4) + r4(3: select_one_from_file + pii_encrypted + econsent_signature) = 15
+        expect($icons.length).toBe(15)
 
     ###
     # Per-model attribute presence
@@ -72,10 +72,10 @@ do ->
         r3 = $icons.filter (icon) -> icon.get('grouping') is 'r3'
         expect(r3.length).toBe(4)
 
-      it 'row r4 contains exactly 2 icons', ->
-        # select_one_from_file + pii_encrypted
+      it 'row r4 contains exactly 3 icons', ->
+        # select_one_from_file + pii_encrypted + econsent_signature
         r4 = $icons.filter (icon) -> icon.get('grouping') is 'r4'
-        expect(r4.length).toBe(2)
+        expect(r4.length).toBe(3)
 
     ###
     # Row 1: basic input types
@@ -161,6 +161,11 @@ do ->
       it 'includes pii_encrypted in r4', ->
         found = $icons.find (icon) ->
           icon.get('id') is 'pii_encrypted' and icon.get('grouping') is 'r4'
+        expect(found).toBeDefined()
+
+      it 'includes econsent_signature in r4', ->
+        found = $icons.find (icon) ->
+          icon.get('id') is 'econsent_signature' and icon.get('grouping') is 'r4'
         expect(found).toBeDefined()
 
     ###

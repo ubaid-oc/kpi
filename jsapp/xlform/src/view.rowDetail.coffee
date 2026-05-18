@@ -218,21 +218,26 @@ module.exports = do ->
 
 
   viewRowDetail.Templates = {
+    # Escape double quotes in attribute values to prevent broken HTML markup.
+    _escapeAttr: (str) -> String(str).replace(/"/g, '&quot;')
+
     textbox: (cid, key, key_label = key, input_class = '', placeholder_text='', max_length = '') ->
       # if placeholder_text is not ''
       #   placeholder_text = t(placeholder_text)
+      escaped = @_escapeAttr(placeholder_text)
       if max_length is ''
-        @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{placeholder_text}" />""", cid, key_label
+        @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{escaped}" />""", cid, key_label
       else
-        @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{placeholder_text}" maxlength="#{max_length}" />""", cid, key_label
+        @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{escaped}" maxlength="#{max_length}" />""", cid, key_label
 
     textarea: (cid, key, key_label = key, input_class = '', placeholder_text='', max_length = '') ->
       # if placeholder_text is not ''
       #   placeholder_text = t(placeholder_text)
+      escaped = @_escapeAttr(placeholder_text)
       if max_length is ''
-        @field """<textarea name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{placeholder_text}" />""", cid, key_label
+        @field """<textarea name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{escaped}" />""", cid, key_label
       else
-        @field """<textarea name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{placeholder_text}" maxlength="#{max_length}" />""", cid, key_label
+        @field """<textarea name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{escaped}" maxlength="#{max_length}" />""", cid, key_label
 
     checkbox: (cid, key, key_label = key, input_label = t("Yes")) ->
       input_label = input_label
@@ -288,6 +293,9 @@ module.exports = do ->
         if externalValue is 'contactdata'
           iconClassName = "k-icon k-icon-lock"
           iconLabel = t("PII (Encrypted)")
+        else if externalValue is 'signature'
+          iconClassName = "k-icon k-icon-econsent-signature"
+          iconLabel = t("eConsent Signature")
         else
           iconClassName = $icons.get(typeStr)?.get("iconClassName")
           iconLabel = $icons.get(typeStr)?.get("label")
@@ -312,6 +320,9 @@ module.exports = do ->
         if senderValue is 'contactdata'
           $headerIcon.addClass("k-icon k-icon-lock")
           $indicatorIcon.attr("data-tip", t("PII (Encrypted)"))
+        else if senderValue is 'signature'
+          $headerIcon.addClass("k-icon k-icon-econsent-signature")
+          $indicatorIcon.attr("data-tip", t("eConsent Signature"))
         else
           if iconDef
             $headerIcon.addClass(iconDef.get("iconClassName"))

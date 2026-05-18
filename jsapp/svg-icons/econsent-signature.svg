@@ -1,0 +1,10 @@
+<svg width="280" height="280" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+    <!-- User Head -->
+    <circle cx="100" cy="72" r="48"/>
+    <!-- User Body -->
+    <path d="M18 188c0-36 29-65 65-65h34c36 0 65 29 65 65v18H18v-18z"/>
+    <!-- Bottom Line -->
+    <rect x="18" y="230" width="164" height="18" rx="9"/>
+    <!-- Check Icon -->
+    <polygon points="190,100 205,115 220,130 270,80 260,70 220,110 205,95 190,100"/>
+</svg>

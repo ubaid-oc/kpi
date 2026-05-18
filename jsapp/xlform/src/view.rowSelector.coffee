@@ -4,6 +4,7 @@ $baseView = require './view.pluggedIn.backboneView'
 $viewTemplates = require './view.templates'
 $icons = require './view.icons'
 $configs = require './model.configs'
+econsentSignature = require('../../js/components/formBuilder/econsentSignature')
 
 module.exports = do ->
   viewRowSelector = {}
@@ -71,10 +72,18 @@ module.exports = do ->
       @line.html $viewTemplates.$$render('xlfRowSelector.line', "")
       @line.find('.row__questiontypes__new-question-name').val(@question_name)
       $menu = @line.find(".row__questiontypes__list")
+      econsentIcon = null
       for mrow in $icons.grouped()
         menurow = $("<div>", class: "questiontypelist__row").appendTo $menu
         for mitem, i in mrow when mitem
+          if mitem.get('id') is 'econsent_signature'
+            econsentIcon = mitem
+            continue
           menurow.append $viewTemplates.$$render('xlfRowSelector.cell', mitem.attributes)
+
+      if econsentIcon and econsentSignature.isEConsentSignatureItemTypeAllowed()
+        menurow = $("<div>", class: "questiontypelist__row").appendTo $menu
+        menurow.append $viewTemplates.$$render('xlfRowSelector.cell', econsentIcon.attributes)
 
       @scrollFormBuilder('+=220')
       @$('.questiontypelist__item').click _.bind(@onSelectNewQuestionType, @)
@@ -125,6 +134,11 @@ module.exports = do ->
         rowDetails['bind::oc:itemgroup'] = ''
         rowDetails['instance::oc:contactdata'] = 'firstname'
 
+      if rowType is 'econsent_signature'
+        rowDetails.type = 'select_multiple'
+        rowDetails['bind::oc:external'] = 'signature'
+        rowDetails['bind::oc:itemgroup'] = ''
+
       rowDetails.label = questionLabelValue
 
       if questionLabelValue != ''
@@ -145,6 +159,8 @@ module.exports = do ->
 
       newRow = survey.addRow(rowDetails, options)
       newRow.linkUp(warnings: [], errors: [])
+      if rowType is 'econsent_signature'
+        econsentSignature.ensureEConsentSignatureStructure(newRow, '')
       @hide()
       return
 
