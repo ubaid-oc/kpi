@@ -437,7 +437,7 @@ do ->
 
     it 'oc_description html() renders the correct placeholder', ->
       result = @mixin_ctx.html()
-      expect(result.indexOf('Enter item definition')).not.toBe(-1)
+      expect(result.indexOf('Optional item definition')).not.toBe(-1)
 
     it 'oc_description html() renders maxlength="3999"', ->
       result = @mixin_ctx.html()
