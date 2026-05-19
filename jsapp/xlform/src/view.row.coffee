@@ -723,6 +723,7 @@ module.exports = do ->
                 'constraint'
                 'constraint_message'
               ]
+                val.set 'value', '' if key is 'bind::oc:itemgroup'
                 continue
               else if key is 'bind::oc:itemgroup' and isPiiExternalValue
                 val.set 'value', ''
