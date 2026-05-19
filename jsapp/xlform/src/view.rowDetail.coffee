@@ -1231,6 +1231,7 @@ module.exports = do ->
       @contact_data_type_class_name = 'contact-data-type'
       @$label_select_contact_data_type = $('<span/>', { class: @contact_data_type_class_name, style: 'display: block; margin-top: 10px;' }).text(t('Contact Data Type') + ":")
       @$select_contact_data_type = $('<select/>', { class: @contact_data_type_class_name, style: 'margin-top: 5px;' })
+      @contact_data_type_placeholder = {value: 'select', label: t('Select')}
       @contact_data_type_options = [
         {value: 'firstname',      label: 'firstname'}
         {value: 'middlename',     label: 'middlename'}
@@ -1247,6 +1248,8 @@ module.exports = do ->
         {value: 'secondaryid',    label: 'secondaryid'}
         {value: 'hospitalnumber', label: 'hospitalnumber'}
       ]
+      # Add placeholder option first
+      $('<option />', {value: @contact_data_type_placeholder.value, text: @contact_data_type_placeholder.label}).appendTo(@$select_contact_data_type)
       for contact_data_type_option in @contact_data_type_options
         $('<option />', {value: contact_data_type_option.value, text: contact_data_type_option.label}).appendTo(@$select_contact_data_type)
 
@@ -1262,6 +1265,12 @@ module.exports = do ->
       addSelectContactDataType = () =>
         @$('.settings__input').append(@$label_select_contact_data_type)
         @$('.settings__input').append(@$select_contact_data_type)
+
+        updateContactDataPlaceholderClass = () =>
+          if @$select_contact_data_type.val() == 'select'
+            @$select_contact_data_type.addClass('is-placeholder')
+          else
+            @$select_contact_data_type.removeClass('is-placeholder')
 
         syncContactDataTypeToItemType = () =>
           selectedContactDataType = @$select_contact_data_type.val()
@@ -1283,13 +1292,18 @@ module.exports = do ->
         if instance_contactdata_value != '' and (instance_contactdata_value in contact_data_values)
           @$select_contact_data_type.val(instance_contactdata_value)
         else
-          @$select_contact_data_type.val('firstname')
-          @rowView.model.attributes['instance::oc:contactdata'].set 'value', 'firstname'
+          @$select_contact_data_type.val('select')
 
+        updateContactDataPlaceholderClass()
         syncContactDataTypeToItemType()
 
         @$select_contact_data_type.change () =>
-          @rowView.model.attributes['instance::oc:contactdata'].set 'value', @$select_contact_data_type.val()
+          selectedValue = @$select_contact_data_type.val()
+          if selectedValue == 'select'
+            @rowView.model.attributes['instance::oc:contactdata'].set 'value', ''
+          else
+            @rowView.model.attributes['instance::oc:contactdata'].set 'value', selectedValue
+          updateContactDataPlaceholderClass()
           syncContactDataTypeToItemType()
       addSelectIdentifierType = () =>
         @$('.settings__input').append(@$label_select_identifier_type)
@@ -1319,8 +1333,16 @@ module.exports = do ->
         if $contactDataSelect.length > 0
           Backbone.trigger('ocCustomEvent', { sender: @model, value: 'contactdata' })
 
+          # Add placeholder option first
+          $('<option />', {value: @contact_data_type_placeholder.value, text: @contact_data_type_placeholder.label}).appendTo($contactDataSelect)
           for opt in @contact_data_type_options
             $('<option />', {value: opt.value, text: opt.label}).appendTo($contactDataSelect)
+
+          updateContactDataPlaceholderClass = () =>
+            if $contactDataSelect.val() == 'select'
+              $contactDataSelect.addClass('is-placeholder')
+            else
+              $contactDataSelect.removeClass('is-placeholder')
 
           syncContactDataTypeToItemType = () =>
             selectedContactDataType = $contactDataSelect.val()
@@ -1342,13 +1364,18 @@ module.exports = do ->
           if instance_contactdata_value != '' and (instance_contactdata_value in contact_data_values)
             $contactDataSelect.val(instance_contactdata_value)
           else
-            $contactDataSelect.val('firstname')
-            @rowView.model.attributes['instance::oc:contactdata'].set 'value', 'firstname'
+            $contactDataSelect.val('select')
 
+          updateContactDataPlaceholderClass()
           syncContactDataTypeToItemType()
 
           $contactDataSelect.change () =>
-            @rowView.model.attributes['instance::oc:contactdata'].set 'value', $contactDataSelect.val()
+            selectedValue = $contactDataSelect.val()
+            if selectedValue == 'select'
+              @rowView.model.attributes['instance::oc:contactdata'].set 'value', ''
+            else
+              @rowView.model.attributes['instance::oc:contactdata'].set 'value', selectedValue
+            updateContactDataPlaceholderClass()
             syncContactDataTypeToItemType()
           return
 

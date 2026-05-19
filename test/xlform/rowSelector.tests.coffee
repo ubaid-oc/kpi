@@ -330,8 +330,8 @@ do ->
       @selector.onSelectNewQuestionType(buildPickerEvent('pii_encrypted'))
       expect(@survey.rows.at(1).getValue('bind::oc:external')).toBe('contactdata')
 
-    it 'pii_encrypted row sets instance::oc:contactdata to "firstname" at creation', ->
-      expect(@survey.rows.at(0).getValue('instance::oc:contactdata')).toBe('firstname')
+    it 'pii_encrypted row sets instance::oc:contactdata to empty string at creation (placeholder shown)', ->
+      expect(@survey.rows.at(0).getValue('instance::oc:contactdata')).toBe('')
 
     it 'pii_encrypted row with empty label still sets bind::oc:external to "contactdata"', ->
       survey3 = new $model.Survey()
