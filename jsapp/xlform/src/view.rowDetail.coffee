@@ -1102,19 +1102,12 @@ module.exports = do ->
       if (sender.key is 'bind::oc:external') and (questionId is senderQuestionId)
         @$el.siblings(".message").remove();
         @$el.closest('div').removeClass("input-error")
-        if senderValue is 'contactdata'
+        if senderValue in ['clinicaldata', 'contactdata', 'identifier', 'signature']
           @removeFieldCheckCondition()
-          $input = @$('input')
-          $input.val('')
-          $input.prop('disabled', true)
+          @$('input').val('').prop('disabled', true)
           @model.set('value', '')
-        else if senderValue in ['clinicaldata', 'identifier']
-          @$('input').prop('disabled', false)
+          @$el.addClass('hidden')
           @removeRequired()
-          @makeFieldCheckCondition({
-            checkIfNotEmpty: true,
-            message: 'This field must be empty if Use External Value is being used'
-          })
         else
           @$el.removeClass('hidden')
           @$('input').prop('disabled', false)
@@ -1126,12 +1119,11 @@ module.exports = do ->
     afterRender: ->
       @listenForInputChange()
       externalValue = @model._parent.getValue('bind::oc:external')
-      if externalValue is 'contactdata'
+      if externalValue in ['clinicaldata', 'contactdata', 'identifier', 'signature']
         @removeFieldCheckCondition()
-        $input = @$('input')
-        $input.val('')
-        $input.prop('disabled', true)
         @model.set('value', '')
+        @$('input').val('').prop('disabled', true)
+        @$el.addClass('hidden')
       else
         @makeRequired()
 
