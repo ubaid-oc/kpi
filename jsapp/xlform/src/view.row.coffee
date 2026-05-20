@@ -893,11 +893,17 @@ module.exports = do ->
     hideMultioptions: ->
       @$card.removeClass('card--expandedchoices')
       @is_expanded = false
+      @$('.js-toggle-row-multioptions .k-icon')
+        .addClass('k-icon-caret-right')
+        .removeClass('k-icon-caret-down')
       return
 
     showMultioptions: ->
       @$card.addClass('card--expandedchoices')
       @is_expanded = true
+      @$('.js-toggle-row-multioptions .k-icon')
+        .addClass('k-icon-caret-down')
+        .removeClass('k-icon-caret-right')
       return
 
     toggleMultioptions: ->
