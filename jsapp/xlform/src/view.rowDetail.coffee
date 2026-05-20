@@ -1139,7 +1139,7 @@ module.exports = do ->
     html: ->
       @fieldTab = "active"
       @$el.addClass("card__settings__fields--#{@fieldTab}")
-      viewRowDetail.Templates.textbox @cid, @model.key, t("Short Display Name"), 'text', t('If the item is used in configurable tables (e.g. Participant Matrix) this will be used as the column header (optional)'), '40'
+      viewRowDetail.Templates.textbox @cid, @model.key, t("Short Display Name"), 'text', t('Optional column header in configurable tables'), '40'
     afterRender: ->
       @listenForInputChange()
 
@@ -1147,7 +1147,7 @@ module.exports = do ->
     html: ->
       @fieldTab = "active"
       @$el.addClass("card__settings__fields--#{@fieldTab}")
-      viewRowDetail.Templates.textbox @cid, @model.key, t("Item Description"), 'text', t('Enter item definition (e.g. CDASH data definition). This will appear only in some metadata and extracts (optional)'), '3999'
+      viewRowDetail.Templates.textbox @cid, @model.key, t("Item Description"), 'text', t('Optional item definition for metadata and extracts'), '3999'
     afterRender: ->
       @listenForInputChange()
 
