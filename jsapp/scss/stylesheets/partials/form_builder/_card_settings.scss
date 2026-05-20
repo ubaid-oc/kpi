@@ -109,10 +109,15 @@
   &.xlf-dv-default,
   &.xlf-dv-calculation,
   &.xlf-dv-oc_description,
-  &.xlf-dv-oc_briefdescription {
+  &.xlf-dv-oc_briefdescription,
+  &.xlf-dv-oc_signature_checkbox_label {
     label {
       vertical-align: top;
       padding-top: 7px;
+    }
+
+    &.input-error > label {
+      margin-top: 0;
     }
   }
 
