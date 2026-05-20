@@ -687,6 +687,8 @@ module.exports = do ->
           $toggle.attr('aria-expanded', 'false')
       questionType = @model.get('type').get('typeId')
       isEConsentSig = econsentSignature.isEConsentSignatureRow(@model)
+      externalValue = @model.get('bind::oc:external')?.get('value')
+      isPiiExternalValue = externalValue in ['contactdata', 'identifier', 'clinicaldata', 'signature']
 
       # don't display columns that start with a $
       hiddenFields = ['label', 'hint', 'type', 'select_from_list_name', 'kobo--matrix_list', 'parameters', 'tags', 'instance::oc:contactdata', 'instance::oc:identifier']
@@ -721,6 +723,10 @@ module.exports = do ->
                 'constraint'
                 'constraint_message'
               ]
+                val.set 'value', '' if key is 'bind::oc:itemgroup'
+                continue
+              else if key is 'bind::oc:itemgroup' and isPiiExternalValue
+                val.set 'value', ''
                 continue
               new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
 
