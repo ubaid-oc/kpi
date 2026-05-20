@@ -1156,10 +1156,12 @@ module.exports = do ->
       viewRowDetail.Templates.textbox @cid, @model.key, t("Short Display Name"), 'text', t('Optional column header in configurable tables'), '40'
     afterRender: ->
       @listenForInputChange()
-      # Hide field if this is a PII (Encrypted) item
+      # Hide and clear field if this is a PII (Encrypted) item
       externalValue = @model._parent.getValue('bind::oc:external')
       if externalValue is 'contactdata'
         @$el.addClass('hidden')
+        @$('input').val('')
+        @model.set('value', '')
 
   viewRowDetail.DetailViewMixins.oc_description =
     onOcCustomEvent: (ocCustomEventArgs) ->
@@ -1182,10 +1184,12 @@ module.exports = do ->
       viewRowDetail.Templates.textbox @cid, @model.key, t("Item Description"), 'text', t('Optional item definition for metadata and extracts'), '3999'
     afterRender: ->
       @listenForInputChange()
-      # Hide field if this is a PII (Encrypted) item
+      # Hide and clear field if this is a PII (Encrypted) item
       externalValue = @model._parent.getValue('bind::oc:external')
       if externalValue is 'contactdata'
         @$el.addClass('hidden')
+        @$('input').val('')
+        @model.set('value', '')
 
   viewRowDetail.DetailViewMixins.oc_external =
     onOcConsentRowsEvent: (ocConsentRowsEventArgs) ->
