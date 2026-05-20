@@ -12,6 +12,7 @@ isAssetLockable = require('js/components/locking/lockingUtils').isAssetLockable
 hasAssetRestriction = require('js/components/locking/lockingUtils').hasAssetRestriction
 LOCKING_RESTRICTIONS = require('js/components/locking/lockingConstants').LOCKING_RESTRICTIONS
 LOCKING_UI_CLASSNAMES = require('js/components/locking/lockingConstants').LOCKING_UI_CLASSNAMES
+isEConsentSignatureRow = require('js/components/formBuilder/econsentSignature').isEConsentSignatureRow
 
 module.exports = do ->
   surveyApp = {}
@@ -275,7 +276,13 @@ module.exports = do ->
       view
 
     toggleCardSettings: (evt)->
-      @_getViewForTarget(evt).toggleSettings()
+      view = @_getViewForTarget(evt)
+      view.toggleSettings()
+      if view.model._isSelectQuestion() and not isEConsentSignatureRow(view.model)
+        if view._settingsExpanded
+          view.showMultioptions()
+        else
+          view.hideMultioptions()
 
     toggleGroupExpansion: (evt)->
       view = @_getViewForTarget(evt)
