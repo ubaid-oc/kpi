@@ -151,9 +151,11 @@ module.exports = do ->
         @rowView.cardSettingsWrap.find('.js-required-logic-error').hide()
 
     _updateRequiredLogicTabError: ->
-      return unless @rowView and @$panelEl
-      panelInputVal = @$panelEl.find('.js-mandatory-setting-custom-text').val() or ''
+      return unless @rowView
+      requiredVal = @getChangedValue()
+      normalizedRequiredVal = String(requiredVal or '').trim()
+      hasExpression = normalizedRequiredVal isnt '' and normalizedRequiredVal isnt 'true' and normalizedRequiredVal isnt 'false'
       $errorIcon = @rowView.cardSettingsWrap.find('.js-required-logic-error')
-      $errorIcon.toggle(panelInputVal is '')
+      $errorIcon.toggle(not hasExpression)
 
   MandatorySettingView: MandatorySettingView
