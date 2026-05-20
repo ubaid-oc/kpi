@@ -23,6 +23,54 @@ pipeline {
                 checkout scmGit(branches: [[name: '*/$release_branch']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-github-token-as-password', url: 'https://github.com/OpenClinica/kpi.git']])
             }
         }
+
+        stage('Run Frontend Tests') {
+            agent {
+                docker {
+                    image 'node:16.15.0-bullseye'
+                    args '--user root:root'
+                    reuseNode true
+                }
+            }
+            steps {
+                script {
+                    if (env.ENV == "build" || env.ENV == "build & deploy") {
+                        try {
+                            sh """
+                                set -eu
+
+                                # Install system dependencies: Python and Chromium
+                                apt-get update
+                                apt-get install -y --no-install-recommends python3 chromium
+
+                                # Create symlink so 'python' command works
+                                ln -sf /usr/bin/python3 /usr/bin/python
+
+                                # Fix npm cache permissions by setting cache to workspace directory
+                                export npm_config_cache="\${WORKSPACE}/.npm-cache"
+                                mkdir -p "\${npm_config_cache}"
+
+                                # Install correct npm version
+                                npm install -g npm@8.5.5
+
+                                # Verify versions
+                                test "\$(node --version)" = "v16.15.0"
+                                test "\$(npm --version)" = "8.5.5"
+
+                                # Verify Chromium
+                                chromium --version || google-chrome --version || { echo "Chrome/Chromium not found"; exit 1; }
+
+                                # Install dependencies and run tests
+                                npm install --quiet
+                                npm test
+                            """
+                        } catch (err) {
+                            error "Frontend tests failed: ${err}"
+                        }
+                    }
+                }
+            }
+        }
         
         stage('Fetch ECR Credentials') {
             steps {
