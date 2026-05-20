@@ -1261,50 +1261,60 @@ module.exports = do ->
       for identifier_type_option in @identifier_type_options
         $('<option />', {value: "#{identifier_type_option}", text: "#{identifier_type_option}"}).appendTo(@$select_identifier_type)
 
+      # Shared helper: Update placeholder class based on select value
+      updateContactDataPlaceholderClass = ($selectEl) =>
+        if $selectEl.val() == 'select'
+          $selectEl.addClass('is-placeholder')
+        else
+          $selectEl.removeClass('is-placeholder')
+
+      # Shared helper: Sync item type based on selected contact data type (fulldob -> date)
+      syncContactDataTypeToItemType = ($selectEl) =>
+        selectedContactDataType = $selectEl.val()
+        typeDetail = @rowView.model.get('type')
+        return  unless typeDetail?
+
+        isExternalContactData = @rowView.model.getValue?('bind::oc:external') is 'contactdata'
+        return  unless isExternalContactData
+
+        if selectedContactDataType is 'fulldob'
+          if typeDetail.get('typeId') is 'text'
+            typeDetail.set('value', 'date')
+        else
+          if typeDetail.get('typeId') is 'date'
+            typeDetail.set('value', 'text')
+
+      # Shared helper: Initialize contact data select value and normalize model if needed
+      initContactDataSelectValue = ($selectEl) =>
+        instance_contactdata_value = @rowView.model.attributes['instance::oc:contactdata'].get 'value'
+        contact_data_values = (opt.value for opt in @contact_data_type_options)
+        if instance_contactdata_value != '' and (instance_contactdata_value in contact_data_values)
+          $selectEl.val(instance_contactdata_value)
+        else
+          $selectEl.val('select')
+          @rowView.model.attributes['instance::oc:contactdata'].set 'value', ''
+
+      # Shared helper: Handle contact data select change event
+      handleContactDataSelectChange = ($selectEl) =>
+        selectedValue = $selectEl.val()
+        if selectedValue == 'select'
+          @rowView.model.attributes['instance::oc:contactdata'].set 'value', ''
+        else
+          @rowView.model.attributes['instance::oc:contactdata'].set 'value', selectedValue
+        updateContactDataPlaceholderClass($selectEl)
+        syncContactDataTypeToItemType($selectEl)
 
       addSelectContactDataType = () =>
         @$('.settings__input').append(@$label_select_contact_data_type)
         @$('.settings__input').append(@$select_contact_data_type)
 
-        updateContactDataPlaceholderClass = () =>
-          if @$select_contact_data_type.val() == 'select'
-            @$select_contact_data_type.addClass('is-placeholder')
-          else
-            @$select_contact_data_type.removeClass('is-placeholder')
-
-        syncContactDataTypeToItemType = () =>
-          selectedContactDataType = @$select_contact_data_type.val()
-          typeDetail = @rowView.model.get('type')
-          return  unless typeDetail?
-
-          isExternalContactData = @rowView.model.getValue?('bind::oc:external') is 'contactdata'
-          return  unless isExternalContactData
-
-          if selectedContactDataType is 'fulldob'
-            if typeDetail.get('typeId') is 'text'
-              typeDetail.set('value', 'date')
-          else
-            if typeDetail.get('typeId') is 'date'
-              typeDetail.set('value', 'text')
-
-        instance_contactdata_value = @rowView.model.attributes['instance::oc:contactdata'].get 'value'
-        contact_data_values = (opt.value for opt in @contact_data_type_options)
-        if instance_contactdata_value != '' and (instance_contactdata_value in contact_data_values)
-          @$select_contact_data_type.val(instance_contactdata_value)
-        else
-          @$select_contact_data_type.val('select')
-
-        updateContactDataPlaceholderClass()
-        syncContactDataTypeToItemType()
+        initContactDataSelectValue(@$select_contact_data_type)
+        updateContactDataPlaceholderClass(@$select_contact_data_type)
+        syncContactDataTypeToItemType(@$select_contact_data_type)
 
         @$select_contact_data_type.change () =>
-          selectedValue = @$select_contact_data_type.val()
-          if selectedValue == 'select'
-            @rowView.model.attributes['instance::oc:contactdata'].set 'value', ''
-          else
-            @rowView.model.attributes['instance::oc:contactdata'].set 'value', selectedValue
-          updateContactDataPlaceholderClass()
-          syncContactDataTypeToItemType()
+          handleContactDataSelectChange(@$select_contact_data_type)
+
       addSelectIdentifierType = () =>
         @$('.settings__input').append(@$label_select_identifier_type)
         @$('.settings__input').append(@$select_identifier_type)
@@ -1338,45 +1348,13 @@ module.exports = do ->
           for opt in @contact_data_type_options
             $('<option />', {value: opt.value, text: opt.label}).appendTo($contactDataSelect)
 
-          updateContactDataPlaceholderClass = () =>
-            if $contactDataSelect.val() == 'select'
-              $contactDataSelect.addClass('is-placeholder')
-            else
-              $contactDataSelect.removeClass('is-placeholder')
-
-          syncContactDataTypeToItemType = () =>
-            selectedContactDataType = $contactDataSelect.val()
-            typeDetail = @rowView.model.get('type')
-            return  unless typeDetail?
-
-            isExternalContactData = @rowView.model.getValue?('bind::oc:external') is 'contactdata'
-            return  unless isExternalContactData
-
-            if selectedContactDataType is 'fulldob'
-              if typeDetail.get('typeId') is 'text'
-                typeDetail.set('value', 'date')
-            else
-              if typeDetail.get('typeId') is 'date'
-                typeDetail.set('value', 'text')
-
-          instance_contactdata_value = @rowView.model.attributes['instance::oc:contactdata'].get 'value'
-          contact_data_values = (opt.value for opt in @contact_data_type_options)
-          if instance_contactdata_value != '' and (instance_contactdata_value in contact_data_values)
-            $contactDataSelect.val(instance_contactdata_value)
-          else
-            $contactDataSelect.val('select')
-
-          updateContactDataPlaceholderClass()
-          syncContactDataTypeToItemType()
+          # Use shared helpers for initialization and event handling
+          initContactDataSelectValue($contactDataSelect)
+          updateContactDataPlaceholderClass($contactDataSelect)
+          syncContactDataTypeToItemType($contactDataSelect)
 
           $contactDataSelect.change () =>
-            selectedValue = $contactDataSelect.val()
-            if selectedValue == 'select'
-              @rowView.model.attributes['instance::oc:contactdata'].set 'value', ''
-            else
-              @rowView.model.attributes['instance::oc:contactdata'].set 'value', selectedValue
-            updateContactDataPlaceholderClass()
-            syncContactDataTypeToItemType()
+            handleContactDataSelectChange($contactDataSelect)
           return
 
       if $select.length > 0
