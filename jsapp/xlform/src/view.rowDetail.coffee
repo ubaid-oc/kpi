@@ -1136,20 +1136,56 @@ module.exports = do ->
         @makeRequired()
 
   viewRowDetail.DetailViewMixins.oc_briefdescription =
+    onOcCustomEvent: (ocCustomEventArgs) ->
+      questionId = @model._parent.cid
+      sender = ocCustomEventArgs.sender
+      senderValue = ocCustomEventArgs.value
+      senderQuestionId = sender._parent.cid
+      # When bind::oc:external changes to 'contactdata', hide field and clear value
+      if (sender.key is 'bind::oc:external') and (questionId is senderQuestionId)
+        if senderValue is 'contactdata'
+          @$el.addClass('hidden')
+          $input = @$('input')
+          $input.val('')
+          @model.set('value', '')
+        else
+          @$el.removeClass('hidden')
     html: ->
       @fieldTab = "active"
       @$el.addClass("card__settings__fields--#{@fieldTab}")
       viewRowDetail.Templates.textbox @cid, @model.key, t("Short Display Name"), 'text', t('Optional column header in configurable tables'), '40'
     afterRender: ->
       @listenForInputChange()
+      # Hide field if this is a PII (Encrypted) item
+      externalValue = @model._parent.getValue('bind::oc:external')
+      if externalValue is 'contactdata'
+        @$el.addClass('hidden')
 
   viewRowDetail.DetailViewMixins.oc_description =
+    onOcCustomEvent: (ocCustomEventArgs) ->
+      questionId = @model._parent.cid
+      sender = ocCustomEventArgs.sender
+      senderValue = ocCustomEventArgs.value
+      senderQuestionId = sender._parent.cid
+      # When bind::oc:external changes to 'contactdata', hide field and clear value
+      if (sender.key is 'bind::oc:external') and (questionId is senderQuestionId)
+        if senderValue is 'contactdata'
+          @$el.addClass('hidden')
+          $input = @$('input')
+          $input.val('')
+          @model.set('value', '')
+        else
+          @$el.removeClass('hidden')
     html: ->
       @fieldTab = "active"
       @$el.addClass("card__settings__fields--#{@fieldTab}")
       viewRowDetail.Templates.textbox @cid, @model.key, t("Item Description"), 'text', t('Optional item definition for metadata and extracts'), '3999'
     afterRender: ->
       @listenForInputChange()
+      # Hide field if this is a PII (Encrypted) item
+      externalValue = @model._parent.getValue('bind::oc:external')
+      if externalValue is 'contactdata'
+        @$el.addClass('hidden')
 
   viewRowDetail.DetailViewMixins.oc_external =
     onOcConsentRowsEvent: (ocConsentRowsEventArgs) ->

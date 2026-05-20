@@ -133,6 +133,9 @@ module.exports = do ->
         rowDetails['bind::oc:external'] = 'contactdata'
         rowDetails['bind::oc:itemgroup'] = ''
         rowDetails['instance::oc:contactdata'] = 'firstname'
+        # For PII (Encrypted) items, Description and Brief Description must be blank
+        rowDetails['bind::oc:briefdescription'] = ''
+        rowDetails['bind::oc:description'] = ''
 
       if rowType is 'econsent_signature'
         rowDetails.type = 'select_multiple'

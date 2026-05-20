@@ -687,6 +687,7 @@ module.exports = do ->
           $toggle.attr('aria-expanded', 'false')
       questionType = @model.get('type').get('typeId')
       isEConsentSig = econsentSignature.isEConsentSignatureRow(@model)
+      isPiiEncrypted = @model.getValue?('bind::oc:external') is 'contactdata'
 
       # don't display columns that start with a $
       hiddenFields = ['label', 'hint', 'type', 'select_from_list_name', 'kobo--matrix_list', 'parameters', 'tags', 'instance::oc:contactdata', 'instance::oc:identifier']
@@ -720,6 +721,12 @@ module.exports = do ->
                 'trigger'
                 'constraint'
                 'constraint_message'
+              ]
+                continue
+              # For PII (Encrypted) items, hide Description and Brief Description fields
+              if isPiiEncrypted and key in [
+                'bind::oc:briefdescription'
+                'bind::oc:description'
               ]
                 continue
               new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
