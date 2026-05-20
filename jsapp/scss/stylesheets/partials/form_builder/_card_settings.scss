@@ -121,6 +121,14 @@
     }
   }
 
+  &.xlf-dv-oc_signature_checkbox_label {
+    textarea {
+      min-height: 76px;
+      overflow: hidden;
+      resize: none;
+    }
+  }
+
   &.xlf-dv-oc_external {
     label {
       vertical-align: top;

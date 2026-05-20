@@ -740,10 +740,6 @@ module.exports = do ->
         $field = $(fieldHtml)
         $field.addClass('xlf-dv-oc_signature_checkbox_label')
         $input = $field.find('textarea').eq(0)
-        $input.css({
-          'min-height': '70px',
-          'overflow': 'hidden'
-        })
         $input.val(econsentSignature.getEConsentSignatureCheckboxLabel(@model) || '')
 
         showOrHideRequired = =>
