@@ -60,10 +60,18 @@ pipeline {
                                 # Verify Chromium
                                 chromium --version || google-chrome --version || { echo "Chrome/Chromium not found"; exit 1; }
 
-                                # Install dependencies and run tests
+                                # Install dependencies
                                 npm install --quiet
-                                npm test
+
+                                # Build tests
+                                npx webpack --config webpack/test.config.js
                             """
+
+                            // Run mocha-chrome with timeout to prevent hanging on 'No inspectable targets'
+                            // See: https://github.com/kobotoolbox/kpi/issues/4337
+                            timeout(time: 2, unit: 'MINUTES') {
+                                sh 'npx mocha-chrome test/tests.html --chrome-launcher.connectionPollInterval=5000'
+                            }
                         } catch (err) {
                             error "Frontend tests failed: ${err}"
                         }
