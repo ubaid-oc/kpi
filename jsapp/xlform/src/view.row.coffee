@@ -742,9 +742,10 @@ module.exports = do ->
 
         # Add Signature checkbox label field (required)
         placeholder = 'Enter text to appear next to signature field, (e.g. "I have read the information above and agree to participate.")'
-        fieldHtml = $viewRowDetail.Templates.textbox(@model.cid + '-siglabel', 'oc_signature_checkbox_label', t('Signature checkbox label'), 'text', placeholder)
+        fieldHtml = $viewRowDetail.Templates.textarea(@model.cid + '-siglabel', 'oc_signature_checkbox_label', t('Signature Checkbox Label'), '', placeholder)
         $field = $(fieldHtml)
-        $input = $field.find('input').eq(0)
+        $field.addClass('xlf-dv-oc_signature_checkbox_label')
+        $input = $field.find('textarea').eq(0)
         $input.val(econsentSignature.getEConsentSignatureCheckboxLabel(@model) || '')
 
         showOrHideRequired = =>
