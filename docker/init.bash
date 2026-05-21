@@ -16,10 +16,10 @@ check_table() {
             return 1
             ;;
     esac
-    result=$(python manage.py dbshell 2>/dev/null <<EOF
+    result=$(gosu "${UWSGI_USER}" python manage.py dbshell 2>/dev/null <<EOF
 SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name='${table}';
 EOF
-)
+) || return 1
     # psql prints COUNT(*) = 1 as a lone "1" on its own line.
     printf '%s\n' "${result}" | grep -q '^[[:space:]]*1[[:space:]]*$'
 }
