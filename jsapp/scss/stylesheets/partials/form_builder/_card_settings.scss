@@ -123,8 +123,8 @@
 
   &.xlf-dv-oc_signature_checkbox_label {
     textarea {
-      min-height: 76px;
-      overflow: hidden;
+      min-height: $oc-signature-textarea-min-height;
+      overflow: auto;
       resize: none;
     }
   }
