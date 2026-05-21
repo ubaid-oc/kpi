@@ -819,3 +819,73 @@ do ->
       $contactDataSelect = @$el.find('select.contact-data-type')
       $contactDataSelect.val('firstname').trigger('change')
       expect(@row.getValue('type')).toBe('text')
+
+  describe 'view.rowDetail: PII — Contact Data Type dropdown placeholder behavior', ->
+    beforeEach ->
+      window.xlfHideWarnings = true
+      @viewRowDetail = require('../../jsapp/xlform/src/view.rowDetail')
+      $model = require('../../jsapp/xlform/src/_model')
+
+      @survey = new $model.Survey()
+      @survey.rows.add(
+        type: 'text'
+        name: 'pii_new'
+        label: 'New PII Item'
+        'bind::oc:external': 'contactdata'
+        'instance::oc:contactdata': ''  # Empty value means placeholder should be shown
+      )
+      @row = @survey.rows.at(0)
+      @detail = @row.get('bind::oc:external')
+      @mixin = @viewRowDetail.DetailViewMixins.oc_external
+
+      # Create DOM element with contact-data-type select rendered by html()
+      htmlResult = @mixin.html.call({
+        fieldTab: 'active'
+        $el: { addClass: -> }
+        model: @detail
+        cid: 'cid_new'
+      })
+      @$el = $('<div/>').html(htmlResult)
+
+      @mixin_ctx = $.extend({}, @mixin, {
+        cid: 'cid_new'
+        $el: @$el
+        $: (selector) => @$el.find(selector)
+        model: @detail
+        rowView: { model: @row }
+        contact_data_type_placeholder: {value: 'select', label: 'Select'}
+        contact_data_type_options: [
+          {value: 'firstname', label: 'firstname'}
+          {value: 'lastname', label: 'lastname'}
+          {value: 'fulldob', label: 'fulldob'}
+        ]
+      })
+
+    afterEach ->
+      window.xlfHideWarnings = false
+
+    it 'shows "Select" placeholder when instance::oc:contactdata is empty', ->
+      @mixin_ctx.afterRender.call(@mixin_ctx)
+      $contactDataSelect = @$el.find('select.contact-data-type')
+      expect($contactDataSelect.val()).toBe('select')
+
+    it 'applies is-placeholder class when value is "select"', ->
+      @mixin_ctx.afterRender.call(@mixin_ctx)
+      $contactDataSelect = @$el.find('select.contact-data-type')
+      expect($contactDataSelect.hasClass('is-placeholder')).toBe(true)
+
+    it 'removes is-placeholder class when a value is selected', ->
+      @mixin_ctx.afterRender.call(@mixin_ctx)
+      $contactDataSelect = @$el.find('select.contact-data-type')
+      $contactDataSelect.val('firstname').trigger('change')
+      expect($contactDataSelect.hasClass('is-placeholder')).toBe(false)
+
+    it 'sets instance::oc:contactdata to empty string when placeholder is selected', ->
+      @mixin_ctx.afterRender.call(@mixin_ctx)
+      $contactDataSelect = @$el.find('select.contact-data-type')
+      # First select a real value
+      $contactDataSelect.val('firstname').trigger('change')
+      expect(@row.getValue('instance::oc:contactdata')).toBe('firstname')
+      # Then select placeholder
+      $contactDataSelect.val('select').trigger('change')
+      expect(@row.getValue('instance::oc:contactdata')).toBe('')

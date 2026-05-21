@@ -132,7 +132,7 @@ module.exports = do ->
         rowDetails.type = 'text'
         rowDetails['bind::oc:external'] = 'contactdata'
         rowDetails['bind::oc:itemgroup'] = ''
-        rowDetails['instance::oc:contactdata'] = 'firstname'
+        rowDetails['instance::oc:contactdata'] = ''
         # For PII (Encrypted) items, Description and Brief Description must be blank
         rowDetails['bind::oc:briefdescription'] = ''
         rowDetails['bind::oc:description'] = ''
