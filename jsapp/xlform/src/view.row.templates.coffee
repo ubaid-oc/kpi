@@ -380,7 +380,7 @@ module.exports = do ->
       <label class="text-box text-box--on-white required-logic-panel__input-wrapper">
         <input
           type="text"
-          class="text-box__input js-mandatory-setting-custom-text"
+          class="text-box__input mandatory-setting-custom-text js-mandatory-setting-custom-text"
           value=""
           placeholder="#{t('e.g. ${AGE} &lt; 18')}"
         >

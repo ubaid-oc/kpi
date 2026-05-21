@@ -28,7 +28,7 @@ module.exports = do ->
       @$el.html(template)
       # Sync panel text input if it exists
       if @$panelEl
-        panelInput = @$panelEl.find('.js-mandatory-setting-custom-text')
+        panelInput = @$panelEl.find('.mandatory-setting-custom-text')
         if reqVal isnt 'true' and reqVal isnt 'false'
           panelInput.val(reqVal)
         else
@@ -45,7 +45,7 @@ module.exports = do ->
       # Populate panel input with existing value if conditional
       reqVal = @getChangedValue()
       if reqVal isnt 'true' and reqVal isnt 'false'
-        @$panelEl.find('.js-mandatory-setting-custom-text').val(reqVal)
+        @$panelEl.find('.mandatory-setting-custom-text').val(reqVal)
       @_updateRequiredLogicTabVisibility()
       return
 
@@ -56,7 +56,7 @@ module.exports = do ->
 
     showMessage: () ->
       return unless @$panelEl
-      $customEl = @$panelEl.find('.js-mandatory-setting-custom-text')
+      $customEl = @$panelEl.find('.mandatory-setting-custom-text')
       $customEl.closest('label').addClass('input-error')
       if $customEl.siblings('.message').length is 0
         $message = $('<div/>').addClass('message').text(t("This field is required"))
@@ -64,13 +64,13 @@ module.exports = do ->
 
     hideMessage: () ->
       return unless @$panelEl
-      $customEl = @$panelEl.find('.js-mandatory-setting-custom-text')
+      $customEl = @$panelEl.find('.mandatory-setting-custom-text')
       $customEl.closest('label').removeClass('input-error')
       $customEl.siblings('.message').remove()
 
     showOrHideCondition: () ->
       return unless @$panelEl
-      $customEl = @$panelEl.find('.js-mandatory-setting-custom-text')
+      $customEl = @$panelEl.find('.mandatory-setting-custom-text')
       if $customEl.val() is ''
         @showMessage()
       else
@@ -83,7 +83,7 @@ module.exports = do ->
         @isConditionalSelected = true
         @setNewValue('')
         @_showRequiredLogicTab()
-        @$panelEl?.find('.js-mandatory-setting-custom-text').val('').focus()
+        @$panelEl?.find('.mandatory-setting-custom-text').val('').focus()
         # Don't show the inline error message yet — only after user interaction
       else
         @isConditionalSelected = false
@@ -98,7 +98,7 @@ module.exports = do ->
       else
         val = evt.currentTarget.value
         @setNewValue(val)
-        @$panelEl?.find('.js-mandatory-setting-custom-text').focus()
+        @$panelEl?.find('.mandatory-setting-custom-text').focus()
         @showOrHideCondition()
       return
 
