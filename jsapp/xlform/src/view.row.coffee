@@ -728,6 +728,8 @@ module.exports = do ->
               else if key is 'bind::oc:itemgroup' and isPiiExternalValue
                 val.set 'value', ''
                 continue
+              # Note: For PII items, bind::oc:briefdescription and bind::oc:description
+              # DetailViews are still rendered so their afterRender can hide+clear values
               new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
 
       if isEConsentSig

@@ -443,6 +443,105 @@ do ->
       result = @mixin_ctx.html()
       expect(result.indexOf('maxlength="3999"')).not.toBe(-1)
 
+  ###############################################################
+  # PII (Encrypted) — oc_briefdescription and oc_description should be
+  # hidden and cleared when bind::oc:external is 'contactdata'
+  ###############################################################
+
+  describe 'view.rowDetail.DetailViewMixins: PII — oc_briefdescription onOcCustomEvent', ->
+    beforeEach ->
+      window.xlfHideWarnings = true
+      @viewRowDetail = require('../../jsapp/xlform/src/view.rowDetail')
+      $model = require('../../jsapp/xlform/src/_model')
+      @survey = new $model.Survey()
+      @survey.rows.add(type: 'text', name: 'pii_q', label: 'Patient Name')
+      @row = @survey.rows.at(0)
+      @detail = @row.get('bind::oc:briefdescription')
+      @$el = $('<div><input type="text" value="test value" /></div>')
+      @mixin = @viewRowDetail.DetailViewMixins.oc_briefdescription
+      @mixin_ctx = $.extend({}, @mixin, {
+        cid: 'cid_brief_pii'
+        $el: @$el
+        $: (sel) => @$el.find(sel)
+        model: @detail
+        Templates: @viewRowDetail.Templates
+      })
+    afterEach ->
+      window.xlfHideWarnings = false
+
+    it 'onOcCustomEvent with "contactdata" hides the field', ->
+      externalDetail = @row.get('bind::oc:external')
+      @mixin_ctx.onOcCustomEvent({
+        sender: externalDetail
+        value: 'contactdata'
+      })
+      expect(@$el.hasClass('hidden')).toBe(true)
+
+    it 'onOcCustomEvent with "contactdata" clears the value', ->
+      @detail.set('value', 'some value')
+      externalDetail = @row.get('bind::oc:external')
+      @mixin_ctx.onOcCustomEvent({
+        sender: externalDetail
+        value: 'contactdata'
+      })
+      expect(@detail.get('value')).toBe('')
+
+    it 'onOcCustomEvent with non-contactdata value shows the field', ->
+      @$el.addClass('hidden')
+      externalDetail = @row.get('bind::oc:external')
+      @mixin_ctx.onOcCustomEvent({
+        sender: externalDetail
+        value: 'identifier'
+      })
+      expect(@$el.hasClass('hidden')).toBe(false)
+
+  describe 'view.rowDetail.DetailViewMixins: PII — oc_description onOcCustomEvent', ->
+    beforeEach ->
+      window.xlfHideWarnings = true
+      @viewRowDetail = require('../../jsapp/xlform/src/view.rowDetail')
+      $model = require('../../jsapp/xlform/src/_model')
+      @survey = new $model.Survey()
+      @survey.rows.add(type: 'text', name: 'pii_q', label: 'Patient Name')
+      @row = @survey.rows.at(0)
+      @detail = @row.get('bind::oc:description')
+      @$el = $('<div><input type="text" value="test value" /></div>')
+      @mixin = @viewRowDetail.DetailViewMixins.oc_description
+      @mixin_ctx = $.extend({}, @mixin, {
+        cid: 'cid_desc_pii'
+        $el: @$el
+        $: (sel) => @$el.find(sel)
+        model: @detail
+        Templates: @viewRowDetail.Templates
+      })
+    afterEach ->
+      window.xlfHideWarnings = false
+
+    it 'onOcCustomEvent with "contactdata" hides the field', ->
+      externalDetail = @row.get('bind::oc:external')
+      @mixin_ctx.onOcCustomEvent({
+        sender: externalDetail
+        value: 'contactdata'
+      })
+      expect(@$el.hasClass('hidden')).toBe(true)
+
+    it 'onOcCustomEvent with "contactdata" clears the value', ->
+      @detail.set('value', 'some description')
+      externalDetail = @row.get('bind::oc:external')
+      @mixin_ctx.onOcCustomEvent({
+        sender: externalDetail
+        value: 'contactdata'
+      })
+      expect(@detail.get('value')).toBe('')
+
+    it 'onOcCustomEvent with non-contactdata value shows the field', ->
+      @$el.addClass('hidden')
+      externalDetail = @row.get('bind::oc:external')
+      @mixin_ctx.onOcCustomEvent({
+        sender: externalDetail
+        value: 'identifier'
+      })
+      expect(@$el.hasClass('hidden')).toBe(false)
+
   describe 'view.rowDetail.DetailViewMixins: "default" (default value) html()', ->
     beforeEach ->
       window.xlfHideWarnings = true
