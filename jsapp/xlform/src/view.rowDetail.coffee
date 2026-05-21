@@ -138,7 +138,6 @@ module.exports = do ->
       where[how || 'append'](@el)
     insertInDOM: (rowView)->
       advancedKeys = [
-        'default'
         'oc_item_group'
         'calculation'
         'trigger'

@@ -696,6 +696,9 @@ module.exports = do ->
             @mandatorySetting = new $viewMandatorySetting.MandatorySettingView({
               model: @model.get('required')
             }).render().insertInDOM(@)
+        else if key is 'default'
+          # handled by the Default Value panel
+          continue
         else if key is '_isRepeat' and @model.getValue('type') is 'kobomatrix'
           # don't display repeat checkbox for matrix groups
           continue
@@ -723,6 +726,32 @@ module.exports = do ->
               ]
                 continue
               new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
+
+      typesWithoutDefault = ['note', 'image', 'audio', 'video', 'file']
+      if questionType not in typesWithoutDefault and not isEConsentSig
+        @cardSettingsWrap.find('.js-default-value-tab').show()
+        $defaultPanel = $($viewTemplates.$$render('row.defaultValuePanel'))
+        $defaultPanel.appendTo(@cardSettingsWrap.find('.js-card-settings-default-value'))
+        defaultModel = @model.get('default')
+        if defaultModel
+          $textarea = $defaultPanel.find('.js-default-value-input')
+          currentVal = defaultModel.get('value') or ''
+          $textarea.val(currentVal)
+          if currentVal
+            setTimeout ->
+              scrollHeight = $textarea.prop('scrollHeight')
+              $textarea.css('height', '')
+              $textarea.css('height', scrollHeight)
+            , 1
+          updateDefaultModel = ->
+            defaultModel.set('value', $textarea.val().replace(/\n/g, ''))
+          $textarea.on('blur', updateDefaultModel)
+          $textarea.on('change', updateDefaultModel)
+          $textarea.on('keyup', updateDefaultModel)
+          $textarea.on 'keypress', (evt) ->
+            if evt.key is 'Enter' or evt.keyCode is 13
+              evt.preventDefault()
+              $textarea.blur()
 
       if isEConsentSig
         # Hide the entire Response List pane (if present in DOM)
