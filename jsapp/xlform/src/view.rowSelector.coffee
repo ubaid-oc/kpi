@@ -132,7 +132,7 @@ module.exports = do ->
         rowDetails.type = 'text'
         rowDetails['bind::oc:external'] = 'contactdata'
         rowDetails['bind::oc:itemgroup'] = ''
-        rowDetails['instance::oc:contactdata'] = 'firstname'
+        rowDetails['instance::oc:contactdata'] = ''
 
       if rowType is 'econsent_signature'
         rowDetails.type = 'select_multiple'
