@@ -1,0 +1,70 @@
+@use '~kobo-common/src/styles/colors';
+
+.default-value-tab--hidden {
+  display: none;
+}
+
+.default-value-panel {
+  &__header {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  &__input {
+    display: block;
+    width: 100%;
+    background-color: colors.$kobo-white;
+    border: 1px solid #CBD5E1;
+    border-radius: 4px;
+    padding: 7px 10.5px;
+    font-size: 13px;
+    color: #334155;
+    box-shadow: 0px 1px 2px 0px #1212170D;
+    resize: none;
+    min-height: 80px;
+    margin-bottom: 12px;
+
+    &:focus {
+      border-color: #3B82F6;
+      outline: none;
+    }
+
+    &::placeholder {
+      color: #94A3B8;
+    }
+  }
+
+  &__hint {
+    font-size: 12px;
+    font-weight: normal;
+    color: colors.$kobo-gray-40;
+
+    p {
+      margin-bottom: 6px;
+    }
+
+    ul {
+      margin: 6px 0 6px 16px;
+      padding: 0;
+      list-style: disc;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      background-color: #F1F5F9;
+      border-radius: 3px;
+      padding: 1px 4px;
+      font-size: 11px;
+      color: #334155;
+    }
+
+    a {
+      color: colors.$kobo-blue;
+      text-decoration: underline;
+    }
+  }
+}
