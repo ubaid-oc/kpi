@@ -84,7 +84,7 @@ module.exports = do ->
           <li data-card-settings-tab-id="validation-criteria" class="card__settings__tabs__tab">
             #{t("Validation Criteria")}
           </li>
-          <li data-card-settings-tab-id="default-value" class="card__settings__tabs__tab js-default-value-tab" style="display:none">
+          <li data-card-settings-tab-id="default-value" class="card__settings__tabs__tab js-default-value-tab default-value-tab--hidden">
             #{t("Default Value")}
           </li>
           <li data-card-settings-tab-id="locked-features" class="card__settings__tabs__tab locking__ui-hidden">
