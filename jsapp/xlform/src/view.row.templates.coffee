@@ -84,6 +84,10 @@ module.exports = do ->
           <li data-card-settings-tab-id="validation-criteria" class="card__settings__tabs__tab">
             #{t("Validation Criteria")}
           </li>
+          <li data-card-settings-tab-id="required-logic" class="card__settings__tabs__tab js-required-logic-tab" style="display:none">
+            <span class="js-required-logic-tab-label">#{t("Required Logic")}</span>
+            <span class="js-required-logic-error required-logic-error-badge" style="display:none">!</span>
+          </li>
           <li data-card-settings-tab-id="calculation" class="card__settings__tabs__tab js-calculation-tab calculation-tab--hidden">
             <span>#{t("Calculation")}</span>
             <span class="calculation-tab__error js-calculation-tab-error calculation-tab__error--hidden">!</span>
@@ -109,6 +113,7 @@ module.exports = do ->
           </div>
           <ul class="js-card-settings-skip-logic card__settings__fields"></ul>
           <ul class="js-card-settings-validation-criteria card__settings__fields"></ul>
+          <div class="js-card-settings-required-logic card__settings__fields"></div>
           <div class="js-card-settings-calculation card__settings__fields"></div>
           <ul class="js-card-settings-locked-features card__settings__fields locking__ui-hidden"></ul>
         </div>
@@ -367,17 +372,25 @@ module.exports = do ->
               value="custom" #{if modifier is 'custom' then 'checked' else ''}
             >
             <span class="radio__label">#{t('Conditional')}</span>
-            <label class="text-box text-box--on-white">
-              <input
-                type="text"
-                class="text-box__input js-mandatory-setting-custom-text"
-                value=""
-                placeholder="#{t('Conditional value')}"
-              >
-            </label>
           </label>
         </div>
       </span>
+    </div>
+    """
+
+  requiredLogicPanel = () ->
+    """
+    <div class="required-logic-panel">
+      <h2 class="required-logic-panel__header">#{t('Required Logic - when should this item be required?')}</h2>
+      <label class="text-box text-box--on-white required-logic-panel__input-wrapper">
+        <input
+          type="text"
+          class="text-box__input mandatory-setting-custom-text js-mandatory-setting-custom-text"
+          value=""
+          placeholder="#{t('e.g. ${AGE} &lt; 18')}"
+        >
+      </label>
+      <p class="required-logic-panel__hint">#{t('This question has a')} <strong>#{t('Conditional')}</strong> #{t("required setting. It will be treated as required when the expression above is 'true'.")}</p>
     </div>
     """
 
@@ -444,6 +457,7 @@ module.exports = do ->
   xlfRowView: xlfRowView
   expandChoiceList: expandChoiceList
   mandatorySettingSelector: mandatorySettingSelector
+  requiredLogicPanel: requiredLogicPanel
   paramsSettingsField: paramsSettingsField
   paramsSimple: paramsSimple
   selectQuestionExpansion: selectQuestionExpansion

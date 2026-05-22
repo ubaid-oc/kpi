@@ -730,6 +730,8 @@ module.exports = do ->
               else if key is 'bind::oc:itemgroup' and isPiiExternalValue
                 val.set 'value', ''
                 continue
+              # Note: For PII items, bind::oc:briefdescription and bind::oc:description
+              # DetailViews are still rendered so their afterRender can hide+clear values
               new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
 
       # Calculation panel setup
@@ -827,9 +829,10 @@ module.exports = do ->
 
         # Add Signature checkbox label field (required)
         placeholder = 'Enter text to appear next to signature field, (e.g. "I have read the information above and agree to participate.")'
-        fieldHtml = $viewRowDetail.Templates.textbox(@model.cid + '-siglabel', 'oc_signature_checkbox_label', t('Signature checkbox label'), 'text', placeholder)
+        fieldHtml = $viewRowDetail.Templates.textarea(@model.cid + '-siglabel', 'oc_signature_checkbox_label', t('Signature Checkbox Label'), '', placeholder)
         $field = $(fieldHtml)
-        $input = $field.find('input').eq(0)
+        $field.addClass('xlf-dv-oc_signature_checkbox_label')
+        $input = $field.find('textarea').eq(0)
         $input.val(econsentSignature.getEConsentSignatureCheckboxLabel(@model) || '')
 
         showOrHideRequired = =>
@@ -984,11 +987,17 @@ module.exports = do ->
     hideMultioptions: ->
       @$card.removeClass('card--expandedchoices')
       @is_expanded = false
+      @$('.js-toggle-row-multioptions .k-icon')
+        .addClass('k-icon-caret-right')
+        .removeClass('k-icon-caret-down')
       return
 
     showMultioptions: ->
       @$card.addClass('card--expandedchoices')
       @is_expanded = true
+      @$('.js-toggle-row-multioptions .k-icon')
+        .addClass('k-icon-caret-down')
+        .removeClass('k-icon-caret-right')
       return
 
     toggleMultioptions: ->
