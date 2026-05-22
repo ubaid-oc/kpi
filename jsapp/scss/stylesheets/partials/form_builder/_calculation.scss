@@ -23,6 +23,10 @@
   align-items: center;
 }
 
+.js-card-settings-calculation.card__settings__fields--active {
+  padding-bottom: 1px;
+}
+
 .calculation-panel {
   &__header {
     font-size: 15px;
@@ -32,6 +36,10 @@
 
   &__field {
     margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   &__label {
