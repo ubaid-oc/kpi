@@ -787,7 +787,6 @@ module.exports = do ->
               $textarea.siblings('.message').remove()
           $textarea.on('blur', makeRequiredCheck)
           $textarea.on('keyup', makeRequiredCheck)
-          makeRequiredCheck()
 
         if triggerModel
           $select = $calcPanel.find('.js-calculation-trigger-select')
