@@ -139,8 +139,6 @@ module.exports = do ->
     insertInDOM: (rowView)->
       advancedKeys = [
         'oc_item_group'
-        'calculation'
-        'trigger'
         'readonly'
       ]
 
