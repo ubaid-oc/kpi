@@ -4,6 +4,10 @@
   display: none;
 }
 
+.js-card-settings-default-value.card__settings__fields--active {
+  padding-bottom: 1px;
+}
+
 .default-value-panel {
   &__header {
     font-size: 13px;
@@ -52,6 +56,10 @@
 
     li {
       margin-bottom: 4px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
 
     code {
