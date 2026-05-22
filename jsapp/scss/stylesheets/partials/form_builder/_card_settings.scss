@@ -109,10 +109,23 @@
   &.xlf-dv-default,
   &.xlf-dv-calculation,
   &.xlf-dv-oc_description,
-  &.xlf-dv-oc_briefdescription {
+  &.xlf-dv-oc_briefdescription,
+  &.xlf-dv-oc_signature_checkbox_label {
     label {
       vertical-align: top;
       padding-top: 7px;
+    }
+
+    &.input-error > label {
+      margin-top: 0;
+    }
+  }
+
+  &.xlf-dv-oc_signature_checkbox_label {
+    textarea {
+      min-height: $oc-signature-textarea-min-height;
+      overflow: auto;
+      resize: none;
     }
   }
 
@@ -345,7 +358,7 @@
   padding-left: 32px;
   cursor: pointer;
   user-select: none;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
   letter-spacing: 0;
   color: #020617;
