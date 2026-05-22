@@ -140,8 +140,6 @@ module.exports = do ->
       advancedKeys = [
         'default'
         'oc_item_group'
-        'calculation'
-        'trigger'
         'readonly'
       ]
 

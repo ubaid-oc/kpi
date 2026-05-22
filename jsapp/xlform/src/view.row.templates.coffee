@@ -84,6 +84,10 @@ module.exports = do ->
           <li data-card-settings-tab-id="validation-criteria" class="card__settings__tabs__tab">
             #{t("Validation Criteria")}
           </li>
+          <li data-card-settings-tab-id="calculation" class="card__settings__tabs__tab js-calculation-tab calculation-tab--hidden">
+            <span>#{t("Calculation")}</span>
+            <span class="calculation-tab__error js-calculation-tab-error calculation-tab__error--hidden">!</span>
+          </li>
           <li data-card-settings-tab-id="locked-features" class="card__settings__tabs__tab locking__ui-hidden">
             #{t("Locked Features")}
           </li>
@@ -105,6 +109,7 @@ module.exports = do ->
           </div>
           <ul class="js-card-settings-skip-logic card__settings__fields"></ul>
           <ul class="js-card-settings-validation-criteria card__settings__fields"></ul>
+          <div class="js-card-settings-calculation card__settings__fields"></div>
           <ul class="js-card-settings-locked-features card__settings__fields locking__ui-hidden"></ul>
         </div>
       </section>
@@ -416,6 +421,26 @@ module.exports = do ->
     #{expandingSpacerHtml}
     """
 
+  calculationPanel = () ->
+    """
+    <div class="calculation-panel">
+      <h2 class="calculation-panel__header">#{t('Calculation')}</h2>
+      <div class="calculation-panel__field">
+        <label class="calculation-panel__label">#{t('Calculation expression')}</label>
+        <textarea
+          class="calculation-panel__textarea js-calculation-input"
+          placeholder="#{t('e.g. ${WEIGHT} div (${HEIGHT} * ${HEIGHT})')}"
+        ></textarea>
+      </div>
+      <div class="calculation-panel__field">
+        <label class="calculation-panel__label">#{t('Triggered by')}</label>
+        <select class="calculation-panel__select js-calculation-trigger-select">
+        </select>
+        <p class="calculation-panel__hint">#{t('Calculation items recalculate their value every time any data in the form changes, by default. To restrict this item to recalculate only when a specific item is changed, select that item above. This could improve performance with very complex forms.')}</p>
+      </div>
+    </div>
+    """
+
   xlfRowView: xlfRowView
   expandChoiceList: expandChoiceList
   mandatorySettingSelector: mandatorySettingSelector
@@ -424,6 +449,7 @@ module.exports = do ->
   selectQuestionExpansion: selectQuestionExpansion
   groupView: groupView
   rowErrorView: rowErrorView
+  calculationPanel: calculationPanel
   koboMatrixView: koboMatrixView
   scoreView: scoreView
   rankView: rankView

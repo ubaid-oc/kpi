@@ -701,6 +701,8 @@ module.exports = do ->
         else if key is '_isRepeat' and @model.getValue('type') is 'kobomatrix'
           # don't display repeat checkbox for matrix groups
           continue
+        else if key is 'calculation' or key is 'trigger'
+          continue
         else
           if questionType is 'select_one_from_file'
             new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
@@ -729,6 +731,89 @@ module.exports = do ->
                 val.set 'value', ''
                 continue
               new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
+
+      # Calculation panel setup
+      typesWithoutCalculation = ['note', 'image', 'audio', 'video', 'file']
+      calculationModel = @model.get('calculation')
+      triggerModel = @model.get('trigger')
+      if questionType not in typesWithoutCalculation and not isEConsentSig and calculationModel
+        @cardSettingsWrap.find('.js-calculation-tab').removeClass('calculation-tab--hidden')
+        $calcPanel = $($viewTemplates.$$render('row.calculationPanel'))
+        $calcPanel.appendTo(@cardSettingsWrap.find('.js-card-settings-calculation'))
+
+        $textarea = $calcPanel.find('.js-calculation-input')
+        currentCalcVal = calculationModel.get('value') or ''
+        $textarea.val(currentCalcVal)
+
+        if currentCalcVal
+          setTimeout ->
+            scrollHeight = $textarea.prop('scrollHeight')
+            $textarea.css('height', '')
+            $textarea.css('height', scrollHeight)
+          , 1
+
+        updateCalculationModel = ->
+          calculationModel.set('value', $textarea.val().replace(/\n/g, ''))
+        $textarea.on('blur', updateCalculationModel)
+        $textarea.on('change', updateCalculationModel)
+        $textarea.on('keyup', updateCalculationModel)
+        $textarea.on 'keypress', (evt) ->
+          if evt.key is 'Enter' or evt.keyCode is 13
+            evt.preventDefault()
+            $textarea.blur()
+
+        $calcTabError = @cardSettingsWrap.find('.js-calculation-tab-error')
+        updateCalcTabError = ->
+          if ($textarea.val() or '').trim() is ''
+            $calcTabError.removeClass('calculation-tab__error--hidden')
+          else
+            $calcTabError.addClass('calculation-tab__error--hidden')
+        $textarea.on('blur', updateCalcTabError)
+        $textarea.on('keyup', updateCalcTabError)
+        updateCalcTabError()
+
+        if questionType is 'calculate'
+          makeRequiredCheck = ->
+            $field = $textarea.closest('.calculation-panel__field')
+            if ($textarea.val() or '').trim() is ''
+              $field.addClass('input-error')
+              if $textarea.siblings('.message').length is 0
+                $message = $('<div/>').addClass('message').text(t('This field is required'))
+                $textarea.after($message)
+            else
+              $field.removeClass('input-error')
+              $textarea.siblings('.message').remove()
+          $textarea.on('blur', makeRequiredCheck)
+          $textarea.on('keyup', makeRequiredCheck)
+          makeRequiredCheck()
+
+        if triggerModel
+          $select = $calcPanel.find('.js-calculation-trigger-select')
+          non_selectable = ['datetime', 'time', 'note', 'group', 'kobomatrix', 'repeat', 'rank', 'score', 'calculate']
+          currentQuestion = @model
+
+          triggerQuestions = []
+          currentQuestion.getSurvey().forEachRow (question) =>
+            if question.getValue('type') not in non_selectable and question.cid isnt currentQuestion.cid
+              triggerQuestions.push question
+          , includeGroups: true
+
+          $select.append($('<option>').val('').text(t('No specific trigger (always recalculate)')))
+          for q in triggerQuestions
+            try
+              labelValue = q.getValue('label')
+            catch e
+              labelValue = ''
+            rowName = q.getValue('name')
+            optVal = "${#{rowName}}"
+            optText = "#{labelValue} (${#{rowName}})"
+            $select.append($('<option>').val(optVal).text(optText))
+
+          currentTriggerVal = triggerModel.get('value') or ''
+          $select.val(currentTriggerVal)
+
+          $select.on 'change', =>
+            triggerModel.set('value', $select.val())
 
       if isEConsentSig
         # Hide the entire Response List pane (if present in DOM)
