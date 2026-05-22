@@ -88,6 +88,9 @@ module.exports = do ->
             <span class="js-required-logic-tab-label">#{t("Required Logic")}</span>
             <span class="js-required-logic-error required-logic-error-badge" style="display:none">!</span>
           </li>
+          <li data-card-settings-tab-id="default-value" class="card__settings__tabs__tab js-default-value-tab default-value-tab--hidden">
+            #{t("Default Value")}
+          </li>
           <li data-card-settings-tab-id="calculation" class="card__settings__tabs__tab js-calculation-tab calculation-tab--hidden">
             <span>#{t("Calculation")}</span>
             <span class="calculation-tab__error js-calculation-tab-error calculation-tab__error--hidden">!</span>
@@ -114,6 +117,7 @@ module.exports = do ->
           <ul class="js-card-settings-skip-logic card__settings__fields"></ul>
           <ul class="js-card-settings-validation-criteria card__settings__fields"></ul>
           <div class="js-card-settings-required-logic card__settings__fields"></div>
+          <div class="js-card-settings-default-value card__settings__fields"></div>
           <div class="js-card-settings-calculation card__settings__fields"></div>
           <ul class="js-card-settings-locked-features card__settings__fields locking__ui-hidden"></ul>
         </div>
@@ -434,6 +438,25 @@ module.exports = do ->
     #{expandingSpacerHtml}
     """
 
+  defaultValuePanel = () ->
+    """
+    <div class="default-value-panel">
+      <h2 class="default-value-panel__header">#{t('Default value - Prefilled when the form loads')}</h2>
+      <textarea
+        class="default-value-panel__input js-default-value-input"
+        placeholder="#{t('Enter value or expression')}"
+      ></textarea>
+      <div class="default-value-panel__hint">
+        <p>#{t('If a Default value is provided, this item will be automatically filled in with that Default when the form is first opened. The Default Value can be:')}</p>
+        <ul>
+          <li>#{t("A constant value like")} <code>1</code> #{t("or")} <code>'text'</code></li>
+          <li>#{t("An xpath expression like")} <code>today()</code> #{t("to fill in today's date")}</li>
+        </ul>
+        <p>#{t('See the')} <a href="https://docs.openclinica.com/oc4/building-forms-and-studies/oc4-design-study/#content-17316" target="_blank" rel="noopener noreferrer">#{t('documentation')}</a> #{t("for more information about xpath expressions and Default Values. Note that using this field will cause this item's Relevant Logic to be overridden, and this item displayed by default.")}</p>
+      </div>
+    </div>
+    """
+
   calculationPanel = () ->
     """
     <div class="calculation-panel">
@@ -469,5 +492,6 @@ module.exports = do ->
   rankView: rankView
   groupSettingsView: groupSettingsView
   rowSettingsView: rowSettingsView
+  defaultValuePanel: defaultValuePanel
   iconTooltip: iconTooltip
   lockedFeatures: lockedFeatures
