@@ -25,6 +25,9 @@ pipeline {
         }
 
         stage('Run Frontend Tests') {
+            when {
+                expression { env.ENV == "build" || env.ENV == "build & deploy" }
+            }
             agent {
                 docker {
                     image 'node:16.15.0-bullseye'
@@ -33,52 +36,23 @@ pipeline {
                 }
             }
             steps {
-                script {
-                    if (env.ENV == "build" || env.ENV == "build & deploy") {
-                        try {
-                            sh """
-                                set -eu
-
-                                # Install system dependencies: Python and Chromium
-                                apt-get update
-                                apt-get install -y --no-install-recommends python3 chromium
-
-                                # Create symlink so 'python' command works
-                                ln -sf /usr/bin/python3 /usr/bin/python
-
-                                # Fix npm cache permissions by setting cache to workspace directory
-                                export npm_config_cache="\${WORKSPACE}/.npm-cache"
-                                mkdir -p "\${npm_config_cache}"
-
-                                # Skip husky install in CI (git dep kobo-common runs 'husky install' in prepare script)
-                                export HUSKY=0
-
-                                # Install correct npm version
-                                npm install -g npm@8.5.5
-
-                                # Verify versions
-                                test "\$(node --version)" = "v16.15.0"
-                                test "\$(npm --version)" = "8.5.5"
-
-                                # Verify Chromium
-                                chromium --version || google-chrome --version || { echo "Chrome/Chromium not found"; exit 1; }
-
-                                # Install dependencies
-                                npm install --quiet
-
-                                # Build tests
-                                npx webpack --config webpack/test.config.js
-                            """
-
-                            // Run mocha-chrome with timeout to prevent hanging on 'No inspectable targets'
-                            // See: https://github.com/kobotoolbox/kpi/issues/4337
-                            timeout(time: 2, unit: 'MINUTES') {
-                                sh 'HUSKY=0 npx mocha-chrome test/tests.html --chrome-launcher.connectionPollInterval=5000'
-                            }
-                        } catch (err) {
-                            error "Frontend tests failed: ${err}"
-                        }
-                    }
+                sh '''
+                    set -eu
+                    export DEBIAN_FRONTEND=noninteractive
+                    export HUSKY=0
+                    export npm_config_cache="${WORKSPACE}/.npm-cache"
+                    
+                    apt-get update -qq
+                    apt-get install -y --no-install-recommends python3 chromium git
+                    ln -sf /usr/bin/python3 /usr/bin/python
+                    
+                    mkdir -p "${npm_config_cache}"
+                    HUSKY=0 npm ci --quiet
+                    npx webpack --config webpack/test.config.js
+                '''
+                
+                timeout(time: 2, unit: 'MINUTES') {
+                    sh 'HUSKY=0 npx mocha-chrome test/tests.html --chrome-launcher.connectionPollInterval=5000'
                 }
             }
         }
