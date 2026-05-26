@@ -50,6 +50,9 @@ pipeline {
                                 export npm_config_cache="\${WORKSPACE}/.npm-cache"
                                 mkdir -p "\${npm_config_cache}"
 
+                                # Skip husky install in CI (git dep kobo-common runs 'husky install' in prepare script)
+                                export HUSKY=0
+
                                 # Install correct npm version
                                 npm install -g npm@8.5.5
 
@@ -70,7 +73,7 @@ pipeline {
                             // Run mocha-chrome with timeout to prevent hanging on 'No inspectable targets'
                             // See: https://github.com/kobotoolbox/kpi/issues/4337
                             timeout(time: 2, unit: 'MINUTES') {
-                                sh 'npx mocha-chrome test/tests.html --chrome-launcher.connectionPollInterval=5000'
+                                sh 'HUSKY=0 npx mocha-chrome test/tests.html --chrome-launcher.connectionPollInterval=5000'
                             }
                         } catch (err) {
                             error "Frontend tests failed: ${err}"
