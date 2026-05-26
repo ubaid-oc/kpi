@@ -23,6 +23,12 @@ module.exports = do ->
       # Sync the conditional flag with model state (handles undo/redo/external changes)
       if reqVal is 'true' or reqVal is 'false'
         @isConditionalSelected = false
+      else if @hideConditional
+        # Conditional option is hidden for this question type — force to 'false'
+        # so no radio is left in an unrepresentable selected state
+        @setNewValue('false')
+        reqVal = 'false'
+        @isConditionalSelected = false
       else
         @isConditionalSelected = true
       template = $($viewTemplates.$$render("row.mandatorySettingSelector", "required_#{@model.cid}", reqVal, @hideConditional))
