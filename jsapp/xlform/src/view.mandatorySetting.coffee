@@ -11,7 +11,8 @@ module.exports = do ->
       'input .js-mandatory-setting-radio': 'onRadioChange'
     }
 
-    initialize: ({@model, @onChange}) ->
+    initialize: ({@model, @onChange, @hideConditional}) ->
+      @hideConditional = @hideConditional or false
       @isConditionalSelected = false
       if @model
         @model.on('change', @render, @)
@@ -24,7 +25,7 @@ module.exports = do ->
         @isConditionalSelected = false
       else
         @isConditionalSelected = true
-      template = $($viewTemplates.$$render("row.mandatorySettingSelector", "required_#{@model.cid}", reqVal))
+      template = $($viewTemplates.$$render("row.mandatorySettingSelector", "required_#{@model.cid}", reqVal, @hideConditional))
       @$el.html(template)
       # Sync panel text input if it exists
       if @$panelEl
