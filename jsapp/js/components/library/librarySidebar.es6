@@ -81,7 +81,9 @@ class LibrarySidebar extends Reflux.Component {
     // returns the correct value when the row-selector picker is opened.
     const eConsentStatus = this.props.router.searchParams.get('econsent');
     if (eConsentStatus) {
-      targetPath += `?econsent=${encodeURIComponent(eConsentStatus)}`;
+      const targetUrl = new URL(targetPath, window.location.origin);
+      targetUrl.searchParams.set('econsent', eConsentStatus);
+      targetPath = `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`;
     }
     this.props.router.navigate(targetPath);
   }
