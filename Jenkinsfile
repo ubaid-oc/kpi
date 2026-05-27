@@ -37,22 +37,22 @@ pipeline {
             }
             steps {
                 sh '''
-                    set -eu
+                    set -e
                     export DEBIAN_FRONTEND=noninteractive
                     export HUSKY=0
                     export npm_config_cache="${WORKSPACE}/.npm-cache"
-                    
+
                     apt-get update -qq
                     apt-get install -y --no-install-recommends python3 chromium git
                     ln -sf /usr/bin/python3 /usr/bin/python
-                    
+
                     mkdir -p "${npm_config_cache}"
-                    HUSKY=0 npm ci --quiet
+                    npm install --quiet --legacy-peer-deps
                     npx webpack --config webpack/test.config.js
                 '''
-                
+
                 timeout(time: 2, unit: 'MINUTES') {
-                    sh 'HUSKY=0 npx mocha-chrome test/tests.html --chrome-launcher.connectionPollInterval=5000'
+                    sh 'npx mocha-chrome test/tests.html --chrome-launcher.connectionPollInterval=5000'
                 }
             }
         }
