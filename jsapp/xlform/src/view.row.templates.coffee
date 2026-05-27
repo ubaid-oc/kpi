@@ -339,7 +339,7 @@ module.exports = do ->
 
   # NOTE: Textbox value is empty, as we set it in some other place to avoid
   # problems with double quotes.
-  mandatorySettingSelector = (uniqueName, currentValue) ->
+  mandatorySettingSelector = (uniqueName, currentValue, hideConditional = false) ->
     if currentValue is 'true' or currentValue is 'false'
       modifier = currentValue
     else
@@ -368,6 +368,7 @@ module.exports = do ->
             >
             <span class="radio__label">#{t('Never')}</span>
           </label>
+          #{if hideConditional then '' else """
           <label class="radio__row mandatory-setting__row mandatory-setting__row--custom">
             <input
               class="radio__input js-mandatory-setting-radio"
@@ -377,6 +378,7 @@ module.exports = do ->
             >
             <span class="radio__label">#{t('Conditional')}</span>
           </label>
+          """}
         </div>
       </span>
     </div>

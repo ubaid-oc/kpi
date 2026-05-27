@@ -697,6 +697,7 @@ module.exports = do ->
           if questionType isnt 'note' and !isEConsentSig
             @mandatorySetting = new $viewMandatorySetting.MandatorySettingView({
               model: @model.get('required')
+              hideConditional: questionType is 'calculate'
             }).render().insertInDOM(@)
         else if key is 'default'
           # handled by the Default Value panel
