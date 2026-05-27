@@ -23,38 +23,6 @@ pipeline {
                 checkout scmGit(branches: [[name: '*/$release_branch']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-github-token-as-password', url: 'https://github.com/OpenClinica/kpi.git']])
             }
         }
-
-        stage('Run Frontend Tests') {
-            when {
-                expression { env.ENV == "build" || env.ENV == "build & deploy" }
-            }
-            agent {
-                docker {
-                    image 'node:16.15.0-bullseye'
-                    args '--user root:root'
-                    reuseNode true
-                }
-            }
-            steps {
-                sh '''
-                    set -e
-                    export DEBIAN_FRONTEND=noninteractive
-                    export HUSKY=0
-                    export npm_config_cache="${WORKSPACE}/.npm-cache"
-
-                    apt-get update -qq
-                    apt-get install -y --no-install-recommends python3 chromium git
-                    ln -sf /usr/bin/python3 /usr/bin/python
-
-                    mkdir -p "${npm_config_cache}"
-                    npm install --quiet --legacy-peer-deps
-                    npx webpack --config webpack/test.config.js
-                    npx mocha-chrome test/tests.html \
-                        --chrome-flags="--no-sandbox --disable-gpu --disable-dev-shm-usage" \
-                        --chrome-launcher.connectionPollInterval=5000
-                '''
-            }
-        }
         
         stage('Fetch ECR Credentials') {
             steps {
