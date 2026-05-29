@@ -53,7 +53,7 @@ module.exports = do ->
       <section class="card__settings  row-extras row-extras--depr">
         <i class="card__settings-close k-icon k-icon-close js-toggle-card-settings"></i>
         <ul class="card__settings__tabs">
-          <li class="heading"><i class="k-icon k-icon-settings"></i> #{t("Settings")}</li>
+          <li class="heading"><i class="k-icon k-icon-edit"></i> #{t("Edit")}</li>
           <li data-card-settings-tab-id="row-options" class="card__settings__tabs__tab card__settings__tabs__tab--active">
             #{t("All group settings")}
           </li>
@@ -77,7 +77,7 @@ module.exports = do ->
       <section class="card__settings  row-extras row-extras--depr">
         <i class="card__settings-close k-icon k-icon-close js-toggle-card-settings"></i>
         <ul class="card__settings__tabs">
-          <li class="heading"><i class="k-icon k-icon-settings"></i> #{t("Settings")}</li>
+          <li class="heading"><i class="k-icon k-icon-edit"></i> #{t("Edit")}</li>
           <li data-card-settings-tab-id="row-options" class="card__settings__tabs__tab--active">
             #{t("Question Options")}
           </li>
@@ -87,14 +87,41 @@ module.exports = do ->
           <li data-card-settings-tab-id="validation-criteria" class="card__settings__tabs__tab">
             #{t("Validation Criteria")}
           </li>
+          <li data-card-settings-tab-id="required-logic" class="card__settings__tabs__tab js-required-logic-tab" style="display:none">
+            <span class="js-required-logic-tab-label">#{t("Required Logic")}</span>
+            <span class="js-required-logic-error required-logic-error-badge" style="display:none">!</span>
+          </li>
+          <li data-card-settings-tab-id="default-value" class="card__settings__tabs__tab js-default-value-tab default-value-tab--hidden">
+            #{t("Default Value")}
+          </li>
+          <li data-card-settings-tab-id="calculation" class="card__settings__tabs__tab js-calculation-tab calculation-tab--hidden">
+            <span>#{t("Calculation")}</span>
+            <span class="calculation-tab__error js-calculation-tab-error calculation-tab__error--hidden">!</span>
+          </li>
           <li data-card-settings-tab-id="locked-features" class="card__settings__tabs__tab locking__ui-hidden">
             #{t("Locked Features")}
           </li>
         </ul>
         <div class="card__settings__content">
-          <ul class="js-card-settings-row-options card__settings__fields card__settings__fields--active"></ul>
+          <button type="button" class="card__settings__back js-toggle-card-settings" aria-label="#{t('Back')}">
+            <i class="k-icon k-icon-arrow-left" aria-hidden="true"></i>
+          </button>
+          <div class="js-card-settings-row-options card__settings__fields card__settings__fields--active card__settings__row-options">
+            <div class="card__settings__fields-grid js-card-settings-row-options-primary">
+              <div class="card__settings__fields-col js-card-settings-col-left"></div>
+              <div class="card__settings__fields-col js-card-settings-col-right"></div>
+            </div>
+            <div class="card__settings__advanced-toggle js-card-settings-advanced-toggle" aria-expanded="false" aria-controls="js-card-settings-row-options-advanced">
+              <span>#{t('Advanced options')}</span>
+              <i class="k-icon k-icon-angle-down card__settings__advanced-toggle__icon" aria-hidden="true"></i>
+            </div>
+            <div id="js-card-settings-row-options-advanced" class="card__settings__fields-grid js-card-settings-row-options-advanced is-collapsed"></div>
+          </div>
           <ul class="js-card-settings-skip-logic card__settings__fields"></ul>
           <ul class="js-card-settings-validation-criteria card__settings__fields"></ul>
+          <div class="js-card-settings-required-logic card__settings__fields"></div>
+          <div class="js-card-settings-default-value card__settings__fields"></div>
+          <div class="js-card-settings-calculation card__settings__fields"></div>
           <ul class="js-card-settings-locked-features card__settings__fields locking__ui-hidden"></ul>
         </div>
       </section>
@@ -110,17 +137,24 @@ module.exports = do ->
             <div class="noop card__indicator__icon"><i class="card__header-icon"></i></div>
           </div>
           <div class="card__text">
+<<<<<<< /tmp/kpiport/mf/cur
             <input type="text" placeholder="#{t("Question label is required")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort" dir="auto">
             <br />
             <input type="text" placeholder="#{t("Question hint")}" class="card__header-hint js-card-hint js-cancel-select-row js-cancel-sort" dir="auto">
+=======
+            <div class="card__header-name js-cancel-select-row js-cancel-sort"></div>
+            <textarea rows="1" placeholder="#{t("Enter question label (required for item to be visible)")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort"></textarea>
+            <input type="text" placeholder="#{t("Enter question hint (optional)")}" class="card__header-hint js-card-hint js-cancel-select-row js-cancel-sort">
+>>>>>>> /tmp/kpiport/mf/fork
           </div>
           <div class="card__buttons">
-            <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings" data-button-name="settings"><i class="k-icon k-icon-settings"></i></span>
+            <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings" data-button-name="settings"><i class="k-icon k-icon-edit"></i></span>
             <span class="card__buttons__button card__buttons__button--delete card__buttons__button--red js-delete-row" data-button-name="delete"><i class="k-icon k-icon-trash"></i></span>
       """
       if surveyView.features.multipleQuestions
-        template += """<span class="card__buttons__button card__buttons__button--copy card__buttons__button--blue js-clone-question" data-button-name="duplicate"><i class="k-icon k-icon-duplicate"></i></span>
-                  <span class="card__buttons__button card__buttons__button--add card__buttons__button--teal js-add-to-question-library" data-button-name="add-to-library"><i class="k-icon k-icon-folder-plus"></i></i></span>"""
+        template += """<span class="card__buttons__button card__buttons__button--copy card__buttons__button--blue js-clone-question" data-button-name="duplicate"><i class="k-icon k-icon-duplicate"></i></span>"""
+        if surveyView.canAddToLibrary
+          template += """<span class="card__buttons__button card__buttons__button--add card__buttons__button--teal js-add-to-question-library" data-button-name="add-to-library"><i class="k-icon k-icon-folder-plus"></i></span>"""
 
       return template + """
           </div>
@@ -137,8 +171,20 @@ module.exports = do ->
     return template
 
   # Empty js-group-icon is only sometimes used, but we need to reserve space for it
+<<<<<<< /tmp/kpiport/mf/cur
   groupView = ()->
     template = """
+=======
+  groupView = (surveyView)->
+    addToLibraryButton = ''
+    if surveyView.canAddToLibrary
+      addToLibraryButton = """
+          <span class="card__buttons__button card__buttons__button--add card__buttons__button--green js-add-group-to-library" data-button-name="add-group-to-library">
+            <i class="k-icon k-icon-folder-plus"></i>
+          </span>
+      """
+    """
+>>>>>>> /tmp/kpiport/mf/fork
     <div class="survey__row__item survey__row__item--group group card js-select-row">
       <header class="group__header">
         <div class="group__header__icon js-group-icon">
@@ -148,16 +194,18 @@ module.exports = do ->
         <input type="text" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort" dir="auto">
         <div class="card__buttons">
           <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings">
-            <i class="k-icon k-icon-settings"></i>
+            <i class="k-icon k-icon-edit"></i>
           </span>
 
           <span class="card__buttons__button card__buttons__button--delete card__buttons__button--red js-delete-group">
             <i class="k-icon k-icon-trash"></i>
           </span>
 
-          <span class="card__buttons__button card__buttons__button--add card__buttons__button--green js-add-group-to-library">
-            <i class="k-icon k-icon-folder-plus"></i>
+          <span class="card__buttons__button card__buttons__button--clone card__buttons__button--gray js-clone-group" data-button-name="duplicate">
+            <i class="k-icon k-icon-duplicate"></i>
           </span>
+
+          #{addToLibraryButton}
         </div>
       </header>
       <ul class="group__rows"></ul>
@@ -175,10 +223,14 @@ module.exports = do ->
             <div class="noop card__indicator__icon"><i class="card__header-icon k-icon k-icon-matrix"></i></div>
           </div>
           <div class="card__text">
+<<<<<<< /tmp/kpiport/mf/cur
             <input type="text" placeholder="#{t("Question label is required")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort" dir="auto">
+=======
+            <input type="text" placeholder="#{t("Item label is required")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort">
+>>>>>>> /tmp/kpiport/mf/fork
           </div>
           <div class="card__buttons">
-            <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings" data-button-name="settings"><i class="k-icon k-icon-settings"></i></span>
+            <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings" data-button-name="settings"><i class="k-icon k-icon-edit"></i></span>
             <span class="card__buttons__button card__buttons__button--delete card__buttons__button--red js-delete-row" data-button-name="delete"><i class="k-icon k-icon-trash"></i></span>
           </div>
         </div>
@@ -316,7 +368,7 @@ module.exports = do ->
 
   # NOTE: Textbox value is empty, as we set it in some other place to avoid
   # problems with double quotes.
-  mandatorySettingSelector = (uniqueName, currentValue) ->
+  mandatorySettingSelector = (uniqueName, currentValue, hideConditional = false) ->
     if currentValue is 'true' or currentValue is 'false'
       modifier = currentValue
     else
@@ -324,7 +376,7 @@ module.exports = do ->
 
     template = """
     <div class="card__settings__fields__field">
-      <label>#{t('Mandatory response')}:</label>
+      <label>#{t('Required')}:</label>
       <span class="settings__input">
         <div class="radio">
           <label class="radio__row mandatory-setting__row mandatory-setting__row--true">
@@ -334,7 +386,7 @@ module.exports = do ->
               name="#{uniqueName}"
               value="true" #{if modifier is 'true' then 'checked' else ''}
             >
-            <span class="radio__label">#{t('Yes')}</span>
+            <span class="radio__label">#{t('Always')}</span>
           </label>
           <label class="radio__row mandatory-setting__row mandatory-setting__row--false">
             <input
@@ -343,8 +395,9 @@ module.exports = do ->
               name="#{uniqueName}"
               value="false" #{if modifier is 'false' then 'checked' else ''}
             >
-            <span class="radio__label">#{t('No')}</span>
+            <span class="radio__label">#{t('Never')}</span>
           </label>
+          #{if hideConditional then '' else """
           <label class="radio__row mandatory-setting__row mandatory-setting__row--custom">
             <input
               class="radio__input js-mandatory-setting-radio"
@@ -352,6 +405,7 @@ module.exports = do ->
               name="#{uniqueName}"
               value="custom" #{if modifier is 'custom' then 'checked' else ''}
             >
+<<<<<<< /tmp/kpiport/mf/cur
             <span class="radio__label">#{t('Custom logic')}</span>
             <label class="mandatory-settings-input-wrapper">
               <input
@@ -361,12 +415,32 @@ module.exports = do ->
                 placeholder="#{t('Mandatory when this formula is true')}"
               >
             </label>
+=======
+            <span class="radio__label">#{t('Conditional')}</span>
+>>>>>>> /tmp/kpiport/mf/fork
           </label>
+          """}
         </div>
       </span>
     </div>
     """
     return template
+
+  requiredLogicPanel = () ->
+    """
+    <div class="required-logic-panel">
+      <h2 class="required-logic-panel__header">#{t('Required Logic - when should this item be required?')}</h2>
+      <label class="text-box text-box--on-white required-logic-panel__input-wrapper">
+        <input
+          type="text"
+          class="text-box__input mandatory-setting-custom-text js-mandatory-setting-custom-text"
+          value=""
+          placeholder="#{t('e.g. ${AGE} &lt; 18')}"
+        >
+      </label>
+      <p class="required-logic-panel__hint">#{t('This question has a')} <strong>#{t('Conditional')}</strong> #{t("required setting. It will be treated as required when the expression above is 'true'.")}</p>
+    </div>
+    """
 
   paramsSettingsField = ->
     template = """
@@ -413,6 +487,7 @@ module.exports = do ->
     """
     return template
 
+<<<<<<< /tmp/kpiport/mf/cur
   return {
     xlfRowView: xlfRowView
     unsupportedRowView: unsupportedRowView
@@ -431,3 +506,62 @@ module.exports = do ->
     iconTooltip: iconTooltip
     lockedFeatures: lockedFeatures
   }
+=======
+  defaultValuePanel = () ->
+    """
+    <div class="default-value-panel">
+      <h2 class="default-value-panel__header">#{t('Default value - Prefilled when the form loads')}</h2>
+      <textarea
+        class="default-value-panel__input js-default-value-input"
+        placeholder="#{t('Enter value or expression')}"
+      ></textarea>
+      <div class="default-value-panel__hint">
+        <p>#{t('If a Default value is provided, this item will be automatically filled in with that Default when the form is first opened. The Default Value can be:')}</p>
+        <ul>
+          <li>#{t("A constant value like")} <code>1</code> #{t("or")} <code>'text'</code></li>
+          <li>#{t("An xpath expression like")} <code>today()</code> #{t("to fill in today's date")}</li>
+        </ul>
+        <p>#{t('See the')} <a href="https://docs.openclinica.com/oc4/building-forms-and-studies/oc4-design-study/#content-17316" target="_blank" rel="noopener noreferrer">#{t('documentation')}</a> #{t("for more information about xpath expressions and Default Values. Note that using this field will cause this item's Relevant Logic to be overridden, and this item displayed by default.")}</p>
+      </div>
+    </div>
+    """
+
+  calculationPanel = () ->
+    """
+    <div class="calculation-panel">
+      <h2 class="calculation-panel__header">#{t('Calculation')}</h2>
+      <div class="calculation-panel__field">
+        <label class="calculation-panel__label">#{t('Calculation expression')}</label>
+        <textarea
+          class="calculation-panel__textarea js-calculation-input"
+          placeholder="#{t('e.g. ${WEIGHT} div (${HEIGHT} * ${HEIGHT})')}"
+        ></textarea>
+      </div>
+      <div class="calculation-panel__field">
+        <label class="calculation-panel__label">#{t('Triggered by')}</label>
+        <select class="calculation-panel__select js-calculation-trigger-select">
+        </select>
+        <p class="calculation-panel__hint">#{t('Calculation items recalculate their value every time any data in the form changes, by default. To restrict this item to recalculate only when a specific item is changed, select that item above. This could improve performance with very complex forms.')}</p>
+      </div>
+    </div>
+    """
+
+  xlfRowView: xlfRowView
+  expandChoiceList: expandChoiceList
+  mandatorySettingSelector: mandatorySettingSelector
+  requiredLogicPanel: requiredLogicPanel
+  paramsSettingsField: paramsSettingsField
+  paramsSimple: paramsSimple
+  selectQuestionExpansion: selectQuestionExpansion
+  groupView: groupView
+  rowErrorView: rowErrorView
+  calculationPanel: calculationPanel
+  koboMatrixView: koboMatrixView
+  scoreView: scoreView
+  rankView: rankView
+  groupSettingsView: groupSettingsView
+  rowSettingsView: rowSettingsView
+  defaultValuePanel: defaultValuePanel
+  iconTooltip: iconTooltip
+  lockedFeatures: lockedFeatures
+>>>>>>> /tmp/kpiport/mf/fork

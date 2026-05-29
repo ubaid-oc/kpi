@@ -11,7 +11,86 @@ module.exports = do ->
     eventName = eventName.replace(regex, '-');
     return eventName
 
+<<<<<<< /tmp/kpiport/mf/cur
   # DEAD CODE TODO: Doesn't seem to be used anywhere?
+=======
+  viewUtils.makeEditable = (that, model, selector, {property, transformFunction, options, edit_callback}) ->
+    if !(selector instanceof jQuery)
+      origSelector = selector
+      selector =that.$el.find(selector)
+
+    if selector.length is 0
+      console?.error("makeEditable called on nonexistent element:", origSelector)
+
+    if selector.data('madeEditable')
+      console?.error "makeEditable called 2x on the same element: ", selector
+    selector.data('madeEditable', true)
+
+    if !transformFunction?
+      transformFunction = (value) -> value
+    if !property?
+      property = 'value'
+
+    if !edit_callback?
+      edit_callback = _.bind (ent) ->
+          ent = transformFunction ent
+          ent = ent.replace(/\t/g, ' ')
+          model.set(property, ent, validate: true)
+          if(model.validationError && model.validationError[property])
+            return model.validationError[property]
+
+          newValue: ent
+        , that
+
+
+    selector.on 'shown', (e, obj) -> obj.input.$input.on 'paste', (e) -> e.stopPropagation()
+
+
+    enable_edit = () ->
+      parent_element = selector.parent()
+      parent_element.find('.error-message').remove()
+      current_value = selector.text().replace new RegExp(String.fromCharCode(160), 'g'), ''
+      edit_box = $('<input />', type:'text', value: current_value, class:'js-cancel-sort js-blur-on-select-row')
+      selector.after edit_box
+      selector.hide()
+      edit_box.select()
+
+      commit_edit = (source) ->
+        parent_element.find('.error-message').remove()
+        
+        if source.type is 'blur' or source.which is 13
+          edit_box.remove()
+          selector.show()
+          return
+
+        if options? && options.validate? && options.validate(edit_box.val())?
+          new_value = options.validate(edit_box.val())
+        else
+          new_value = edit_callback edit_box.val()
+
+        if !new_value?
+          new_value = newValue: edit_box.val()
+
+        if new_value.newValue?
+          displayValue = _.escape(new_value.newValue) 
+          selector.html(displayValue)
+          edit_box.val(displayValue)
+        else
+          error_box = $('<div class="error-message">' + new_value + '</div>')
+          parent_element.append(error_box)
+
+      edit_box.blur commit_edit
+      edit_box.keyup (event) ->
+        if event.which == 13
+          commit_edit event
+        else
+          commit_edit event
+
+
+    selector.on 'click', enable_edit
+
+
+>>>>>>> /tmp/kpiport/mf/fork
   viewUtils.reorderElemsByData = (selector, parent, dataAttribute)->
     arr = []
     parentEl = false

@@ -52,8 +52,13 @@ module.exports = do ->
         collection.parseable = false
         return
 
+<<<<<<< /tmp/kpiport/mf/cur
   utils.sluggifyLabel = (str, other_names=[])->
     return utils.sluggify(str, {
+=======
+  utils.sluggifyLabel = (str, other_names=[], character_limit=30, chars_exception=false)->
+    utils.sluggify(str, {
+>>>>>>> /tmp/kpiport/mf/fork
         preventDuplicates: other_names
         lowerCase: false
         preventDuplicateUnderscores: true
@@ -61,6 +66,8 @@ module.exports = do ->
         lrstrip: true
         incrementorPadding: 3
         validXmlTag: true
+        characterLimit: character_limit,
+        nonWordCharsExceptions: chars_exception
       })
 
   utils.isValidXmlTag = (str)->

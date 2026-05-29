@@ -27,8 +27,6 @@ module.exports = do ->
       return super '', ' ' + "'" + response_value.replace(/'/g, "\\'") + "'"
   class rowDetailValidationLogic.ValidationLogicDateOperator extends rowDetailValidationLogic.ValidationLogicBasicOperator
     serialize: (question_name, response_value) ->
-      if response_value.indexOf('date') == -1
-        response_value = "date('" + response_value + "')"
       return super '', ' ' + response_value
   class rowDetailValidationLogic.ValidationLogicExistenceOperator extends rowDetailValidationLogic.ValidationLogicBasicOperator
     serialize: () ->

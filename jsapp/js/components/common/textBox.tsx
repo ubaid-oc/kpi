@@ -109,6 +109,7 @@ export default function TextBox(props: TextBoxProps) {
   const rootClassNames = []
   rootClassNames.push(styles.root)
 
+<<<<<<< /tmp/kpiport/mf/cur
   if (props.className) {
     rootClassNames.push(props.className)
   }
@@ -190,6 +191,28 @@ export default function TextBox(props: TextBoxProps) {
         {props.disableAutocomplete && <input type='password' hidden={true} />}
         {/* We use two different components based on the type of the TextBox */}
         {props.type === 'text-multiline' && (
+=======
+    const inputProps = {
+      value: this.props.value,
+      placeholder: this.props.placeholder,
+      onChange: this.onChange.bind(this),
+      onBlur: this.onBlur.bind(this),
+      onKeyPress: this.onKeyPress.bind(this),
+      readOnly: this.props.readOnly,
+      disabled: this.props.disabled,
+      'data-cy': this.props['data-cy'],
+    };
+
+    return (
+      <bem.TextBox m={modifiers}>
+        {this.props.label &&
+          <bem.TextBox__label m={modifiers}>
+            {this.props.label}
+          </bem.TextBox__label>
+        }
+
+        {this.props.type === 'text-multiline' &&
+>>>>>>> /tmp/kpiport/mf/fork
           <TextareaAutosize
             className={styles.input}
             aria-required={props.required}

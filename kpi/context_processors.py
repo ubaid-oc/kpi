@@ -20,8 +20,15 @@ def external_service_tokens(request):
     out = {}
     if settings.GOOGLE_ANALYTICS_TOKEN:
         out['google_analytics_token'] = settings.GOOGLE_ANALYTICS_TOKEN
+<<<<<<< /tmp/kpiport/mf/cur
     if settings.SENTRY_JS_DSN:
         out['sentry_js_dsn'] = settings.SENTRY_JS_DSN
+=======
+    if settings.RAVEN_JS_DSN:
+        out['raven_js_dsn'] = settings.RAVEN_JS_DSN
+    if settings.USER_PILOT_SDK_TOKEN:
+        out['user_pilot_sdk_token'] = settings.USER_PILOT_SDK_TOKEN
+>>>>>>> /tmp/kpiport/mf/fork
     return out
 
 

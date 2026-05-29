@@ -12,14 +12,25 @@ function parseSettings(asset: AssetResponse) {
   if (settings) {
     let foundSettings: AssetContentSettings = {}
     if (Array.isArray(settings) && settings.length) {
+<<<<<<< /tmp/kpiport/mf/cur
       foundSettings = settings[0]
+=======
+      foundSettings = settings[0];
+    } else {
+      foundSettings = <AssetContentSettings> settings;
+>>>>>>> /tmp/kpiport/mf/fork
     }
     return {
       unparsed__settings: foundSettings,
-      settings__style: foundSettings.style,
-      settings__form_id: foundSettings.form_id,
       settings__title: foundSettings.title,
+<<<<<<< /tmp/kpiport/mf/cur
     }
+=======
+      settings__style: foundSettings.style !== undefined ? foundSettings.style : '',
+      settings__form_id: foundSettings.form_id !== undefined ? foundSettings.form_id : (foundSettings.id_string !== undefined ? foundSettings.id_string : ''),
+      settings__version: foundSettings.version !== undefined ? foundSettings.version : '',
+    };
+>>>>>>> /tmp/kpiport/mf/fork
   } else {
     return {}
   }

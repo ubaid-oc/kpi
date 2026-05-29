@@ -28,6 +28,7 @@
 // inputs in edit-in-place
 
 .card__text input,
+.card__text textarea,
 .editable-wrapper input {
   font-family: mdl.$font;
   border: none;
@@ -35,13 +36,21 @@
   margin: 0;
   font-weight: 600;
   display: inline;
-  height: auto !important;
   font-size: 13px;
   width: 100%;
   background: transparent;
 }
 
+<<<<<<< /tmp/kpiport/mf/cur
 code input[type='text'] {
+=======
+.card__text input,
+.editable-wrapper input {
+  height: auto !important;
+}
+
+code input[type="text"] {
+>>>>>>> /tmp/kpiport/mf/fork
   border: none;
   padding: 0;
   padding-right: 4px;

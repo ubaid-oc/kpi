@@ -16,12 +16,20 @@ git+https://github.com/kobotoolbox/ssrf-protect@9b97d3f0fd8f737a38dd7a6b64efeffc
 # using a fork for django > 1.1.0 compatibility
 git+https://github.com/trevoriancox/django-dont-vary-on.git@01a804122b7ddcdc22f50b40993f91c27b03bef6#egg=django-dont-vary-on
 
+# OC - Keycloak authentication integration
+mozilla-django-oidc # requirement of boss-oidc2
+drf-oidc-auth # requirement of boss-oidc2
+-e git+https://github.com/gushil/boss-oidc2.git@6b7fd20a0ea72444b79e128f1dcadd90932ed90c#egg=boss-oidc2
+-e git+https://github.com/gushil/django-oidc.git@1fbbe169e785bab04cd9da5410245c97a18f3e38#egg=django-oidc
+-e git+https://github.com/gushil/python-keycloak-client.git@549c90f615fc2327bd47819290dd9c0d5c6de680#egg=python-keycloak-client
+
 # Regular PyPI packages
 Django>=4.2,<4.3
 Markdown
 Pygments
 amqp
 billiard
+beautifulsoup4
 celery
 celery[redis]
 dict2xml
@@ -79,8 +87,12 @@ pillow-heif<1  # temporary 20260226
 psycopg
 pymongo<4.11.0  # for compatibility with unmaintained mongomock; see https://github.com/mongomock/mongomock/issues/912
 python-dateutil
+<<<<<<< /tmp/kpiport/mf/cur
 pyxform==3.0.0
 psutil
+=======
+-e git+https://github.com/OpenClinica/pyxform.git#egg=pyxform
+>>>>>>> /tmp/kpiport/mf/fork
 requests
 regex
 responses
@@ -88,7 +100,11 @@ shortuuid
 sqlparse
 static3
 tabulate
+<<<<<<< /tmp/kpiport/mf/cur
 ua-parser<1  # temporary 20260226
+=======
+tldextract
+>>>>>>> /tmp/kpiport/mf/fork
 uWSGI
 Werkzeug
 xlrd

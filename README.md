@@ -6,7 +6,7 @@
 
 For production always use a specific release branch, `main` branch may include breaking changes. Run `git branch -rl 'origin/release/*'` to list release branches and then switch to a release branch of your choice.
 
-We're open for [contributions](./CONTRIBUTING.md)!
+We are open for [contributions](./CONTRIBUTING.md)!
 
 ## API Deprecation & Removal Notices
 

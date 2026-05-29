@@ -29,3 +29,11 @@ CALCULATED_HASH_CACHE_EXPIRATION = 5
 # with option `--print-sql`
 SHELL_PLUS_PRINT_SQL_TRUNCATE = None
 RUNSERVER_PLUS_PRINT_SQL_TRUNCATE = None
+
+# local development: disable secure cookies when not effectively serving over HTTPS
+if not COOKIES_ARE_SECURE:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SAMESITE = False
+    CSRF_COOKIE_SAMESITE = False
+    ALLOWED_HOSTS = '*'

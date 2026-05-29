@@ -74,6 +74,7 @@ module.exports = do ->
       @handcode_button = view_factory.create_button '<i>${}</i> ' + t("Manually enter your validation logic in XLSForm code"), 'kobo-button kobo-button--blue'
 
   class validationLogicHelpers.ValidationLogicHandCodeHelper extends $skipLogicHelpers.SkipLogicHandCodeHelper
+    @criteria_value = @criteria
     render: ($destination) ->
       $destination.replaceWith(@$handCode)
       @button.render().attach_to @$handCode
@@ -81,17 +82,19 @@ module.exports = do ->
         @$handCode.replaceWith($destination)
         @context.use_mode_selector_helper()
       @$handCode.on('change', () =>
+        @criteria = @criteria_value.replace(/&quot;/g, '"');
         @context.view_factory.survey.trigger('change')
       )
     serialize: () ->
       @textarea.val()
     constructor: (criteria, builder, view_factory, context) ->
       super(criteria, builder, view_factory, context)
+      @criteria_value = @criteria.replace(/"/g, '&quot;');
       @$handCode = $("""
         <div class="card__settings__fields__field">
-          <label for="#{@context.helper_factory.current_question.cid}-handcode">#{t("Validation Code:")}</label>
+          <label for="#{@context.helper_factory.current_question.cid}-handcode">#{t("Constraint:")}</label>
           <span class="settings__input">
-            <input type="text" name="constraint" id="#{@context.helper_factory.current_question.cid}-handcode" class="text" value="">
+            <input type="text" name="constraint" id="#{@context.helper_factory.current_question.cid}-handcode" class="text" value="#{@criteria_value}">
           </span>
         </div>
       """)

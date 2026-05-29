@@ -1,3 +1,4 @@
+<<<<<<< /tmp/kpiport/mf/cur
 # syntax=docker/dockerfile:labs
 # ^  Tell BuildKit to pull the latest 'labs' version
 #    of the Dockerfile syntax before the build.
@@ -126,11 +127,46 @@ RUN --mount=from=npm-install,source=/srv/src/kpi/node_modules,target=/srv/src/kp
 FROM ghcr.io/astral-sh/uv:python3.10-bookworm AS pip-dependencies
 ENV TMP_DIR=/srv/tmp \
     VIRTUAL_ENV=/opt/venv
+=======
+FROM --platform=$BUILDPLATFORM python:3.10.18 as build-python
+
+ENV VIRTUAL_ENV=/opt/venv \
+    TMP_DIR=/srv/tmp
+
+>>>>>>> /tmp/kpiport/mf/fork
 RUN python -m venv "$VIRTUAL_ENV"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 COPY ./dependencies/pip/requirements.txt "${TMP_DIR}/pip_dependencies.txt"
+<<<<<<< /tmp/kpiport/mf/cur
 RUN uv pip sync "${TMP_DIR}/pip_dependencies.txt" 1>/dev/null
+=======
+RUN pip-sync "${TMP_DIR}/pip_dependencies.txt" 1>/dev/null
+
+
+from --platform=$TARGETPLATFORM python:3.10.18-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+ENV VIRTUAL_ENV=/opt/venv
+
+ENV KPI_LOGS_DIR=/srv/logs \
+    DJANGO_SETTINGS_MODULE=kobo.settings.prod \
+    # The mountpoint of a volume shared with the `nginx` container. Static files will
+    #   be copied there.
+    NGINX_STATIC_DIR=/srv/static \
+    KPI_SRC_DIR=/srv/src/kpi \
+    KPI_MEDIA_DIR=/srv/src/kpi/media \
+    KPI_NODE_PATH=/srv/src/kpi/node_modules \
+    TMP_DIR=/srv/tmp \
+    UWSGI_USER=kobo \
+    UWSGI_GROUP=kobo \
+    SERVICES_DIR=/etc/service \
+    CELERY_PID_DIR=/var/run/celery \
+    INIT_PATH=/srv/init
+>>>>>>> /tmp/kpiport/mf/fork
 
 RUN rm -rf ${VIRTUAL_ENV}/lib/python*/site-packages/rest_framework/static/rest_framework
 
@@ -153,8 +189,18 @@ ENV DEBIAN_FRONTEND=noninteractive \
 # DO NOT remove packages like `less` and `procps` without approval from
 # jnm (or the current on-call sysadmin). Thanks.
 RUN apt-get -qq update && \
+<<<<<<< /tmp/kpiport/mf/cur
     apt-get -qq -y install curl && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+=======
+    apt-get -qq -y install ca-certificates curl gnupg && \
+    mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
+        | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" \
+        | tee /etc/apt/sources.list.d/nodesource.list && \
+    apt-get -qq update && \
+>>>>>>> /tmp/kpiport/mf/fork
     apt-get -qq -y install --no-install-recommends \
         ffmpeg \
         gdal-bin \
@@ -164,9 +210,13 @@ RUN apt-get -qq update && \
         less \
         libproj-dev \
         locales \
+<<<<<<< /tmp/kpiport/mf/cur
         # pin an exact Node version for stability. update this regularly.
         nodejs=$(apt-cache show nodejs | grep -F 'Version: 20.18.1' | cut -f 2 -d ' ') \
         openjdk-17-jre \
+=======
+        nodejs=$(apt-cache show nodejs | grep -F 'Version: 16.15.0' | cut -f 2 -d ' ') \
+>>>>>>> /tmp/kpiport/mf/fork
         postgresql-client \
         procps \
         rsync \
@@ -204,6 +254,7 @@ ENV DJANGO_SETTINGS_MODULE=kobo.settings.prod \
 
 WORKDIR ${KPI_SRC_DIR}/
 
+<<<<<<< /tmp/kpiport/mf/cur
 ####################################
 # Create local non-root user 1000  #
 ####################################
@@ -216,6 +267,14 @@ RUN adduser --disabled-password --gecos '' "$UWSGI_USER"
 RUN mkdir -p "${TMP_DIR}/.npm" && \
     npm config set cache "${TMP_DIR}/.npm" --global && \
     npm install --global --production github:mgol/check-dependencies#bfc3d06ba7d52b5ea9770f708d882526488eeb7d && \
+=======
+RUN rm -rf ${KPI_NODE_PATH} && \
+    npm install -g npm@8.5.5 && \
+    npm install -g check-dependencies@1.1.0 && \
+    rm -rf "${KPI_SRC_DIR}/jsapp/fonts" && \
+    rm -rf "${KPI_SRC_DIR}/jsapp/compiled" && \
+    npm install --quiet && \
+>>>>>>> /tmp/kpiport/mf/fork
     npm cache clean --force
 
 ###############################################

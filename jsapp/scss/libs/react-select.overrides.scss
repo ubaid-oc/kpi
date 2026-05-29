@@ -136,7 +136,7 @@
     // NOTE: we previously restricted height of select dropdown by brute force
     // but it seems that our current version of react-select handles this very
     // well. I will leave this commented out for now here.
-    // max-height: 36px * 3.5 + 8px; // display 3.5 items
+    // max-height: 36px * 4.5 + 8px; // display 4.5 items
     padding-top: 0;
     padding-bottom: 0;
   }

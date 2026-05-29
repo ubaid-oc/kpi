@@ -18,6 +18,7 @@ export const ORDER_DIRECTIONS: { [id in OrderDirection]: OrderDirection } = {
   descending: 'descending',
 }
 
+<<<<<<< /tmp/kpiport/mf/cur
 export type AssetsTableColumnName =
   | 'date-modified'
   | 'icon-status'
@@ -27,6 +28,9 @@ export type AssetsTableColumnName =
   | 'owner'
   | 'primary-sector'
   | 'subscribers-count'
+=======
+export type AssetsTableColumnName = 'date-modified' | 'icon-status' | 'items-count' | 'languages' | 'name' | 'owner' | 'primary-sector' | 'subscribers-count' | 'item-version' | 'item-type' | 'actions';
+>>>>>>> /tmp/kpiport/mf/fork
 
 export interface AssetsTableColumn {
   label: string
@@ -70,7 +74,7 @@ export const ASSETS_TABLE_COLUMNS: { [id: string]: AssetsTableColumn } = Object.
     defaultValue: null,
   },
   owner: {
-    label: t('Owner'),
+    label: t('Created By'),
     id: 'owner',
     orderBy: 'owner__username',
     defaultValue: ORDER_DIRECTIONS.ascending,
@@ -95,4 +99,30 @@ export const ASSETS_TABLE_COLUMNS: { [id: string]: AssetsTableColumn } = Object.
     filterByPath: ['settings', 'sector'],
     filterByMetadataName: 'sectors',
   },
+<<<<<<< /tmp/kpiport/mf/cur
 })
+=======
+  'item-version': {
+    label: t('Version'),
+    id: 'item-version',
+    // NOTE: currently it is not possible to order by summary.row_count and children.count at the same time
+    // so we disable this column
+    orderBy: null,
+    defaultValue: null,
+  },
+  'item-type': {
+    label: t('Type'),
+    id: 'item-type',
+    orderBy: 'asset_type',
+    defaultValue: ORDER_DIRECTIONS.ascending,
+  },
+  'actions': {
+    label: t('Actions'),
+    id: 'actions',
+    // NOTE: currently it is not possible to order by summary.row_count and children.count at the same time
+    // so we disable this column
+    orderBy: null,
+    defaultValue: null,
+  },
+});
+>>>>>>> /tmp/kpiport/mf/fork

@@ -59,7 +59,7 @@
 
 .row__questiontypes__close {
   position: absolute;
-  top: -3px;
+  top: 0px;
   right: 1px;
   color: colors.$kobo-gray-700;
   background: transparent;
@@ -68,7 +68,7 @@
   font-weight: 600;
   padding: 4px;
   line-height: 1em;
-  font-size: 24px;
+  font-size: 20px;
   cursor: pointer;
 
   &:hover {

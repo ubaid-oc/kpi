@@ -1,4 +1,9 @@
+<<<<<<< /tmp/kpiport/mf/cur
 @use 'scss/colors';
+=======
+@use 'scss/breakpoints';
+@use '~kobo-common/src/styles/colors';
+>>>>>>> /tmp/kpiport/mf/fork
 @use 'scss/z-indexes';
 @use 'scss/breakpoints';
 @use 'js/components/common/checkbox';
@@ -532,8 +537,15 @@ $s-data-table-font: 13px;
     display: none !important;
   }
 
+<<<<<<< /tmp/kpiport/mf/cur
   .form-view--table .ReactTable .rt-tr-group {
     max-height: 100%;
+=======
+  @media screen and (max-width: breakpoints.$b1100) {
+    .table-meta__additional-text {
+      display: none;
+    }
+>>>>>>> /tmp/kpiport/mf/fork
   }
 
   .form-view--table .rt-table,

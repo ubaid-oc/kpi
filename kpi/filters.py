@@ -21,21 +21,33 @@ from kpi.constants import (
 from kpi.exceptions import (
     QueryParserBadSyntax,
     QueryParserNotSupportedFieldLookup,
-    SearchQueryTooShortException,
 )
+<<<<<<< /tmp/kpiport/mf/cur
 from kpi.models.asset import AssetDeploymentStatus, UserAssetSubscription
 from kpi.utils.django_orm_helper import OrderCustomCharField
+=======
+from kpi.models import Asset, ObjectPermission
+from kpi.models.asset import UserAssetSubscription
+from kpi.utils.query_parser import get_parsed_parameters, parse, ParseError
+from kpi.utils.domain import get_subdomain
+from bossoidc2.models import Keycloak as KeycloakModel
+>>>>>>> /tmp/kpiport/mf/fork
 from kpi.utils.object_permission import (
     get_anonymous_user,
     get_database_user,
     get_objects_for_user,
     get_perm_ids_from_code_names,
 )
+<<<<<<< /tmp/kpiport/mf/cur
 from kpi.utils.permissions import is_user_anonymous
 from kpi.utils.query_parser import ParseError, get_parsed_parameters, parse
 
+=======
+from kpi.utils.permissions import is_user_anonymous, get_subdomain_user_ids
+>>>>>>> /tmp/kpiport/mf/fork
 from .models import Asset, ObjectPermission
 
+from kpi.utils.log import logging
 
 class DeploymentFilter:
     DEPLOYMENT_STATUS_DEFAULT_ORDER = [
@@ -175,7 +187,33 @@ class KpiObjectPermissionsFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
 
         user = request.user
+<<<<<<< /tmp/kpiport/mf/cur
         if user.is_superuser and view.detail:
+=======
+
+        # User can access assets/collections created by users with same subdomain
+        model_name = queryset.model._meta.model_name
+        if model_name == 'asset' or model_name == 'collection':
+            try:
+                subdomain_user_ids = get_subdomain_user_ids(user)
+                if model_name == 'asset':
+                    subdomain_assetIds = Asset.objects.filter(owner__in=subdomain_user_ids).values_list('id', flat=True)
+                    return queryset.filter(pk__in=subdomain_assetIds)
+                # elif model_name == 'collection':
+                #     subdomain_collectionIds = Collection.objects.filter(owner__in=subdomain_userIds).values_list('id', flat=True)
+                #     return queryset.filter(pk__in=subdomain_collectionIds)
+            except KeycloakModel.DoesNotExist:
+                # User has no Keycloak record; fall through to standard filtering
+                pass
+            except Exception:
+                logging.exception(
+                    'Unexpected error while filtering queryset by subdomain '
+                    'for user %s', user
+                )
+                raise
+
+        if user.is_superuser and view.action != 'list':
+>>>>>>> /tmp/kpiport/mf/fork
             # For a list, we won't deluge the superuser with everyone else's
             # stuff. This isn't a list, though, so return it all
             return queryset
@@ -404,7 +442,7 @@ class KpiObjectPermissionsFilter(filters.BaseFilterBackend):
             q_obj = parse(
                 q, default_field_lookups=ASSET_SEARCH_DEFAULT_FIELD_LOOKUPS
             )
-        except (ParseError, SearchQueryTooShortException):
+        except ParseError:
             # Let's `SearchFilter` handle errors
             return {}
         else:
@@ -466,20 +504,13 @@ class SearchFilter(filters.BaseFilterBackend):
             q_obj = parse(
                 q,
                 default_field_lookups=view.search_default_field_lookups,
-                min_search_characters=getattr(
-                    view, 'min_search_characters', None
-                ),
             )
         except ParseError:
             return queryset.model.objects.none()
         except (
             QueryParserBadSyntax,
             QueryParserNotSupportedFieldLookup,
-            SearchQueryTooShortException,
         ) as e:
-            # raising an exception if the default search query without a
-            # specified field is less than a set length of characters -
-            # currently 3 (see `settings.MINIMUM_DEFAULT_SEARCH_CHARACTERS`)
             raise e
         try:
             # If we are searching on an n-to-many field, we may get multiple results

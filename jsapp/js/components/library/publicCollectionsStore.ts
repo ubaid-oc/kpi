@@ -1,3 +1,4 @@
+<<<<<<< /tmp/kpiport/mf/cur
 import type { RouterState } from '@remix-run/router'
 import { reaction } from 'mobx'
 import Reflux from 'reflux'
@@ -7,6 +8,33 @@ import { ASSETS_TABLE_COLUMNS, ORDER_DIRECTIONS } from '#/components/assetsTable
 import type { AssetsTableColumn } from '#/components/assetsTable/assetsTableConstants'
 import searchBoxStore from '#/components/header/searchBoxStore'
 import { ACCESS_TYPES, ASSET_TYPES } from '#/constants'
+=======
+import Reflux from 'reflux';
+import {when} from 'mobx';
+import type {Update} from 'history';
+import searchBoxStore, {SEARCH_CONTEXTS} from 'js/components/header/searchBoxStore';
+import assetUtils from 'js/assetUtils';
+import {
+  getCurrentPath,
+  isPublicCollectionsRoute,
+} from 'js/router/routerUtils';
+import {actions} from 'js/actions';
+import sessionStore from 'js/stores/session';
+import {
+  ORDER_DIRECTIONS,
+  ASSETS_TABLE_COLUMNS,
+} from 'js/components/assetsTable/assetsTableConstants';
+import type {AssetsTableColumn} from 'js/components/assetsTable/assetsTableConstants';
+import {
+  ASSET_TYPES,
+  ACCESS_TYPES,
+} from 'js/constants';
+import {ROUTES} from 'js/router/routerConstants';
+import {history} from 'js/router/historyRouter';
+import {
+  DEFAULT_PAGE_SIZE,
+} from 'js/dataInterface';
+>>>>>>> /tmp/kpiport/mf/fork
 import type {
   AssetResponse,
   AssetSubscriptionsResponse,
@@ -41,11 +69,19 @@ class PublicCollectionsStore extends Reflux.Store {
    * A method for aborting current XHR fetch request.
    * It doesn't need to be defined upfront, but I'm adding it here for clarity.
    */
+<<<<<<< /tmp/kpiport/mf/cur
   abortFetchData?: Function
   previousPath = getCurrentPath()
   PAGE_SIZE = 100
   DEFAULT_ORDER_COLUMN = ASSETS_TABLE_COLUMNS['date-modified']
   searchContext = 'PUBLIC_COLLECTIONS'
+=======
+  abortFetchData?: Function;
+  previousPath = getCurrentPath();
+  previousSearchPhrase = searchBoxStore.getSearchPhrase();
+  PAGE_SIZE = DEFAULT_PAGE_SIZE;
+  DEFAULT_ORDER_COLUMN = ASSETS_TABLE_COLUMNS['date-modified'];
+>>>>>>> /tmp/kpiport/mf/fork
 
   isInitialised = false
 
@@ -91,6 +127,9 @@ class PublicCollectionsStore extends Reflux.Store {
     actions.resources.createResource.completed.listen(this.onAssetCreated.bind(this))
     actions.resources.deleteAsset.completed.listen(this.onDeleteAssetCompleted.bind(this))
 
+    // Wait for login before starting store
+    when(() => sessionStore.isLoggedIn, this.startupStore.bind(this));
+
     // startup store after config is ready
     actions.permissions.getConfig.completed.listen(this.startupStore.bind(this))
   }
@@ -100,9 +139,14 @@ class PublicCollectionsStore extends Reflux.Store {
    * otherwise wait until route changes to a library (see `onRouteChange`)
    */
   startupStore() {
+<<<<<<< /tmp/kpiport/mf/cur
     if (!this.isInitialised && isPublicCollectionsRoute() && !this.data.isFetchingData) {
       // This will indirectly run `fetchData`
       searchBoxStore.setContext(this.searchContext)
+=======
+    if (!this.isInitialised && isPublicCollectionsRoute() && !this.data.isFetchingData && sessionStore.isLoggedIn) {
+      this.fetchData(true);
+>>>>>>> /tmp/kpiport/mf/fork
     }
   }
 

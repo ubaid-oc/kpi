@@ -31,8 +31,14 @@ $z-modal-x: 10;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+<<<<<<< /tmp/kpiport/mf/cur
   max-width: 90%;
   max-height: 95%;
+=======
+  min-width: 40%;
+  max-width: 99%;
+  max-height: 99%;
+>>>>>>> /tmp/kpiport/mf/fork
   overflow-x: auto;
   visibility: hidden;
 
@@ -40,10 +46,14 @@ $z-modal-x: 10;
     visibility: visible;
   }
 
+  &.modal--top-aligned {
+    top: 15%;
+    transform: translate(-50%, 0);
+  }
+
   &.modal--large {
-    height: 80%;
-    width: 80%;
-    max-width: 1240px;
+    height: 100%;
+    width: 100%;
 
     &.modal--large-shorter {
       max-width: 960px;
@@ -82,8 +92,9 @@ $z-modal-x: 10;
 
 .modal__body {
   // we use margin for bottom to make it stack with modal__footer
-  padding: 30px 30px 0;
-  margin-bottom: 30px;
+  padding: 0 20px;
+  margin-bottom: 20px;
+  overflow: auto;
 
   // in some cases adding custom footer requires it to be inside modal__body and
   // then padding is not needed (it is partially needed when in .modal--large)
@@ -93,7 +104,6 @@ $z-modal-x: 10;
 }
 
 .modal__content {
-  overflow: auto;
   background-color: colors.$kobo-white;
   width: 100%;
 }
@@ -104,27 +114,40 @@ $z-modal-x: 10;
 }
 
 .modal__header {
-  min-height: 70px;
-  background: colors.$kobo-blue;
-  color: colors.$kobo-white;
+  min-height: 50px;
+  background: colors.$kobo-white;
+  color: colors.$kobo-gray-24;
   display: flex;
   justify-content: space-between;
 }
 
 .modal__title {
+<<<<<<< /tmp/kpiport/mf/cur
   margin: 0;
   padding: 24px 30px;
   font-size: 18px;
+=======
+  margin: 0px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 500;
+>>>>>>> /tmp/kpiport/mf/fork
   line-height: 22px;
 }
 
 .modal__x {
   z-index: $z-modal-x;
+<<<<<<< /tmp/kpiport/mf/cur
   color: colors.$kobo-white;
   background-color: inherit;
   padding: 8px;
   margin: 11px 15px 11px 11px;
   border-radius: 50%;
+=======
+  color: colors.$kobo-gray-55;
+  padding: 0;
+  margin: 10px 5px;
+>>>>>>> /tmp/kpiport/mf/fork
   font-size: 20px;
   cursor: pointer;
 
@@ -151,8 +174,13 @@ $z-modal-x: 10;
 .modal__subheader {
   background: colors.$kobo-gray-200;
   padding: 20px 30px;
+<<<<<<< /tmp/kpiport/mf/cur
   margin: -30px -30px 20px;
   color: colors.$kobo-gray-700;
+=======
+  margin: 0 -20px 20px;
+  color: colors.$kobo-gray-40;
+>>>>>>> /tmp/kpiport/mf/fork
 
   i {
     margin: 5px 10px 10px 3px;
@@ -297,7 +325,11 @@ $modal-custom-header-height: 60px;
 
 .enketo-holder {
   // resets modal window paddings
+<<<<<<< /tmp/kpiport/mf/cur
   margin: -30px;
+=======
+  margin: 0 -20px;
+>>>>>>> /tmp/kpiport/mf/fork
 
   .enketo-loading-message {
     p {

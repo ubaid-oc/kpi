@@ -8,6 +8,7 @@ import autoBind from 'react-autobind'
 import bem from '#/bem'
 
 interface PopoverMenuProps {
+<<<<<<< /tmp/kpiport/mf/cur
   /** A callback run whenever popover is opened (made visible). */
   popoverSetVisible?: () => void
   /**
@@ -19,6 +20,13 @@ interface PopoverMenuProps {
   blurEventDisabled?: boolean
   type?: string
   additionalModifiers?: string[]
+=======
+  popoverSetVisible?: () => void;
+  clearPopover?: boolean;
+  blurEventDisabled?: boolean;
+  type?: string;
+  additionalModifiers?: string[];
+>>>>>>> /tmp/kpiport/mf/fork
   /** the element that will be opening the menu, menu will be placed in relation to it */
   triggerLabel: React.ReactNode
   /** content of the menu, can be anything really */
@@ -108,7 +116,22 @@ export default class PopoverMenu extends React.Component<PopoverMenuProps, Popov
     } else {
       this.setState({
         popoverVisible: true,
+<<<<<<< /tmp/kpiport/mf/cur
       })
+=======
+      });
+    }
+
+    if (this.props.type === 'assetrow-menu' && !this.state.popoverVisible) {
+      // if popover doesn't fit above, place it below
+      // 20px is a nice safety margin
+      const $assetRow = $(evt.target).parents('.asset-row');
+      const $popoverMenu = $(evt.target).parents('.popover-menu').find('.popover-menu__content');
+      const rowOffsetTop = $assetRow?.offset()?.top;
+      const rowHeight = $assetRow?.outerHeight();
+      const menuHeight = $popoverMenu?.outerHeight();
+      this.setState({placement: 'below'});
+>>>>>>> /tmp/kpiport/mf/fork
     }
 
     if (typeof this.props.popoverSetVisible === 'function' && !this.state.popoverVisible) {

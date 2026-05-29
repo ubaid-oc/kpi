@@ -11,10 +11,17 @@ $aliases = require './model.aliases'
 $rowDetail = require './model.rowDetail'
 $choices = require './model.choices'
 $skipLogicHelpers = require './mv.skipLogicHelpers'
+<<<<<<< /tmp/kpiport/mf/cur
 readParameters = require('#/components/formBuilder/formBuilderUtils').readParameters
 writeParameters = require('#/components/formBuilder/formBuilderUtils').writeParameters
 txtid = require('#/utils').txtid
 notify = require('#/utils').notify
+=======
+readParameters = require('../../js/components/formBuilder/formBuilderUtils').readParameters
+writeParameters = require('../../js/components/formBuilder/formBuilderUtils').writeParameters
+notify = require('js/utils').notify
+econsentSignature = require('../../js/components/formBuilder/econsentSignature')
+>>>>>>> /tmp/kpiport/mf/fork
 
 module.exports = do ->
   row = {}
@@ -53,6 +60,30 @@ module.exports = do ->
     isInGroup: ->
       return @_parent?._parent?.constructor.kls is "Group"
 
+    getConsentItemChoices: () ->
+      listChoices = []
+      modelTypeValueArr = @getValue('type').split(' ')
+      modelType = modelTypeValueArr[0]
+      if modelTypeValueArr.length is 2
+        listName = modelTypeValueArr[1]
+        listChoices = @getSurvey().choices?.find((choice) -> choice.getValue('name') is listName)
+        listChoices
+        
+    isConsentItem: () ->
+      isConsent = false
+
+      listChoices = @getConsentItemChoices()
+      listChoicesNames = listChoices?.options?._parent?.getNames()
+      isConsent = listChoices?.options?.length is 1 and listChoicesNames?[0] is '1'
+        
+      isConsent
+
+    getConsentItemChoiceValue: () ->
+      list = @getList?()
+      if list?.options?.length > 0
+        return list.options.at(0)?.get('name') ? null
+      null
+
     detach: (opts)->
       if @_parent
         @_parent.remove @, opts
@@ -61,16 +92,14 @@ module.exports = do ->
 
     selectableRows: () ->
       questions = []
-      limit = false
-
-      non_selectable = ['datetime', 'time', 'note', 'calculate', 'group', 'kobomatrix', 'repeat', 'rank', 'score']
+      
+      non_selectable = ['datetime', 'time', 'note', 'group', 'kobomatrix', 'repeat', 'rank', 'score']
 
       survey = @getSurvey()
       if survey == null
         return null
       survey.forEachRow (question) =>
-        limit = limit || question is @
-        if !limit && question.getValue('type') not in non_selectable
+        if (question.getValue('type') not in non_selectable) and (not (question is @))
           questions.push question
           return
       , includeGroups:true
@@ -82,6 +111,9 @@ module.exports = do ->
 
     # TODO: see if we need both toJSON* methods, and if yes, please describe both (differences)
     toJSON2: ->
+      if @constructor.kls is 'Row' and econsentSignature.isEConsentSignatureRow(@)
+        econsentSignature.ensureEConsentSignatureStructure(@, econsentSignature.getEConsentSignatureCheckboxLabel(@))
+
       outObj = {}
       for [key, val] in @attributesArray()
         if key is 'type' and val.get('typeId') in ['select_one', 'select_multiple']

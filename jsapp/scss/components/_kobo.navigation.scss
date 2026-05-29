@@ -37,6 +37,7 @@
   }
 
   .header__logo {
+<<<<<<< /tmp/kpiport/mf/cur
     // NOTE: this is overrideable, see `/kpi/templates/index.html`
     background-image: url('../img/kobologo_symbol.svg');
     background-repeat: no-repeat;
@@ -44,6 +45,11 @@
     width: 40px;
     height: 40px;
     // Needed for non-horizontal images
+=======
+    width: 165px;
+    height: 40px;
+    background: url("../img/oclogo.svg") no-repeat left center;
+>>>>>>> /tmp/kpiport/mf/fork
     background-size: contain;
     display: block;
   }
@@ -293,10 +299,22 @@
     display: initial;
   }
 
+<<<<<<< /tmp/kpiport/mf/cur
   .mdl-layout__header .mdl-layout__title {
     // This makes sure the search box is aligned with right side content.
     // We subtract the header bar paddings and the left margin of search box.
     width: variables.$s-drawer-width - 20px - 6px;
+=======
+  .mdl-layout__header {
+    .mdl-layout__title {
+      width: 40px;
+    }
+
+    .main-header__title input {
+      border-radius: 0;
+    }
+
+>>>>>>> /tmp/kpiport/mf/fork
   }
 
   .mdl-layout__header .header__logo {

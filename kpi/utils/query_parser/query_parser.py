@@ -4,7 +4,6 @@ from collections import defaultdict
 from distutils import util
 from functools import reduce
 
-from django.conf import settings
 from django.db.models import Q
 from django_request_cache import cache_for_request
 
@@ -49,10 +48,13 @@ class QueryParseActions:
         'iexact',
     ]
 
-    def __init__(self, default_field_lookups: list, min_search_characters: int):
+    def __init__(self, default_field_lookups: list):
         self.default_field_lookups = default_field_lookups
+<<<<<<< /tmp/kpiport/mf/cur
         self.min_search_characters = min_search_characters
         self.has_term_with_sufficient_length = False
+=======
+>>>>>>> /tmp/kpiport/mf/fork
 
     @classmethod
     def process_value(cls, field, value):
@@ -143,6 +145,7 @@ class QueryParseActions:
         if elements[0].text == '':
             value = _get_value('', elements)
 
+<<<<<<< /tmp/kpiport/mf/cur
             value = str(value) if not isinstance(value, str) else value
             if len(value) >= self.min_search_characters:
                 # Note that at least one term meets the minimum length
@@ -151,6 +154,10 @@ class QueryParseActions:
 
             # Since no field was specified, apply the search term to all
             # default fields
+=======
+            # A list of `Q` objects where every value is the same
+            # searched value
+>>>>>>> /tmp/kpiport/mf/fork
             q_list = [
                 Q(**{field: value}) for field in self.default_field_lookups
             ]
@@ -311,7 +318,6 @@ def get_parsed_parameters(parsed_query: Q) -> dict:
 def parse(
     query: str,
     default_field_lookups: list,
-    min_search_characters: int = None,
 ) -> Q:
     """
     Parse a Boolean query string into a Django Q object.
@@ -321,6 +327,7 @@ def parse(
     any object whose `summary` or `name` field contains `term` (case
     insensitive)
     """
+<<<<<<< /tmp/kpiport/mf/cur
     if not min_search_characters:
         min_search_characters = settings.MINIMUM_DEFAULT_SEARCH_CHARACTERS
 
@@ -336,3 +343,9 @@ def parse(
         raise SearchQueryTooShortException()
 
     return q_object
+=======
+    return grammar_parse(
+        query,
+        QueryParseActions(default_field_lookups),
+    )
+>>>>>>> /tmp/kpiport/mf/fork

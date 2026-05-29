@@ -338,9 +338,15 @@ module.exports = do ->
       handle_model_cid_change = () =>
         return @val(@model.get 'cid')
 
+<<<<<<< /tmp/kpiport/mf/cur
       @model.off 'change:cid', handle_model_cid_change
       @model.on 'change:cid', handle_model_cid_change
       return
+=======
+      if @model?
+        @model.off 'change:cid', handle_model_cid_change
+        @model.on 'change:cid', handle_model_cid_change
+>>>>>>> /tmp/kpiport/mf/fork
 
     constructor: (responses) ->
       super(_.map responses.models, (response) ->
@@ -364,7 +370,7 @@ module.exports = do ->
         options = _.map(target_question.selectableRows(), (row) ->
           return {
             value: row.cid
-            text: row.getValue("label")
+            text: "#{row.getValue('label')} (${#{row.getValue('name')}})"
           }
         )
 

@@ -125,6 +125,16 @@ export function userCanPartially(permName: PermissionCodename, asset?: AssetResp
 }
 
 /**
+   * @param {Object} asset
+   */
+export function userWithSameSubdomainAsAssetOwner(asset: AssetResponse) {
+  const currentUserSubdomain = sessionStore.currentAccount.subdomain;
+  const ownerUserSubdomain = asset.owner__subdomain;
+
+  return currentUserSubdomain === ownerUserSubdomain;
+}
+
+/**
  * This checks if current user can remove themselves from a project that was
  * shared with them. If `view_asset` comes from `asset.effective_permissions`,
  * but doesn't exist in `asset.permissions` it means that `view_asset` comes

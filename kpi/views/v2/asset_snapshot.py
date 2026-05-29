@@ -19,6 +19,10 @@ from kobo.apps.audit_log.base_views import AuditLoggedNoUpdateModelViewSet
 from kobo.apps.audit_log.models import AuditType
 from kobo.apps.openrosa.libs.utils.logger_tools import http_open_rosa_error_handler
 from kpi.authentication import DigestAuthentication, EnketoSessionAuthentication
+<<<<<<< /tmp/kpiport/mf/cur
+=======
+from kpi.constants import PERM_VIEW_ASSET, X_OPENROSA_ACCEPT_CONTENT_LENGTH
+>>>>>>> /tmp/kpiport/mf/fork
 from kpi.exceptions import SubmissionIntegrityError
 from kpi.filters import RelatedAssetPermissionsFilter
 from kpi.highlighters import highlight_xform
@@ -335,6 +339,8 @@ class AssetSnapshotViewSet(OpenRosaViewSetMixin, AuditLoggedNoUpdateModelViewSet
                 and self.request.accepted_renderer.format == 'xml'
             )
         ):
+            if self.request.method == 'HEAD':
+                return queryset.none()
             # The XML renderer is totally public and serves anyone, so
             # /asset_snapshot/valid_uid.xml is world-readable, even though
             # /asset_snapshot/valid_uid/ requires ownership. Return the
@@ -353,6 +359,17 @@ class AssetSnapshotViewSet(OpenRosaViewSetMixin, AuditLoggedNoUpdateModelViewSet
             return owned_snapshots | RelatedAssetPermissionsFilter().filter_queryset(
                 self.request, queryset, view=self
             )
+
+    def retrieve(self, request, *args, **kwargs):
+        if request.method == 'HEAD':
+            return Response(None, headers={
+                X_OPENROSA_ACCEPT_CONTENT_LENGTH :
+                    settings.X_OPENROSA_ACCEPT_CONTENT_LENGTH_DEFAULT
+            })
+
+        return super(AssetSnapshotViewSet, self).retrieve(
+            request, *args, **kwargs
+        )
 
     @action(
         detail=True,
@@ -436,6 +453,7 @@ class AssetSnapshotViewSet(OpenRosaViewSetMixin, AuditLoggedNoUpdateModelViewSet
         # **Not** part of the OpenRosa API
         snapshot = self.get_object()
         if snapshot.details.get('status') == 'success':
+<<<<<<< /tmp/kpiport/mf/cur
             data = {
                 'server_url': reverse(
                     viewname='assetsnapshot-detail',
@@ -465,6 +483,17 @@ class AssetSnapshotViewSet(OpenRosaViewSetMixin, AuditLoggedNoUpdateModelViewSet
 
             json_response = response.json()
             preview_url = json_response.get('preview_url')
+=======
+            preview_url = "{}/{}?form={}".format(
+                              settings.ENKETO_URL,
+                              settings.ENKETO_PREVIEW_ENDPOINT,
+                              reverse(viewname='assetsnapshot-detail',
+                                      format='xml',
+                                      kwargs={'uid': snapshot.uid},
+                                      request=request,
+                                      ),
+                            )
+>>>>>>> /tmp/kpiport/mf/fork
 
             return HttpResponseRedirect(preview_url)
         else:

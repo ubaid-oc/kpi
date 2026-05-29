@@ -4,7 +4,7 @@ export const ROOT_BREADCRUMBS = Object.freeze({
     href: '#/forms',
   },
   MY_LIBRARY: {
-    label: t('My Library'),
+    label: t('Library'),
     href: '#/library/my-library',
   },
   PUBLIC_COLLECTIONS: {

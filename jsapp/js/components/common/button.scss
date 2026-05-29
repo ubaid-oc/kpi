@@ -23,6 +23,7 @@ $button-icon-l: icon.$s-icon-m;
 $button-icon-alone-l: icon.$s-icon-l;
 
 // shared variables for all sizes
+<<<<<<< /tmp/kpiport/mf/cur
 $button-border-width: 1px;
 $button-border-radius: 6px;
 
@@ -34,6 +35,26 @@ $button-border-radius: 6px;
 ) {
   color: $textColor;
   background-color: $mainBgColor;
+=======
+$button-border-width: sizes.$x1;
+$button-border-radius: sizes.$x6;
+
+// button container for data-tip purpose
+.button-container {
+  display: inline-block;
+  height: inherit;
+}
+
+// Sets colors for `bare` type button.
+@mixin button-bare($mainColor) {
+  color: $mainColor;
+
+  // We use the same style for hover and pending states.
+  &:hover,
+  &.k-button--pending {
+    background-color: colors.$kobo-gray-92;
+    color: color.adjust($mainColor, $lightness: -5%);
+>>>>>>> /tmp/kpiport/mf/fork
 
   // We use similar styles for focus as for hover
   &:focus-visible {

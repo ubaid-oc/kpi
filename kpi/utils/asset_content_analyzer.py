@@ -16,6 +16,7 @@ class AssetContentAnalyzer:
         self.default_translation = False
         if len(self.translations) > 0:
             self.default_translation = self.translations[0]
+        self.settings_version = None
         self.summary = self.get_summary()
 
     def decide_name_quality(self, row):
@@ -134,6 +135,9 @@ class AssetContentAnalyzer:
                 or self.settings.get(KOBO_LOCK_COLUMN, False)
             ):
                 lock_any = True
+        
+        if "version" in self.settings:
+            self.settings_version = self.settings['version']
 
         summary = {
             'row_count': row_count,
@@ -145,6 +149,7 @@ class AssetContentAnalyzer:
             'labels': labels[0:5],
             'columns': columns,
             'name_quality': self.compile_name_qualities(names_by_quality),
+            'settings_version': self.settings_version,
         }
 
         if len(naming_conflicts) > 0:

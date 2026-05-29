@@ -1,9 +1,13 @@
+@use '~kobo-common/src/styles/colors';
+
 .mandatory-setting {
   .card__settings__fields__field > label {
     vertical-align: top;
     margin-top: 6px;
   }
+}
 
+<<<<<<< /tmp/kpiport/mf/cur
   .mandatory-setting__row {
     &.mandatory-setting__row--custom {
       .mandatory-settings-input-wrapper {
@@ -16,7 +20,63 @@
         height: 0;
         overflow: hidden;
         margin-top: 0;
+=======
+.js-card-settings-required-logic.card__settings__fields--active {
+  margin-top: -15px;
+}
+
+.required-logic-panel {
+  &__header {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .text-box {
+    display: block;
+    margin-bottom: 8px;
+
+    input[type='text'] {
+      background-color: colors.$kobo-white;
+    }
+
+    &.input-error {
+      color: colors.$kobo-red;
+
+      input[type='text'] {
+        border-color: colors.$kobo-red;
+>>>>>>> /tmp/kpiport/mf/fork
       }
     }
+  }
+
+  .message {
+    color: colors.$kobo-red;
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  &__hint {
+    font-size: 12px;
+    font-weight: normal;
+    color: colors.$kobo-gray-40;
+    margin-top: 8px;
+  }
+}
+
+.js-required-logic-tab {
+  display: flex;
+  align-items: center;
+
+  .js-required-logic-tab-label {
+    flex: 1;
+  }
+
+  .required-logic-error-badge {
+    color: colors.$kobo-red;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
+    flex-shrink: 0;
   }
 }

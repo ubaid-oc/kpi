@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
+<<<<<<< /tmp/kpiport/mf/cur
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.urls import include, path, re_path
@@ -15,6 +16,13 @@ from kpi.utils.spectacular_processing import (
 )
 from kpi.utils.urls import is_request_for_html
 from kpi.views.v2.swagger_ui import ExtendedSwaggerUIView
+=======
+from django.contrib.auth import logout
+from django.urls import include, path, re_path
+from django.views.generic.base import RedirectView
+from kobo.apps.service_health.views import service_health
+
+>>>>>>> /tmp/kpiport/mf/fork
 
 admin.autodiscover()
 admin.site.login = staff_member_required(admin.site.login, login_url=settings.LOGIN_URL)
@@ -59,6 +67,9 @@ urlpatterns = [
     # Disable admin login form
     re_path(r'^admin/', admin.site.urls),
     path('', include('kobo.apps.accounts.mfa.urls')),
+    re_path(r'^api-auth/',
+            include('rest_framework.urls', namespace='rest_framework')),
+    re_path(r'^accounts/logout/', logout),
     path('accounts/', include('allauth.urls')),  # Must be after kpi.url, login
     re_path(
         r'^accounts/register/?',

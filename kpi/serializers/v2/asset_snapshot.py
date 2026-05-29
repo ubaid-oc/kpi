@@ -2,11 +2,16 @@
 from rest_framework import exceptions, serializers
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework.reverse import reverse
+from bossoidc2.models import Keycloak as KeycloakModel
 
 from kpi.constants import PERM_VIEW_ASSET
 from kpi.fields import RelativePrefixHyperlinkedRelatedField, WritableJSONField
 from kpi.models import Asset, AssetSnapshot
+<<<<<<< /tmp/kpiport/mf/cur
 from kpi.utils.object_permission import get_database_user
+=======
+from kpi.utils.permissions import is_owner_in_subdomain
+>>>>>>> /tmp/kpiport/mf/fork
 
 
 class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
@@ -52,6 +57,21 @@ class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
                   'source',
                   )
 
+    def check_subdomain_permission(self, asset):
+        # Check if asset owner id in subdomain userIds
+        user = self.context['request'].user
+
+        if isinstance(asset, dict) and 'owner' in asset:
+            asset_owner = asset['owner']
+        else:
+            asset_owner = asset.owner
+
+        try:
+            if not is_owner_in_subdomain(user, asset_owner.id):
+                raise exceptions.PermissionDenied
+        except KeycloakModel.DoesNotExist:
+            raise exceptions.PermissionDenied
+
     def create(self, validated_data):
         """
         Create a snapshot of an asset, either by copying an existing
@@ -69,8 +89,10 @@ class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
         validated_data['owner'] = get_database_user(self.context['request'].user)
 
         if source:
+            self.check_subdomain_permission(validated_data)
             snapshot = AssetSnapshot.objects.create(**validated_data)
         else:
+            self.check_subdomain_permission(asset)
             # asset.snapshot pulls, by default, a snapshot for the latest
             # version.
             snapshot = asset.snapshot()
@@ -116,8 +138,9 @@ class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
 
         if asset:
             if not user.has_perm(PERM_VIEW_ASSET, asset):
-                # The client is not allowed to snapshot this asset
-                raise exceptions.PermissionDenied
+                # Fall back to subdomain check: allow if the asset owner
+                # belongs to the same Keycloak subdomain as the requesting user
+                self.check_subdomain_permission(asset)
             if not source:
                 attrs.pop('source', None)
         elif source:

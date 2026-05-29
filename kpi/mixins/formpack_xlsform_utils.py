@@ -113,6 +113,10 @@ class FormpackXLSFormUtilsMixin:
 
     def _xlsform_structure(self, content, ordered=True, kobo_specific=False):
         opts = copy.deepcopy(FLATTEN_OPTS)
+
+        # Remove hxl column and value from XLS export
+        opts['remove_columns']['survey'].append('hxl')
+
         if not kobo_specific:
             opts['remove_columns']['survey'].append('$kuid')
             opts['remove_columns']['survey'].append('$autoname')
@@ -287,6 +291,8 @@ class FormpackXLSFormUtilsMixin:
                             try:
                                 val = row[col].pop(_tindex)
                             except KeyError:
+                                continue
+                            except AttributeError:
                                 continue
                         row[col].insert(0, val)
             if is_new:

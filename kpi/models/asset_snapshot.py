@@ -1,14 +1,32 @@
 import copy
+import traceback
 
 from django.conf import settings
 from django.db import models
+<<<<<<< /tmp/kpiport/mf/cur
+=======
+from django.conf import settings as django_settings
+from rest_framework.reverse import reverse
+
+>>>>>>> /tmp/kpiport/mf/fork
 from formpack import FormPack
+from bs4 import BeautifulSoup
+from pyxform import builder, xls2json
+from pyxform.errors import PyXFormError
 
 from kobo.apps.openrosa.apps.logger.xform_instance_parser import add_uuid_prefix
 from kpi.constants import API_NAMESPACES
 from kpi.fields import KpiUidField
 from kpi.interfaces.open_rosa import OpenRosaFormListInterface
+<<<<<<< /tmp/kpiport/mf/cur
 from kpi.mixins import FormpackXLSFormUtilsMixin, XlsExportableMixin
+=======
+from kpi.mixins import (
+    FormpackXLSFormUtilsMixin,
+    XlsExportableMixin,
+    OCFormUtilsMixin,
+)
+>>>>>>> /tmp/kpiport/mf/fork
 from kpi.utils.hash import calculate_hash
 from kpi.utils.log import logging
 from kpi.utils.models import DjangoModelABCMetaclass
@@ -47,6 +65,7 @@ class AssetSnapshot(
     AbstractFormList,
     XlsExportableMixin,
     FormpackXLSFormUtilsMixin,
+    OCFormUtilsMixin,
 ):
     """
     This model serves as a cache of the XML that was exported by the installed
@@ -136,7 +155,12 @@ class AssetSnapshot(
                 self.owner = self.asset.owner
         _note = self.details.pop('note', None)
         _source = copy.deepcopy(self.source)
+
+        self._adjust_content_media_column_before_standardize(_source)
         self._standardize(_source)
+        self._adjust_content_media_column(_source)
+        self._revert_custom_column(_source)
+
         self._make_default_translation_first(_source)
         self._strip_empty_rows(_source)
         self._autoname(_source)
@@ -173,6 +197,7 @@ class AssetSnapshot(
         self.source = _source
         return super().save(*args, **kwargs)
 
+<<<<<<< /tmp/kpiport/mf/cur
     def generate_xml_from_source(
         self,
         source,
@@ -181,6 +206,139 @@ class AssetSnapshot(
         form_title=None,
         id_string=None,
     ):
+=======
+    def _adjust_content_media_column_before_generate_xml(self, content):
+
+        media_columns = {"audio": "media::audio", "image": "media::image", "video": 'media::video'}
+
+        def _adjust_media_columns(survey, non_dc_cols):
+            for survey_col_idx in range(len(survey)):
+                survey_col = survey[survey_col_idx]
+                survey_col_keys = list(survey_col.keys())
+                for survey_col_key in survey_col_keys:
+                    if survey_col_key in non_dc_cols:
+                        survey_col["{}".format(media_columns[survey_col_key])] = survey_col[survey_col_key]
+                        del survey_col[survey_col_key]
+
+        survey = content.get('survey', [])
+
+        survey_col_key_list = []
+        for survey_col_idx in range(len(survey)):
+            survey_col = survey[survey_col_idx]
+            survey_col_key_list = survey_col_key_list + list(survey_col.keys())
+
+        for media_column_key in media_columns.keys():
+            non_dc_col = media_column_key
+            non_dc_cols = [s for s in survey_col_key_list if s.startswith(non_dc_col)]
+
+            if len(non_dc_cols) > 0:
+                _adjust_media_columns(survey, non_dc_cols)
+
+        if 'translations' in content:
+            translated = content.get('translated', [])
+            non_dc_media_columns = ['audio', 'image', 'video']
+            for translated_idx in range(len(translated)):
+                for non_dc_media_column in non_dc_media_columns:
+                    if non_dc_media_column == translated[translated_idx]:
+                        translated[translated_idx] = u"{}".format(media_columns[non_dc_media_column])
+
+    def _prepare_for_xml_pyxform_generation(self, content, id_string):
+        if 'settings' in content:
+            settings = content['settings']
+
+            if 'id_string' not in settings.keys():
+                settings['id_string'] = id_string
+
+            settings['name'] = 'data'
+            content['settings'] = [settings]
+
+        if 'settings_header' not in content:
+            content['settings_header'] = [
+                {
+                  "form_title": "",
+                  "form_id": "",
+                  "version": "",
+                  "style": "",
+                  "crossform_references": "",
+                  "namespaces": "",
+                  "Read Me - Form template created by OpenClinica Form Designer": ""
+                }
+            ]
+
+        translations = None
+        if 'translations' in content:
+            translations = content['translations']
+            if all(x is None for x in translations):
+                del content['translations']
+
+        if 'choices' in content:
+            choices = content['choices']
+
+            for choice_col_idx in range(len(choices)):
+                choice_col = choices[choice_col_idx]
+
+                if 'label' in choice_col:
+                    choice_col['label'] = choice_col['label'][0]
+
+        if 'choices_header' not in content:
+            content['choices_header'] = [
+                {
+                  "list_name": "",
+                  "label": "",
+                  "name": "",
+                  "image": ""
+                }
+            ]
+
+
+        if 'survey' in content:
+            survey = content['survey']
+            translated = content.get('translated', [])
+
+            for survey_col_idx in range(len(survey)):
+                survey_col = survey[survey_col_idx]
+
+                if 'label' in survey_col and len(translated) > 0 and 'label' not in translated and type(survey_col['label']) is list:
+                    survey_col['label'] = survey_col['label'][0]
+
+                if 'hint' in survey_col and len(translated) > 0 and 'hint' not in translated and type(survey_col['hint']) is list:
+                    survey_col['hint'] = survey_col['hint'][0]
+
+                if 'type' in survey_col:
+                    if 'select_one' == survey_col['type'] and 'select_from_list_name' in survey_col.keys():
+                        survey_col['type'] = "{0} {1}".format(survey_col['type'], survey_col['select_from_list_name'])
+                        del survey_col['select_from_list_name']
+                    elif 'select_one_from_file' == survey_col['type']:
+                        select_one_from_file_filename = 'codelist.csv'
+                        if 'select_one_from_file_filename' in survey_col.keys():
+                            select_one_from_file_filename = survey_col['select_one_from_file_filename']
+                            if not select_one_from_file_filename.endswith(('.csv', '.xml')):
+                                select_one_from_file_filename = '{}.csv'.format(select_one_from_file_filename)
+                            del survey_col['select_one_from_file_filename']
+                        survey_col['type'] = "{0} {1}".format(survey_col['type'], select_one_from_file_filename)
+
+                if len(translated) > 0:
+                    for translated_column in translated:
+                        if translated_column in survey_col:
+                            translated_value = survey_col[translated_column]
+                            del survey_col[translated_column]
+                            for translation in translations:
+                                column_value = translated_value[translations.index(translation)]
+                                if translations.index(translation) == 0:
+                                    survey_col['{}'.format(translated_column, translation)] = u"{}".format(column_value)
+                                else:
+                                    survey_col['{}::{}'.format(translated_column, translation)] = u"{}".format(column_value)
+
+        if 'survey_header' not in content:
+            content['survey_header'] = [{ col : "" for col in self.surveyCols}]
+
+    def generate_xml_from_source(self,
+                                 source,
+                                 include_note=False,
+                                 root_node_name=None,
+                                 form_title=None,
+                                 id_string=None):
+>>>>>>> /tmp/kpiport/mf/fork
 
         if not root_node_name:
             if self.asset and self.asset.uid:
@@ -213,8 +371,12 @@ class AssetSnapshot(
 
         allow_choice_duplicates(source_copy)
 
+        self._settings_ensure_required_columns(source_copy)
+        self._adjust_content_media_column_before_generate_xml(source_copy)
+
         warnings = []
         details = {}
+<<<<<<< /tmp/kpiport/mf/cur
 
         try:
             xml = FormPack(
@@ -228,22 +390,94 @@ class AssetSnapshot(
                 'status': 'success',
                 'warnings': warnings,
             })
+=======
+        xml = ''
+        generation_error = None
+        generation_traceback = None
+        formpack_error = None  # original FormPack error, kept for context if fallback also fails
+
+        # Step 1: try FormPack to generate XML
+        try:
+            xml = FormPack({'content': source_copy},
+                           root_node_name=root_node_name,
+                           id_string=id_string,
+                           title=form_title)[0].to_xml(warnings=warnings)
+        except PyXFormError as formpack_err:
+            formpack_error = formpack_err
+            # Step 2: FormPack failed; fall back to pyxform directly
+            try:
+                self._prepare_for_xml_pyxform_generation(source_copy, id_string=id_string)
+                survey_json = xls2json.workbook_to_json(source_copy)
+                survey = builder.create_survey_element_from_dict(survey_json)
+                xml = survey.to_xml()
+            except Exception as err:
+                generation_error = err
+                generation_traceback = traceback.format_exc()
+>>>>>>> /tmp/kpiport/mf/fork
         except Exception as err:
-            err_message = str(err)
+            generation_error = err
+            generation_traceback = traceback.format_exc()
+
+        # Step 3: update details based on whether generation succeeded or failed
+        if generation_error:
+            err_message = str(generation_error)
             logging.error('Failed to generate xform for asset', extra={
                 'src': source,
                 'id_string': id_string,
                 'uid': self.uid,
                 '_msg': err_message,
+                'traceback': generation_traceback,
+                # Include the original FormPack error so the root cause is not lost
+                'formpack_error': str(formpack_error) if formpack_error else None,
                 'warnings': warnings,
             })
-            xml = ''
             details.update({
                 'status': 'failure',
-                'error_type': type(err).__name__,
+                'error_type': type(generation_error).__name__,
                 'error': err_message,
+                # Expose the original FormPack error in the response details too
+                'formpack_error': str(formpack_error) if formpack_error else None,
                 'warnings': warnings,
             })
+        else:
+            details.update({
+                'status': 'success',
+                'warnings': warnings,
+            })
+
+        if xml != "":
+
+            def bind_is_calculate_and_has_external_clinicaldata(tag):
+                return tag.name == 'bind' \
+                    and tag.has_attr('calculate') \
+                    and tag.has_attr('oc:external') \
+                    and tag['oc:external'] == 'clinicaldata'
+
+            soup = BeautifulSoup(xml, 'xml')
+            soup_find_clinicaldata= soup.find_all(bind_is_calculate_and_has_external_clinicaldata)
+            clinicaldata_count = len(soup_find_clinicaldata)
+            soup_find_all_instance = soup.find_all('instance')
+            instance_count = len(soup_find_all_instance)
+
+            oc_clinicaldata_soup = BeautifulSoup('<instance id="clinicaldata" src="{}"/>'.format(django_settings.ENKETO_FORM_OC_INSTANCE_URL), 'xml')
+            if clinicaldata_count > 0:
+                if instance_count == 0:
+                    if soup.find('model') is not None:
+                        soup.model.insert(1, oc_clinicaldata_soup.instance)
+                else:
+                    soup_find_instance = soup.find_all('instance')
+                    instance_count = len(soup_find_instance)
+                    soup_find_instance[instance_count - 1].insert_after(oc_clinicaldata_soup.instance)
+
+            soup_body = soup.find('h:body')
+            if 'class' in soup_body.attrs:
+                if 'no-text-transform' not in soup_body['class']:
+                    soup_body['class'] = soup_body['class'] + ' no-text-transform'
+            else:
+                soup_body['class'] = 'no-text-transform'
+
+            xml = str(soup)
+
         return xml, details
 
     @property

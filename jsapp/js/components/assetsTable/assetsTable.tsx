@@ -32,6 +32,7 @@ type FilterChangeCallback = (columnId: string | null, columnValue: string | null
 type SwitchPageCallback = (pageNumber: number) => void
 
 interface AssetsTableProps {
+<<<<<<< /tmp/kpiport/mf/cur
   context: AssetsTableContextName
   /** Displays a spinner */
   isLoading?: boolean
@@ -63,6 +64,41 @@ interface AssetsTableProps {
   totalPages?: number
   /** Called when user clicks page change. */
   onSwitchPage?: SwitchPageCallback
+=======
+ context: AssetsTableContextName;
+ /** Displays a spinner */
+ isLoading?: boolean;
+ /** To display contextual empty message when zero assets. */
+ emptyMessage?: string;
+ /** List of assets to be displayed. */
+ assets: AssetResponse[];
+ /** Number of assets on all pages. */
+ totalAssets: number;
+ /** List of available filters values. */
+ metadata?: MetadataResponse; // this type ??
+ /** Seleceted order column id, one of ASSETS_TABLE_COLUMNS. */
+ orderColumnId: string;
+ /** Seleceted order column value. */
+ orderValue: string;
+ /** Called when user selects a column for odering. */
+ onOrderChange: OrderChangeCallback;
+ /** Seleceted filter column, one of ASSETS_TABLE_COLUMNS. */
+ filterColumnId: string | null;
+ /** Seleceted filter column value. */
+ filterValue: string | null;
+ /** Called when user selects a column for filtering. */
+ onFilterChange: FilterChangeCallback;
+ /**
+  * For displaying pagination. If you omit any of these, pagination will simply
+  * not be rendered. Good to use when you actually don't need it.
+  */
+ currentPage?: number;
+ totalPages?: number;
+ /** Called when user clicks page change. */
+ onSwitchPage?: SwitchPageCallback;
+ /** Show or Hide Tags */
+ showAllTags?: boolean;
+>>>>>>> /tmp/kpiport/mf/fork
 }
 
 interface AssetsTableState {
@@ -187,7 +223,7 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
         displayLabel = t('Questions')
       }
       return (
-        <bem.AssetsTableRow__column m={columnDef.id} disabled>
+        <bem.AssetsTableRow__column m={columnDef.id} className="header" disabled>
           {displayLabel}
         </bem.AssetsTableRow__column>
       )
@@ -350,6 +386,7 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
 
         {this.renderPagination()}
 
+<<<<<<< /tmp/kpiport/mf/cur
         {this.props.totalAssets !== null && (
           <Button
             type='text'
@@ -359,6 +396,17 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
             onClick={this.toggleFullscreen.bind(this)}
           />
         )}
+=======
+        {/* {this.props.totalAssets !== null &&
+          <button
+            className='mdl-button'
+            onClick={this.toggleFullscreen.bind(this)}
+          >
+            {t('Toggle fullscreen')}
+            <i className='k-icon k-icon-expand' />
+          </button>
+        } */}
+>>>>>>> /tmp/kpiport/mf/fork
       </bem.AssetsTable__footer>
     )
   }
@@ -373,16 +421,20 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
       <bem.AssetsTable m={modifiers}>
         <bem.AssetsTable__header>
           <bem.AssetsTableRow m='header'>
-            {this.renderHeader(ASSETS_TABLE_COLUMNS['icon-status'])}
             {this.renderHeader(ASSETS_TABLE_COLUMNS.name)}
-            {this.renderHeader(ASSETS_TABLE_COLUMNS['items-count'])}
+            {this.renderHeader(ASSETS_TABLE_COLUMNS['item-version'])}
+            {this.renderHeader(ASSETS_TABLE_COLUMNS['item-type'])}
             {this.renderHeader(ASSETS_TABLE_COLUMNS.owner)}
+<<<<<<< /tmp/kpiport/mf/cur
             {this.props.context === ASSETS_TABLE_CONTEXTS.PUBLIC_COLLECTIONS &&
               this.renderHeader(ASSETS_TABLE_COLUMNS['subscribers-count'])}
             {this.renderHeader(ASSETS_TABLE_COLUMNS.languages)}
             {this.props.context === ASSETS_TABLE_CONTEXTS.PUBLIC_COLLECTIONS &&
               this.renderHeader(ASSETS_TABLE_COLUMNS['primary-sector'])}
+=======
+>>>>>>> /tmp/kpiport/mf/fork
             {this.renderHeader(ASSETS_TABLE_COLUMNS['date-modified'])}
+            {this.renderHeader(ASSETS_TABLE_COLUMNS.actions)}
 
             {this.state.scrollbarWidth !== 0 && this.state.scrollbarWidth !== null && (
               <div className='assets-table__scrollbar-padding' style={{ width: `${this.state.scrollbarWidth}px` }} />
@@ -397,6 +449,18 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
             <bem.AssetsTableRow m='empty-message'>
               {this.props.emptyMessage || t('There are no assets to display.')}
             </bem.AssetsTableRow>
+<<<<<<< /tmp/kpiport/mf/cur
+=======
+          }
+
+          {!this.props.isLoading && this.props.assets.map((asset) =>
+            <AssetsTableRow
+              asset={asset}
+              key={asset.uid}
+              context={this.props.context}
+              showTag={this.props.showAllTags}
+            />
+>>>>>>> /tmp/kpiport/mf/fork
           )}
 
           {!this.props.isLoading &&

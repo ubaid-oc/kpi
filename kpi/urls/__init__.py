@@ -14,6 +14,14 @@ from .router_api_v1 import urls_patterns as router_api_v1_urls
 from .router_api_v2 import URL_NAMESPACE
 from .router_api_v2 import urls_patterns as router_api_v2_urls
 
+from oc.views import (
+    OCAuthenticationCallbackView,
+    OCAuthenticationRequestView,
+    OCLogoutView,
+    OCAppInfoView
+)
+
+
 # TODO: Give other apps their own `urls.py` files instead of importing their
 # views directly! See
 # https://docs.djangoproject.com/en/1.8/intro/tutorial03/#namespacing-url-names
@@ -32,6 +40,7 @@ urlpatterns = [
     path('', include('kobo.apps.accounts.urls')),
     path('', include('kobo.apps.service_health.urls')),
     re_path(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+<<<<<<< /tmp/kpiport/mf/cur
     # DEPRECATED, remove with v1
     path(
         'authorized_application/authenticate_user/',
@@ -42,6 +51,15 @@ urlpatterns = [
         'api/v2/authorized_application/authenticate_user/',
         AuthorizedApplicationUserViewSet.as_view({'post': 'authenticate_user'}),
         name='authorized-application-authenticate-user',
+=======
+    path('openid/callback/', OCAuthenticationCallbackView.as_view(), name="oidc_authentication_callback"),
+    path('openid/authenticate/', OCAuthenticationRequestView.as_view(), name="oidc_authentication_init"),
+    path('openid/logout/', OCLogoutView.as_view(), name="oidc_logout"),
+    re_path(r'^openid/', include('mozilla_django_oidc.urls')),
+    re_path(
+        r'^authorized_application/authenticate_user/$',
+        authorized_application_authenticate_user
+>>>>>>> /tmp/kpiport/mf/fork
     ),
     path('modern_browsers/', modern_browsers),
     re_path(r'^i18n/', include('django.conf.urls.i18n')),
@@ -54,11 +72,16 @@ urlpatterns = [
             ConfigurationFile.content_view, name='configurationfile'),
     re_path(r'^private-media/', include(private_storage.urls)),
     # Statistics for superusers
+<<<<<<< /tmp/kpiport/mf/cur
     re_path(
         r'^superuser_stats/',
         include(('kobo.apps.superuser_stats.urls', 'superuser_stats')),
     ),
     path('logout-all/', logout_from_all_devices, name='logout_all'),
+=======
+    re_path(r'^superuser_stats/', include(('kobo.apps.superuser_stats.urls', 'superuser_stats'))),
+    path('app_info/', OCAppInfoView.as_view(), name='app_info'),
+>>>>>>> /tmp/kpiport/mf/fork
 ]
 
 

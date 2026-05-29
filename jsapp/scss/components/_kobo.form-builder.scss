@@ -1,3 +1,4 @@
+@use 'scss/breakpoints';
 @use 'scss/z-indexes';
 @use 'scss/breakpoints';
 @use 'scss/colors';
@@ -22,7 +23,7 @@ $s-form-builder-content-width: 1024px;
   overflow-y: scroll;
   margin-right: 0;
   transition: margin $t-form-builder-aside-open;
-  padding: 20px 40px;
+  padding: 10px;
   width: auto;
 
   .form-builder-message-box {
@@ -32,8 +33,14 @@ $s-form-builder-content-width: 1024px;
   }
 }
 
+<<<<<<< /tmp/kpiport/mf/cur
 @media screen and (width >= 1100px) {
   .form-builder-aside--visible + .form-builder, {
+=======
+@media screen and (min-width: breakpoints.$b1100) {
+  .form-builder-aside--visible + .form-builder,
+  .lib-nav--visible + .form-builder {
+>>>>>>> /tmp/kpiport/mf/fork
     .form-builder__contents {
       margin-right: $s-form-builder-aside;
     }
@@ -42,8 +49,7 @@ $s-form-builder-content-width: 1024px;
 
 .form-wrap {
   width: 100%;
-  max-width: $s-form-builder-content-width;
-  margin: 0 auto;
+  padding: 45px 75px; // Similar to the previous form builder
 
   input,
   textarea {
@@ -72,6 +78,12 @@ $s-form-builder-content-width: 1024px;
       border: 1px solid black;
       padding-right: 12px;
     }
+  }
+}
+
+@media screen and (max-width: breakpoints.$b1280) {
+  .form-wrap {
+    padding: 20px;
   }
 }
 
@@ -193,8 +205,83 @@ $s-form-builder-content-width: 1024px;
 
     // second row
     &.form-builder-header__cell--toolsButtons {
+<<<<<<< /tmp/kpiport/mf/cur
       @include mixins.centerRowFlex;
       gap: 10px;
+=======
+      margin: 0 10px;
+
+      button {
+        color: colors.$kobo-gray-40;
+        // for tooltip
+        overflow: visible;
+        padding: 0;
+        margin-right: 10px;
+
+        &[data-tip]::after {
+          margin-left: 30px;
+        }
+
+        &:hover,
+        &:focus,
+        &:focus:not(:active) {
+          background-color: transparent;
+        }
+
+        &:hover {
+          color: colors.$kobo-gray-24;
+        }
+
+        i {
+          font-size: 24px;
+          margin: 3px;
+          vertical-align: middle;
+        }
+
+        &.add-questions-to-library {
+          .k-icon-plus {
+            color: colors.$kobo-teal;
+            position: absolute;
+            font-size: 16px;
+            left: 13px;
+            top: 15px;
+          }
+        }
+      }
+
+      button:last-child {
+        margin-right: 0;
+      }
+    }
+
+    &.form-builder-header__cell--supportUrl {
+      margin: 0 10px;
+
+      a:hover {
+        color: colors.$kobo-gray-14;
+
+        .k-icon {
+          color: colors.$kobo-gray-14;
+        }
+      }
+
+      i {
+        font-size: 32px;
+        vertical-align: bottom;
+      }
+
+      .k-icon {
+        color: #8a8ea3;
+        font-size: 32px;
+        vertical-align: bottom;
+      }
+    }
+
+    &.form-builder-header__cell--rightTaskbar-buttons {
+      .k-icon {
+        vertical-align: bottom;
+      }
+>>>>>>> /tmp/kpiport/mf/fork
     }
 
     &.form-builder-header__cell--spacer {
@@ -210,6 +297,123 @@ $s-form-builder-content-width: 1024px;
   }
 }
 
+<<<<<<< /tmp/kpiport/mf/cur
+=======
+.form-builder-header__close {
+  border: none;
+  color: colors.$kobo-gray-40;
+  cursor: pointer;
+
+  @extend .mdl-button, .mdl-button--icon;
+
+  &:hover {
+    color: colors.$kobo-gray-24;
+  }
+
+  &:focus {
+    i {
+      @include form-builder-focus();
+    }
+  }
+}
+
+.form-builder-header__button {
+  @extend .mdl-button;
+
+  &:focus {
+    i {
+      @include form-builder-focus();
+    }
+  }
+
+  &.form-builder-header__button--create,
+  &.form-builder-header__button--save {
+    margin-left: 10px;
+    text-transform: uppercase;
+    min-width: 85px;
+
+    @extend .mdl-button--colored, .mdl-button--raised;
+
+    > i {
+      display: none;
+    }
+
+    &:focus {
+      background-color: darken(colors.$kobo-blue, 10%);
+      font-weight: bold;
+    }
+  }
+
+  &.form-builder-header__button--back {
+    text-transform: uppercase;
+    color: colors.$kobo-blue;
+    background-color: colors.$kobo-white;
+    border: 2px solid colors.$kobo-blue;
+
+    &:hover {
+      border-color: darken(colors.$kobo-blue, 10%);
+      color: darken(colors.$kobo-blue, 10%);
+    }
+  }
+
+  &.form-builder-header__button--savepending,
+  &.form-builder-header__button--create-pending {
+    > i {
+      @extend .k-spin, .k-icon, .k-icon-spinner;
+
+      font-size: 24px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 3px;
+      margin-left: -2px;
+    }
+
+    > i + span {
+      display: none;
+    }
+  }
+
+  &.form-builder-header__button--savefailed::after,
+  &.form-builder-header__button--saveneeded::after {
+    content: '*';
+    color: colors.$kobo-white;
+  }
+
+  &.form-builder-header__button--panel-toggle {
+    padding: 0 10px;
+
+    &.form-builder-header__button--active {
+      i.k-icon {
+        color: colors.$kobo-blue;
+      }
+    }
+
+    .panel-toggle-name {
+      margin-right: 10px;
+    }
+
+    i.k-icon {
+      font-size: 24px;
+      margin-right: 3px;
+      vertical-align: middle;
+    }
+
+    &:focus {
+      @include form-builder-focus();
+
+      i {
+        outline: none;
+      }
+    }
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+>>>>>>> /tmp/kpiport/mf/fork
 // FORM STYLE SETTINGS
 
 .form-builder-aside {
@@ -315,10 +519,17 @@ $s-form-builder-content-width: 1024px;
 // TODO: we should rework all these media queries to mobile first, but it's
 // possible we would rewrite form builder, so it would be useless
 
+<<<<<<< /tmp/kpiport/mf/cur
 @media screen and (width < breakpoints.$b768) {
   .form-builder-header {
     .form-builder-header__row {
       gap: 5px;
+=======
+  .formBuilder-header__cell--buttonsTopRight {
+    .formBuilder-header__button--save {
+      max-width: 135px;
+      text-overflow: ellipsis;
+>>>>>>> /tmp/kpiport/mf/fork
     }
 
     .form-builder-header__row.form-builder-header__row--secondary {

@@ -63,7 +63,7 @@
     padding: 5px;
     font-size: 13px;
     display: inline-block;
-    width: 72%;
+    width: 45%;
     vertical-align: top;
     height: auto;
     position: relative;
@@ -91,11 +91,17 @@
 
   code {
     font-weight: 600;
+<<<<<<< /tmp/kpiport/mf/cur
     font-size: 11px;
     font-family: mdl.$font;
     background-color: colors.$kobo-gray-300;
     padding: 2px;
     margin: 2px;
+=======
+    font-size: 12px;
+    font-family: $font;
+    padding: 0;
+>>>>>>> /tmp/kpiport/mf/fork
     width: 25%;
     text-align: initial;
     display: inline-block;
@@ -104,16 +110,28 @@
 
     label {
       display: inline-block;
-      width: 40%;
+      width: 15%;
       padding-left: 4px;
+<<<<<<< /tmp/kpiport/mf/cur
       color: colors.$kobo-gray-700;
+=======
+      padding-top: 8px;
+      color: colors.$kobo-gray-40;
+>>>>>>> /tmp/kpiport/mf/fork
+    }
+
+    span, input[type="text"] {
+      width: 83%;
+      border: $thinBorderStyle;
+      border-radius: 5px;
+      padding: 8px 4px 2px 2px;
+      font-size: 12px;
     }
 
     span {
       text-align: right;
       display: inline-block;
       float: right;
-      width: 60%;
       padding-right: 4px;
       color: colors.$kobo-gray-700;
       overflow-wrap: break-word;
@@ -128,10 +146,13 @@
       text-align: right;
       display: inline-block;
       float: right;
+<<<<<<< /tmp/kpiport/mf/cur
       width: 60% !important;
       color: variables.$linkColor;
+=======
+      color: $linkColor;
+>>>>>>> /tmp/kpiport/mf/fork
       line-height: inherit;
-      font-size: 11px;
     }
   }
 

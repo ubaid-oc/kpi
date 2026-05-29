@@ -72,6 +72,18 @@
               font-size: 15px;
             }
         }
+
+        .ui-resizable-handle {
+            color: colors.$kobo-gray-65;
+        }
+
+        .ui-resizable-s {
+            border-top: 1px solid colors.$kobo-gray-85;
+
+            &:hover {
+                border-top: 1px solid darken(colors.$kobo-gray-85, 20%);
+            }
+        }
     }
 
     .card__attr--file {
@@ -85,6 +97,15 @@
       }
     }
 
+    .card__header-name {
+        text-align: right;
+        padding-bottom: 10px;
+        color: colors.$kobo-gray-65;
+
+        &:focus {
+            color: colors.$kobo-gray-14;
+        }
+    }
     .card__header-title {
         color: colors.$kobo-gray-700;
 
@@ -92,10 +113,16 @@
             color: colors.$kobo-gray-800;
           }
 
+<<<<<<< /tmp/kpiport/mf/cur
         // we use placeholder as error message, as empty title is not welcomed
          &::placeholder {
             color: colors.$kobo-red;
             background-color: rgba(colors.$kobo-mid-red, 0.075);
+=======
+        &::placeholder {
+            color: inherit;
+            opacity: 0.6;
+>>>>>>> /tmp/kpiport/mf/fork
         }
     }
 
@@ -298,6 +325,19 @@ $cardIndicatorIconWidth: 21px;
 
     &.card__buttons__button--teal {
         color: colors.$kobo-teal;
+    }
+
+    &.card__buttons__button--delete {
+        top: 4px;
+    }
+
+    &.card__buttons__button--copy,
+    &.card__buttons__button--clone {
+        top: 8px;
+    }
+
+    &.card__buttons__button--add {
+       top: 10px;
     }
 
     &.card__buttons__button--activated {

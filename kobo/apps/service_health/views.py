@@ -13,6 +13,7 @@ from kpi.models import Asset
 from kpi.utils.log import logging
 
 
+<<<<<<< /tmp/kpiport/mf/cur
 def get_response(url_):
     message = 'OK'
     failure = False
@@ -40,6 +41,8 @@ def get_response(url_):
 
     return failure, message, content
 
+=======
+>>>>>>> /tmp/kpiport/mf/fork
 
 def check_status(
     service_name: str, check_function: Callable
@@ -49,6 +52,7 @@ def check_status(
     If an exception is raised, return the class name for public consumption.
     Log the full exception information. This prevents information leakage
     """
+<<<<<<< /tmp/kpiport/mf/cur
     error = None
     t0 = time.time()
     try:
@@ -86,6 +90,41 @@ def service_health(request):
         check_results.append(
             f"{service_name}: {service_message or 'OK'} in {service_time:.3} seconds"
         )
+=======
+
+    any_failure = False
+
+    t0 = time.time()
+    mongo_message = None
+    try:
+        settings.MONGO_DB.instances.find_one(max_time_ms=settings.MONGO_TIMEOUT_MS)
+    except Exception:
+        pass
+    else:
+        mongo_message = 'OK'
+    mongo_time = time.time() - t0
+
+    t0 = time.time()
+    try:
+        Asset.objects.order_by().first()
+    except Exception as e:
+        postgres_message = repr(e)
+        any_failure = True
+    else:
+        postgres_message = 'OK'
+    postgres_time = time.time() - t0
+
+    output = (
+        '{} KPI\r\n\r\n'
+        'Postgres: {} in {:.3} seconds\r\n'
+    ).format(
+        'FAIL' if any_failure else 'OK',
+        postgres_message, postgres_time,
+    )
+
+    if mongo_message is not None:
+        output += 'Mongo: {} in {:.3} seconds\r\n'.format(mongo_message, mongo_time)
+>>>>>>> /tmp/kpiport/mf/fork
 
     output = f"{'FAIL' if any_failure else 'OK'} KPI\r\n\r\n"
     output += '\r\n'.join(check_results)

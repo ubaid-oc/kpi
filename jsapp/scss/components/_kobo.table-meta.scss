@@ -1,6 +1,11 @@
+<<<<<<< /tmp/kpiport/mf/cur
 @use 'scss/colors';
 @use 'scss/mixins';
 @use 'scss/breakpoints';
+=======
+@use 'scss/breakpoints';
+@use '~kobo-common/src/styles/colors';
+>>>>>>> /tmp/kpiport/mf/fork
 
 .table-meta {
   flex-grow: 1;
@@ -19,6 +24,15 @@
     display: inline;
     white-space: nowrap;
   }
+<<<<<<< /tmp/kpiport/mf/cur
+=======
+
+  @media screen and (max-width: breakpoints.$b1100) {
+    .table-meta__additional-text {
+      display: none;
+    }
+  }
+>>>>>>> /tmp/kpiport/mf/fork
 }
 
 .table-meta__bulk-options {

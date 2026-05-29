@@ -50,6 +50,7 @@ into understanding it, I simply gathered the sum of the styles below:
   margin: 0 auto;
   align-items: stretch;
 
+<<<<<<< /tmp/kpiport/mf/cur
   > .form-builder {
     box-sizing: border-box;
     flex-flow: column;
@@ -57,3 +58,17 @@ into understanding it, I simply gathered the sum of the styles below:
     height: 100%;
   }
 }
+=======
+@import "../partials/form_builder/survey_row";
+@import "../partials/form_builder/row_questiontypes";
+@import "../partials/form_builder/card";
+@import "../partials/form_builder/card_settings";
+@import "../partials/form_builder/card_multichoice";
+@import "../partials/form_builder/group";
+@import "../partials/form_builder/settings_skiplogic";
+@import "../partials/form_builder/params_view";
+@import "../partials/form_builder/mandatory_setting";
+@import "../partials/form_builder/default_value";
+@import "../partials/form_builder/calculation";
+@import "../partials/form_builder/misc";
+>>>>>>> /tmp/kpiport/mf/fork

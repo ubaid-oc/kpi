@@ -23,15 +23,16 @@ module.exports = do ->
   addIconToRow(constants.QUESTION_TYPES.integer, "r1")
   # row 2
   addIconToRow(constants.QUESTION_TYPES.decimal, "r2")
+  addIconToRow(constants.QUESTION_TYPES.calculate, "r2")
   addIconToRow(constants.QUESTION_TYPES.date, "r2")
-  addIconToRow(constants.QUESTION_TYPES.time, "r2")
-  addIconToRow(constants.QUESTION_TYPES.datetime, "r2")
+  addIconToRow(constants.QUESTION_TYPES.note, "r2")
   # row 3
-  addIconToRow(constants.QUESTION_TYPES.geopoint, "r3")
+  addIconToRow(constants.QUESTION_TYPES.file, "r3")
   addIconToRow(constants.QUESTION_TYPES.image, "r3")
   addIconToRow(constants.QUESTION_TYPES.audio, "r3")
   addIconToRow(constants.QUESTION_TYPES.video, "r3")
   # row 4
+<<<<<<< /tmp/kpiport/mf/cur
   addIconToRow(constants.QUESTION_TYPES.geotrace, "r4")
   addIconToRow(constants.QUESTION_TYPES.note, "r4")
   addIconToRow(constants.QUESTION_TYPES.barcode, "r4")
@@ -51,6 +52,12 @@ module.exports = do ->
   addIconToRow(constants.QUESTION_TYPES['select_one_from_file'], "r7")
   addIconToRow(constants.QUESTION_TYPES['select_multiple_from_file'], "r7")
 
+=======
+  addIconToRow(constants.QUESTION_TYPES.select_one_from_file, "r4")
+  addIconToRow(constants.QUESTION_TYPES.pii_encrypted, "r4")
+  addIconToRow(constants.QUESTION_TYPES.econsent_signature, "r4")
+  
+>>>>>>> /tmp/kpiport/mf/fork
   class QtypeIcon extends Backbone.Model
     defaults: {
       iconClassname: "k-icon"

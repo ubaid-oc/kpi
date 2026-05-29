@@ -140,11 +140,16 @@ export const fetchDataRaw = async <T>(
     Accept: JSON_HEADER,
   }
 
+<<<<<<< /tmp/kpiport/mf/cur
   // For when it's needed we pass authentication data
   if (method !== 'GET') {
     // Need to support old token (64 characters - prior to Django 4.1)
     // and new token (32 characters).
     const csrfCookie = document.cookie.match(/csrftoken=(\w{32,64})/)
+=======
+  if (method === 'DELETE' || data) {
+    const csrfCookie = document.cookie.match(/occsrftoken_v2=(\w{64})/);
+>>>>>>> /tmp/kpiport/mf/fork
     if (csrfCookie) {
       headers['X-CSRFToken'] = csrfCookie[1]
     }

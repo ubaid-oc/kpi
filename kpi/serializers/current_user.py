@@ -12,7 +12,11 @@ from django.utils.translation import gettext as t
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
+<<<<<<< /tmp/kpiport/mf/cur
 from rest_framework.reverse import reverse
+=======
+from bossoidc2.models import Keycloak as KeycloakModel
+>>>>>>> /tmp/kpiport/mf/fork
 
 from hub.models import ExtraUserDetail
 from kobo.apps.accounts.serializers import SocialAccountSerializer
@@ -49,10 +53,18 @@ class CurrentUserSerializer(serializers.ModelSerializer):
     social_accounts = SocialAccountSerializer(
         source='socialaccount_set', many=True, read_only=True
     )
+<<<<<<< /tmp/kpiport/mf/cur
     validated_password = serializers.SerializerMethodField()
     accepted_tos = serializers.SerializerMethodField()
     organization = serializers.SerializerMethodField()
     extra_details__uid = serializers.SerializerMethodField()
+=======
+    user_type = serializers.SerializerMethodField()
+    subdomain = serializers.SerializerMethodField()
+    user_uuid = serializers.SerializerMethodField()
+    customer_name = serializers.SerializerMethodField()
+    customer_shared_infra = serializers.SerializerMethodField()
+>>>>>>> /tmp/kpiport/mf/fork
 
     class Meta:
         model = User
@@ -71,6 +83,7 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             'new_password',
             'git_rev',
             'social_accounts',
+<<<<<<< /tmp/kpiport/mf/cur
             'validated_password',
             'accepted_tos',
             'organization',
@@ -79,6 +92,13 @@ class CurrentUserSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'email',
             'accepted_tos',
+=======
+            'user_type',
+            'subdomain',
+            'user_uuid',
+            'customer_name',
+            'customer_shared_infra'
+>>>>>>> /tmp/kpiport/mf/fork
         )
 
     def get_accepted_tos(self, obj: User) -> bool:
@@ -111,6 +131,7 @@ class CurrentUserSerializer(serializers.ModelSerializer):
         else:
             return False
 
+<<<<<<< /tmp/kpiport/mf/cur
     @extend_schema_field(GravatarField)
     def get_gravatar(self, obj):
         return gravatar_url(obj.email)
@@ -159,6 +180,38 @@ class CurrentUserSerializer(serializers.ModelSerializer):
     @extend_schema_field(OpenApiTypes.STR)
     def get_extra_details__uid(self, obj):
         return obj.extra_details.uid
+=======
+    def get_user_type(self, obj):
+        request = self.context.get('request', False)
+        if request and request.user:
+            return KeycloakModel.objects.get(user=request.user).user_type
+        return None
+
+    def get_subdomain(self, obj):
+        request = self.context.get('request', False)
+        if request and request.user:
+            return KeycloakModel.objects.get(user=request.user).subdomain
+        return None
+
+    def get_user_uuid(self, obj):
+        request = self.context.get('request', False)
+        if not request:
+            return None
+        return request.session.get('oc_user_uuid')
+
+    def get_customer_name(self, obj):
+        request = self.context.get('request', False)
+        if not request:
+            return None
+        return request.session.get('oc_customer_name')
+
+    def get_customer_shared_infra(self, obj):
+        request = self.context.get('request', False)
+        if not request:
+            return None
+        return request.session.get('oc_customer_shared_infra')
+
+>>>>>>> /tmp/kpiport/mf/fork
 
     def to_representation(self, obj):
         if obj.is_anonymous:

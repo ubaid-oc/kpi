@@ -67,6 +67,11 @@ class UserViewSet(
     filter_backends = (SearchFilter,)
     serializer_class = UserSerializer
     lookup_field = 'username'
+<<<<<<< /tmp/kpiport/mf/cur
+=======
+    lookup_value_regex = '[^/]+'
+    pagination_class = LimitOffsetPagination
+>>>>>>> /tmp/kpiport/mf/fork
     permission_classes = (IsAuthenticated,)
     search_default_field_lookups = [
         'username__icontains',

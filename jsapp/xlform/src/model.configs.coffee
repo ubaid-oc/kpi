@@ -19,16 +19,19 @@ module.exports = do ->
       name: "start"
       label: "start time"
       description: "Records when the survey was begun"
-      default: true
+      default: false
     end_time:
       name: "end"
       label: "end time"
       description: "records when the survey was marked as completed"
+<<<<<<< /tmp/kpiport/mf/cur
       default: true
     startgeo:
       name: "start-geopoint"
       label: "start geopoint early"
       description: '"warms up" the GPS to make it quicker to get an accurate reading'
+=======
+>>>>>>> /tmp/kpiport/mf/fork
       default: false
     today:
       name: "today"
@@ -105,68 +108,45 @@ module.exports = do ->
     geotrace:
       label:
         value: "Record a line"
-      required:
-        value: false
-        _hideUnlessChanged: true
     geoshape:
       label:
         value: "Record an area"
-      required:
-        value: false
-        _hideUnlessChanged: true
     geopoint:
       label:
         value: "Record your current location"
-      required:
-        value: false
-        _hideUnlessChanged: true
     image:
       label:
-        value: "Point and shoot! Use the camera to take a photo"
+        value: ""
     video:
       label:
-        value: "Use the camera to record a video"
+        value: ""
     audio:
       label:
-        value: "Use the camera's microphone to record a sound"
+        value: ""
     file:
       label:
-        value: "Upload a file"
+        value: ""
     note:
       label:
-        value: "This note can be read out loud"
-      required:
-        value: false
-        _hideUnlessChanged: true
+        value: ""
     integer:
       label:
-        value: "Enter a number"
+        value: ""
     barcode:
       label:
         value: "Use the camera to scan a barcode"
     decimal:
       label:
-        value: "Enter a number"
+        value: ""
     date:
       label:
-        value: "Enter a date"
+        value: ""
     range:
       label:
         value: "Enter a number within a specified range"
     calculate:
-      calculation:
+      label:
         value: ""
-      label:
-        value: "calculation"
-      required:
-        value: false
-        _hideUnlessChanged: true
-    hidden:
-      label:
-        value: "hidden"
-      required:
-        value: false
-        _hideUnlessChanged: true
     datetime:
       label:
         value: "Enter a date and time"
@@ -214,12 +194,15 @@ module.exports = do ->
         defaultValue: 1
       }
     }
+<<<<<<< /tmp/kpiport/mf/cur
     image: {
       'max-pixels': {
         type: configs.paramTypes.maxPixels
         defaultValue: 2048
       }
     }
+=======
+>>>>>>> /tmp/kpiport/mf/fork
     select_one: {
       randomize: {
         type: configs.paramTypes.boolean
@@ -239,16 +222,29 @@ module.exports = do ->
   }
 
   configs.columns = [
-    "type",
     "name",
+<<<<<<< /tmp/kpiport/mf/cur
     "file",
+=======
+    "bind::oc:itemgroup",
+    "bind::oc:briefdescription",
+    'bind::oc:description',
+    'select_one_from_file_filename',
+    'appearance',
+    "type",
+>>>>>>> /tmp/kpiport/mf/fork
     "label",
     "hint",
-    "guidance_hint",
     "required",
     "relevant",
+    "constraint",
+    "bind::oc:external",
+    "readonly",
+    "instance::oc:contactdata",
+    "instance::oc:identifier",
     "default",
-    "constraint"
+    'calculation',
+    'trigger'
   ]
 
   configs.lookupRowType = do->
@@ -279,10 +275,15 @@ module.exports = do ->
       ["kobomatrix", "Advanced Matrix"],
       ["rank__level", "Rank Level"],
       ["select_multiple", "Multiple choice", orOtherOption: true, specifyChoice: true],
+<<<<<<< /tmp/kpiport/mf/cur
       ["select_one_from_file", "Select one from file"],
       ["select_multiple_from_file", "Select multiple from file"],
       ["xml-external", "External XML"],
       ["background-geopoint", "Background geopoint", supportedByUI: false],
+=======
+      ["select_one_from_file", "Text"],
+      ["xml-external", "External XML"]
+>>>>>>> /tmp/kpiport/mf/fork
     ]
 
     class Type
@@ -318,17 +319,14 @@ module.exports = do ->
     hint:
       value: ""
       _hideUnlessChanged: true
-    guidance_hint:
-      value: ""
     required:
-      value: false
+      value: "false"
       _hideUnlessChanged: true
     relevant:
       value: ""
       _hideUnlessChanged: true
     default:
       value: ""
-      _hideUnlessChanged: true
     constraint:
       value: ""
       _hideUnlessChanged: true
@@ -341,17 +339,39 @@ module.exports = do ->
     appearance:
       value: ''
       _hideUnlessChanged: true
+    "bind::oc:itemgroup":
+      value: ''
+    "bind::oc:external":
+      value: ''
+    readonly:
+      value: ''
+    calculation:
+      value: ""
+    "bind::oc:briefdescription":
+      value: ''
+    "bind::oc:description":
+      value: ''
+    "select_one_from_file_filename":
+      value: ''
+    "instance::oc:contactdata":
+      value: ''
+    "instance::oc:identifier":
+      value: ''
+    trigger:
+      value: ''
 
   configs.newGroupDetails =
     name:
       value: ->
         return "group_#{txtid()}"
     label:
-      value: "Group"
+      value: ""
     type:
       value: "group"
     _isRepeat:
       value: false
+    repeat_count:
+      value: ""
     relevant:
       value: ""
       _hideUnlessChanged: true

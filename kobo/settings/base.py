@@ -37,6 +37,7 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY', '@25)**hc^rjaiagb4#&q*84hr*uscsxwr-cv#
 # SECURITY WARNING: If enabled, outer web server must filter out the `X-Forwarded-Proto` header.
 SECURE_PROXY_SSL_HEADER = env.tuple('SECURE_PROXY_SSL_HEADER', str, None)
 
+<<<<<<< /tmp/kpiport/mf/cur
 public_request_scheme = env.str('PUBLIC_REQUEST_SCHEME', 'https').lower()
 
 if public_request_scheme == 'https' or SECURE_PROXY_SSL_HEADER:
@@ -46,6 +47,19 @@ if public_request_scheme == 'https' or SECURE_PROXY_SSL_HEADER:
 # These HSTS settings are sometimes overriden via nginx like in the `kobo-helm-chart`
 # repository or by the AWS ALB/Azure app gateway. If you see the header returned
 # with other values, check these places first
+=======
+COOKIES_ARE_SECURE = (
+    env.str('PUBLIC_REQUEST_SCHEME', '').lower() == 'https'
+    or bool(SECURE_PROXY_SSL_HEADER)
+)
+if COOKIES_ARE_SECURE:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+# SameSite=None requires the Secure flag; fall back to 'Lax' when not serving over HTTPS
+_default_samesite = 'None' if COOKIES_ARE_SECURE else 'Lax'
+
+>>>>>>> /tmp/kpiport/mf/fork
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool('SECURE_HSTS_INCLUDE_SUBDOMAINS', False)
 SECURE_HSTS_PRELOAD = env.bool('SECURE_HSTS_PRELOAD', False)
 SECURE_HSTS_SECONDS = env.int('SECURE_HSTS_SECONDS', 0)
@@ -55,6 +69,7 @@ SECURE_HSTS_SECONDS = env.int('SECURE_HSTS_SECONDS', 0)
 USE_X_FORWARDED_HOST = env.bool('USE_X_FORWARDED_HOST', False)
 
 # Domain must not exclude KoBoCAT when sharing sessions
+<<<<<<< /tmp/kpiport/mf/cur
 SESSION_COOKIE_DOMAIN = env.str('SESSION_COOKIE_DOMAIN', None)
 if SESSION_COOKIE_DOMAIN:
     SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'kobonaut')
@@ -64,8 +79,47 @@ if SESSION_COOKIE_DOMAIN:
         f'{public_request_scheme}://*{SESSION_COOKIE_DOMAIN}',
     ]
     CSRF_TRUSTED_ORIGINS = trusted_domains
+=======
+# NOTE: For multi-tenant setups with separate subdomains, keep cookie domains as None
+# to ensure each subdomain has its own isolated session and CSRF tokens
+ALLOWED_DOMAINS = [
+    d.strip() for d in env.list('ALLOWED_DOMAINS', default=[
+        '.localhost.io',
+    ]) if d.strip()
+]
+
+SESSION_COOKIE_DOMAIN = None # always None for tenant isolation
+SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'kobonaut_v2')
+SESSION_COOKIE_SAMESITE = env.str('SESSION_COOKIE_SAMESITE', _default_samesite)
+
+CSRF_COOKIE_DOMAIN = None # always None for tenant isolation
+CSRF_TRUSTED_ORIGINS = ALLOWED_DOMAINS
+CSRF_COOKIE_NAME = env.str('CSRF_COOKIE_NAME', 'occsrftoken_v2')
+CSRF_COOKIE_SAMESITE = env.str('CSRF_COOKIE_SAMESITE', _default_samesite)
+
+# Safety net: if SameSite=None was set explicitly via env var despite no HTTPS
+# detection, enforce Secure=True to prevent browsers from rejecting the cookie
+if SESSION_COOKIE_SAMESITE == 'None':
+    SESSION_COOKIE_SECURE = True
+    COOKIES_ARE_SECURE = True
+if CSRF_COOKIE_SAMESITE == 'None':
+    CSRF_COOKIE_SECURE = True
+    COOKIES_ARE_SECURE = True
+
+SESSION_SAVE_EVERY_REQUEST = True
+
+>>>>>>> /tmp/kpiport/mf/fork
 ENKETO_CSRF_COOKIE_NAME = env.str('ENKETO_CSRF_COOKIE_NAME', '__csrf')
 
+# Instances of this model will be treated as allowed origins; see
+# https://github.com/ottoyiu/django-cors-headers#cors_model
+CORS_ALLOWED_DOMAINS = ALLOWED_DOMAINS
+CORS_ORIGIN_REGEX_WHITELIST = [
+    rf'^(https?://)?([A-Za-z0-9-]+\.){{1,4}}{re.escape(domain.lstrip("."))}$'
+    for domain in CORS_ALLOWED_DOMAINS
+]
+
+CORS_ALLOW_CREDENTIALS = True
 # Limit sessions to 1 week (the default is 2 weeks)
 SESSION_COOKIE_AGE = env.int('DJANGO_SESSION_COOKIE_AGE', 604800)
 
@@ -78,7 +132,7 @@ DEBUG = env.bool('DJANGO_DEBUG', False)
 ALLOWED_HOSTS = env.str('DJANGO_ALLOWED_HOSTS', '*').split(' ')
 
 LOGIN_REDIRECT_URL = 'kpi-root'
-LOGOUT_REDIRECT_URL = 'kobo_login'  # Use URL pattern instead of hard-coded value
+LOGOUT_REDIRECT_URL = '/'  # Use URL pattern instead of hard-coded value
 
 # Application definition
 
@@ -88,6 +142,8 @@ LOGOUT_REDIRECT_URL = 'kobo_login'  # Use URL pattern instead of hard-coded valu
 INSTALLED_APPS = (
     # Always put `contenttypes` before `auth`; see
     # https://code.djangoproject.com/ticket/10827
+    # 'oc_hack',
+    # 'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.admin',
     'kobo.apps.kobo_auth.KoboAuthAppConfig',
@@ -140,6 +196,7 @@ INSTALLED_APPS = (
     'kobo.apps.mass_emails.MassEmailsConfig',
     'kobo.apps.trackers.TrackersConfig',
     'kobo.apps.trash_bin.TrashBinAppConfig',
+<<<<<<< /tmp/kpiport/mf/cur
     'kobo.apps.markdownx_uploader.MarkdownxUploaderAppConfig',
     'kobo.apps.form_disclaimer.FormDisclaimerAppConfig',
     'kobo.apps.openrosa.apps.logger.app.LoggerAppConfig',
@@ -152,6 +209,11 @@ INSTALLED_APPS = (
     'kobo.apps.long_running_migrations.app.LongRunningMigrationAppConfig',
     'kobo.apps.user_reports.apps.UserReportsConfig',
     'drf_spectacular',
+=======
+    'oc',
+    'bossoidc2',
+    'mozilla_django_oidc',
+>>>>>>> /tmp/kpiport/mf/fork
 )
 
 MIDDLEWARE = [
@@ -159,22 +221,36 @@ MIDDLEWARE = [
     'kobo.apps.openrosa.koboform.redirect_middleware.ConditionalRedirects',
     'django_dont_vary_on.middleware.RemoveUnneededVaryHeadersMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+<<<<<<< /tmp/kpiport/mf/cur
     'hub.middleware.LocaleMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'allauth.usersessions.middleware.UserSessionsMiddleware',
+=======
+    # 'oc.middleware.session.OCSessionMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+>>>>>>> /tmp/kpiport/mf/fork
     'django.middleware.common.CommonMiddleware',
     'kobo.apps.audit_log.middleware.create_project_history_log_middleware',
     # Still needed really?
     'kobo.apps.openrosa.libs.utils.middleware.LocaleMiddlewareWithTweaks',
     'django.middleware.csrf.CsrfViewMiddleware',
+<<<<<<< /tmp/kpiport/mf/cur
     'corsheaders.middleware.CorsMiddleware',
+=======
+    # 'oc.middleware.csrf.OCCsrfViewMiddleware',
+>>>>>>> /tmp/kpiport/mf/fork
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'kobo.apps.openrosa.libs.utils.middleware.RestrictedAccessMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+<<<<<<< /tmp/kpiport/mf/cur
     'kobo.apps.openrosa.libs.utils.middleware.HTTPResponseNotAllowedMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+=======
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
+>>>>>>> /tmp/kpiport/mf/fork
     'hub.middleware.UsernameInResponseHeaderMiddleware',
     'django_userforeignkey.middleware.UserForeignKeyMiddleware',
     'django_request_cache.middleware.RequestCacheMiddleware',
@@ -826,6 +902,7 @@ TEST_RUNNER = __name__ + '.DoNotUseRunner'
 AUTHENTICATION_BACKENDS = (
     'kpi.backends.ModelBackend',
     'kpi.backends.ObjectPermissionBackend',
+    'oc.backend.OpenIdConnectBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
@@ -871,6 +948,7 @@ django.conf.locale.LANG_INFO.update(EXTRA_LANG_INFO)
 DJANGO_LANGUAGE_CODES = env.str(
     'DJANGO_LANGUAGE_CODES',
     default=(
+<<<<<<< /tmp/kpiport/mf/cur
         'am '  # Amharic
         'ar '  # Arabic
         'bn '  # Bengali
@@ -900,6 +978,9 @@ DJANGO_LANGUAGE_CODES = env.str(
         'vi '  # Vietnamese
         'yo '  # Yoruba
         'zh-hans'  # Chinese Simplified
+=======
+        'en'  # English
+>>>>>>> /tmp/kpiport/mf/fork
     )
 )
 LANGUAGES = [
@@ -913,8 +994,13 @@ TIME_ZONE = 'UTC'
 
 LOCALE_PATHS = (os.path.join(BASE_DIR, 'locale'),)
 
-USE_I18N = True
+USE_I18N = False
 
+<<<<<<< /tmp/kpiport/mf/cur
+=======
+USE_L10N = False
+
+>>>>>>> /tmp/kpiport/mf/fork
 USE_TZ = True
 
 CAN_LOGIN_AS = lambda request, target_user: request.user.is_superuser
@@ -1001,7 +1087,13 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # SessionAuthentication and BasicAuthentication would be included by
         # default
+<<<<<<< /tmp/kpiport/mf/cur
         'kpi.authentication.SessionAuthentication',
+=======
+        'mozilla_django_oidc.contrib.drf.OIDCAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'oidc_auth.authentication.BearerTokenAuthentication',
+>>>>>>> /tmp/kpiport/mf/fork
         'kpi.authentication.BasicAuthentication',
         'kpi.authentication.TokenAuthentication',
         'kpi.authentication.OAuth2Authentication',
@@ -1221,9 +1313,17 @@ TEMPLATES = [
 
 DEFAULT_SUBMISSIONS_COUNT_NUMBER_OF_DAYS = 31
 GOOGLE_ANALYTICS_TOKEN = os.environ.get('GOOGLE_ANALYTICS_TOKEN')
+<<<<<<< /tmp/kpiport/mf/cur
 SENTRY_JS_DSN = None
 if SENTRY_JS_DSN_URL := env.url('SENTRY_JS_DSN', default=None):
     SENTRY_JS_DSN = SENTRY_JS_DSN_URL.geturl()
+=======
+USER_PILOT_SDK_TOKEN = os.environ.get('USER_PILOT_SDK_TOKEN')
+RAVEN_JS_DSN_URL = env.url('RAVEN_JS_DSN', default=None)
+RAVEN_JS_DSN = None
+if RAVEN_JS_DSN_URL:
+    RAVEN_JS_DSN = RAVEN_JS_DSN_URL.geturl()
+>>>>>>> /tmp/kpiport/mf/fork
 
 # replace this with the pointer to the KoboCAT server, if it exists
 KOBOCAT_URL = os.environ.get('KOBOCAT_URL', 'https://change-me.invalid')
@@ -1298,7 +1398,7 @@ ENKETO_INTERNAL_URL = ENKETO_INTERNAL_URL.rstrip('/')  # Remove any trailing sla
 ENKETO_API_KEY = os.environ.get('ENKETO_API_KEY', 'enketorules')
 # http://apidocs.enketo.org/v2/
 ENKETO_SURVEY_ENDPOINT = 'api/v2/survey/all'
-ENKETO_PREVIEW_ENDPOINT = 'api/v2/survey/preview/iframe'
+ENKETO_PREVIEW_ENDPOINT = 'preview'
 ENKETO_EDIT_INSTANCE_ENDPOINT = 'api/v2/instance'
 ENKETO_VIEW_INSTANCE_ENDPOINT = 'api/v2/instance/view'
 ENKETO_FLUSH_CACHE_ENDPOINT = 'api/v2/survey/cache'
@@ -1356,13 +1456,51 @@ if STRIPE_ENABLED:
     stripe_domain = 'https://js.stripe.com'
     CSP_SCRIPT_SRC.append(stripe_domain)
     CSP_FRAME_SRC.append(stripe_domain)
+if USER_PILOT_SDK_TOKEN:
+    CSP_SCRIPT_SRC.extend(['https://*.userpilot.io'])
+    CSP_CONNECT_SRC.extend(['https://*.userpilot.io', 'wss://*.userpilot.io'])
+    CSP_IMG_SRC.extend([
+        'https://www.meddra.org',
+        'https://*.userpilot.io'
+    ])
+    CSP_STYLE_SRC.extend([
+        'https://fonts.googleapis.com',
+        'https://*.userpilot.io'
+    ])
+    CSP_FONT_SRC = getattr(locals(), 'CSP_FONT_SRC', CSP_DEFAULT_SRC) + [
+        'https://fonts.gstatic.com',
+        'https://*.userpilot.io'
+    ]
+    CSP_FRAME_SRC.extend([
+        'https://*.userpilot.io'
+    ])
+
+def is_local_domain(domain):
+    return 'localhost' in domain or 'local' in domain
+
+CSP_OC_SITES = [
+    f'https://*{domain}' if not is_local_domain(domain) else f'http://*{domain}'
+    for domain in ALLOWED_DOMAINS
+] + ['https://*.cloudfront.net']
+
+CSP_ENV_SITES = env.list('CSP_ENV_SITES', default=[])
+CSP_FRAME_ANCESTORS = CSP_OC_SITES + CSP_ENV_SITES
+CSP_CONNECT_SRC = CSP_CONNECT_SRC + CSP_OC_SITES + CSP_ENV_SITES
+CSP_FRAME_SRC = CSP_FRAME_SRC + CSP_OC_SITES + CSP_ENV_SITES
 
 csp_report_uri = env.url('CSP_REPORT_URI', None)
 if csp_report_uri:  # Let environ validate uri, but set as string
     CSP_REPORT_URI = csp_report_uri.geturl()
 CSP_REPORT_ONLY = env.bool('CSP_REPORT_ONLY', False)
 
+<<<<<<< /tmp/kpiport/mf/cur
 """ Celery configuration """
+=======
+# OC Instance URL
+ENKETO_FORM_OC_INSTANCE_URL = os.environ.get('ENKETO_FORM_OC_INSTANCE_URL', '//build.openclinica-dev.io/form-service/api/storage/artifacts/clinicaldata.xml')
+
+''' Celery configuration '''
+>>>>>>> /tmp/kpiport/mf/fork
 # Celery 4.0 New lowercase settings.
 # Uppercase settings can be used when using a PREFIX
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#new-lowercase-settings
@@ -1944,8 +2082,11 @@ else:
     except ValueError:  # db_url is unable to parse replica set strings
         mongo_db_name = env.str('MONGO_DB_NAME', 'formhub')
 
+MONGO_TIMEOUT_MS = env.int('MONGO_TIMEOUT_MS', 2000)  # 2 seconds
+
 mongo_client = MongoClient(
-    MONGO_DB_URL, connect=False, journal=True, tz_aware=True
+    MONGO_DB_URL, connect=False, journal=True, tz_aware=True,
+    serverSelectionTimeoutMS=MONGO_TIMEOUT_MS
 )
 MONGO_DB = mongo_client[mongo_db_name]
 
@@ -2054,7 +2195,7 @@ MFA_SUPPORTED_AUTH_CLASSES = [
     'kobo.apps.openrosa.libs.authentication.TokenAuthentication',
 ]
 
-MINIMUM_DEFAULT_SEARCH_CHARACTERS = 3
+MINIMUM_DEFAULT_SEARCH_CHARACTERS = 1
 
 # Django 3.2 required settings
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
@@ -2150,6 +2291,7 @@ THUMB_CONF = {
     'small': 240,
 }
 
+<<<<<<< /tmp/kpiport/mf/cur
 SUPPORTED_MEDIA_UPLOAD_TYPES = [
     'image/jpeg',
     'image/png',
@@ -2231,3 +2373,34 @@ SECURE_REFERRER_POLICY = env(
     'SECURE_REFERRER_POLICY',
     default='strict-origin-when-cross-origin',
 )
+=======
+# OpenClinica Keycloak Settings
+X_OPENROSA_ACCEPT_CONTENT_LENGTH_DEFAULT = os.environ.get('X_OPENROSA_ACCEPT_CONTENT_LENGTH_DEFAULT', '100000000')
+OC_BUILD_URL = os.environ.get('OC_BUILD_URL', '')
+
+OIDC_RP_CLIENT_ID = os.environ.get('KEYCLOAK_CLIENT_ID', 'formdesigner')
+OIDC_RP_SCOPES = 'openid profile email'
+OIDC_RP_SIGN_ALGO = "RS256"
+OIDC_CALLBACK_CLASS = "oc.views.OCAuthenticationCallbackView"
+OIDC_AUTHENTICATE_CLASS = "oc.views.OCAuthenticationRequestView"
+ALLOW_LOGOUT_GET_METHOD = True
+
+PUBLIC_URI_FOR_KEYCLOAK = os.environ.get('PUBLIC_URI', 'http://cust2.kobo.local')
+KEYCLOAK_AUTH_URI = os.environ.get('KEYCLOAK_AUTH_URI', 'https://auth.openclinica-dev.io')
+KEYCLOAK_DEFAULT_REALM = os.environ.get('KEYCLOAK_DEFAULT_REALM', 'cust2-aws-dev')
+KEYCLOAK_MASTER_REALM = os.environ.get('KEYCLOAK_MASTER_REALM', 'master')
+KEYCLOAK_CLIENT_ID = os.environ.get('KEYCLOAK_CLIENT_ID', 'formdesigner')
+KEYCLOAK_CLIENT_SECRET = os.environ.get('KEYCLOAK_CLIENT_SECRET', 'client-secret')
+KEYCLOAK_ADMIN_CLIENT_ID = os.environ.get('KEYCLOAK_ADMIN_CLIENT_ID', 'admin-cli')
+KEYCLOAK_ADMIN_CLIENT_SECRET = os.environ.get('KEYCLOAK_ADMIN_CLIENT_SECRET', 'admin-client-secret')
+
+if KEYCLOAK_AUTH_URI != '' and KEYCLOAK_CLIENT_ID != '' and KEYCLOAK_CLIENT_SECRET != '' and PUBLIC_URI_FOR_KEYCLOAK != '':
+    from oc.settings import configure_oidc
+
+    configure_oidc(
+        auth_uri='{}/auth/realms/{}'.format(KEYCLOAK_AUTH_URI, KEYCLOAK_DEFAULT_REALM),
+        client_id=KEYCLOAK_CLIENT_ID,
+        public_uri=PUBLIC_URI_FOR_KEYCLOAK,
+        client_secret=KEYCLOAK_CLIENT_SECRET
+    )
+>>>>>>> /tmp/kpiport/mf/fork
