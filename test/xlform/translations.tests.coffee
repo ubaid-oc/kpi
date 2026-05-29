@@ -19,9 +19,9 @@ describe("translations", ->
         translations: ["polski (pl)", null]
       )
     expect(run).toThrow("""
-      There is an unnamed translation in your form definition.
-      Please give a name to all translations in your form.
-      Use "Manage Translations" option from form landing page.
+      This form includes columns with languages defined but there are also one or more columns that don\'t include a language name.
+      If translations are used in your form, every user-facing text and media content column must include a language name as part of its column title.
+      Please revise your form definition spreadsheet, upload it, and open it in Form Designer again.
     """)
   )
 )

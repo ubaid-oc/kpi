@@ -1,0 +1,58 @@
+@use '~kobo-common/src/styles/colors';
+@use 'scss/z-indexes';
+@use 'scss/sizes';
+@use 'scss/_variables';
+
+.library-actions {
+  position: absolute;
+  top: sizes.$x10;
+  right: sizes.$x5;
+  z-index: z-indexes.$z-table-row-buttons;
+  width: sizes.$x400;
+  display: flex;
+  justify-content: end;
+
+  .library-actions-buttons {
+    width: sizes.$x60;
+    font-size: sizes.$x24;
+    padding-top: sizes.$x3;
+
+    .library-actions-buttons__button {
+      cursor: pointer;
+      margin-right: sizes.$x5;
+      color: colors.$kobo-gray-40;
+
+      &:hover {
+        color: colors.$kobo-blue;
+      }
+    }
+
+    &.library-actions-buttons--display-all-tags {
+      .library-actions-buttons__button--all-tags-toggle {
+        color: colors.$kobo-blue;
+      }
+    }
+  }
+
+  .library-type-filter {
+    width: sizes.$x250;
+    margin-left: sizes.$x20;
+
+    .kobo-select {
+      display: inline-block;
+      min-width: sizes.$x150;
+    }
+
+  }
+}
+
+.assets-table-row__link {
+  z-index: 0 !important;
+}
+
+.breadcrumbs {
+  &.breadcrumbs--gray-wrapper {
+    padding: sizes.$x10 !important;
+    height: #{(variables.$s-breadcrumbs-height - 10px)} !important;
+  }
+}
