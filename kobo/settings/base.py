@@ -74,7 +74,19 @@ SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'kobonaut_v2')
 SESSION_COOKIE_SAMESITE = env.str('SESSION_COOKIE_SAMESITE', _default_samesite)
 
 CSRF_COOKIE_DOMAIN = None # always None for tenant isolation
-CSRF_TRUSTED_ORIGINS = ALLOWED_DOMAINS
+# Django 4.0+ requires each CSRF trusted origin to include a scheme. ALLOWED_DOMAINS
+# holds bare domain suffixes (e.g. '.localhost.io'), so emit scheme-prefixed
+# wildcards, and add explicit origins (with port) from CSP_ENV_SITES so local/
+# reverse-proxied dev (e.g. http://*.localhost.io:8090) matches at runtime.
+CSRF_TRUSTED_ORIGINS = [
+    f'{scheme}://*{domain}'
+    for domain in ALLOWED_DOMAINS
+    for scheme in ('https', 'http')
+] + [
+    origin.strip()
+    for origin in env.list('CSP_ENV_SITES', default=[])
+    if origin.strip().startswith(('http://', 'https://'))
+]
 CSRF_COOKIE_NAME = env.str('CSRF_COOKIE_NAME', 'occsrftoken_v2')
 CSRF_COOKIE_SAMESITE = env.str('CSRF_COOKIE_SAMESITE', _default_samesite)
 
