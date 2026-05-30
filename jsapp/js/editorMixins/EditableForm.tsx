@@ -316,7 +316,7 @@ export default function EditableForm(props: EditableFormProps) {
   }
 
   function onStyleChange(newStyle: null | FormStyleDefinition) {
-    let settingsStyle: FormStyleName
+    let settingsStyle: FormStyleName | undefined
     if (newStyle !== null) {
       settingsStyle = newStyle.value
     }

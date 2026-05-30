@@ -53,6 +53,8 @@ export default class MyLibraryRoute extends React.Component<{}, MyLibraryRouteSt
       filterValue: myLibraryStore.data.filterValue,
       currentPage: myLibraryStore.data.currentPage,
       totalPages: myLibraryStore.data.totalPages,
+      collectionUid: myLibraryStore.data.collectionUid,
+      totalUserRootAssets: myLibraryStore.data.totalUserRootAssets,
       showAllTags: false,
       typeFilterVal: libraryTypeFilterStore.getFilterType(),
     }

@@ -17,6 +17,8 @@ declare function t(str: string): string
 // and on the console.log output of a dialog instance.
 
 interface AlertifyDialogSettings {
+  title?: string | null
+  label?: string | null
   message?: string | null
   labels?: {
     ok?: string

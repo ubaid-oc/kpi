@@ -1,4 +1,4 @@
-import React, {ReactElement, Suspense, useState} from 'react';
+import React, {ReactElement, ReactNode, Suspense, useState} from 'react';
 import {RouteObject} from 'react-router-dom';
 import sessionStore from 'js/stores/session';
 import AccessDenied from './accessDenied';
@@ -13,6 +13,6 @@ export default function RequireAdmin({children}: Props) {
   return session.currentAccount.user_type.toLowerCase() == 'user' ? (
     <AccessDenied />
   ) : (
-    <Suspense fallback={null}>{children}</Suspense>
+    <Suspense fallback={null}>{children as ReactNode}</Suspense>
   );
 };
