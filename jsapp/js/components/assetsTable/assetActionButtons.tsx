@@ -240,9 +240,12 @@ class AssetActionButtons extends React.Component<AssetActionButtonsProps, AssetA
     const assetType = this.props.asset.asset_type
     let downloads: AssetDownloads = []
     if (assetType !== ASSET_TYPES.collection.id) {
-      downloads = this.props.asset.downloads
+      // OpenClinica fork: only offer XLS download for library assets (drop XML/other formats).
+      downloads = this.props.asset.downloads.filter((dl) => dl.format !== 'xml')
     }
-    const userCanEdit = userCan('change_asset', this.props.asset)
+    // OpenClinica fork: bypass kobo per-asset edit permission (was `userWithSameSubdomainAsAssetOwner`); OC gates access at the SSO/route layer.
+    // const userCanEdit = userCan('change_asset', this.props.asset)
+    const userCanEdit = true
     const userCanDelete = userCan('delete_submissions', this.props.asset)
     const isDeployable = assetType === ASSET_TYPES.survey.id && this.props.asset.deployed_version_id === null
 
@@ -401,7 +404,9 @@ class AssetActionButtons extends React.Component<AssetActionButtonsProps, AssetA
     }
 
     const assetType = this.props.asset.asset_type
-    const userCanEdit = userCan('change_asset', this.props.asset)
+    // OpenClinica fork: bypass kobo per-asset edit permission.
+    // const userCanEdit = userCan('change_asset', this.props.asset)
+    const userCanEdit = true
     const hasDetailsEditable = assetType === ASSET_TYPES.template.id || assetType === ASSET_TYPES.collection.id
     const isCollection = assetType === ASSET_TYPES.collection.id
 

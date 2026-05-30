@@ -585,7 +585,7 @@ export default class ProjectExportsCreator extends React.Component<
           <label className='project-downloads__column-row'>
             <bem.ProjectDownloads__title>
               {firstPart}
-              <em>{t('Select Many')}</em>
+              <em>{t('Select Multiple')}</em>
               {nextPart}
             </bem.ProjectDownloads__title>
 

@@ -52,8 +52,8 @@ export default function AssetNavigatorCard(props: AssetNavigatorCardProps) {
             </ol>
           )}
 
-          {/* Expanded details: tags */}
-          {props.isExpanded && tags.length > 0 && (
+          {/* Tags (always shown - OpenClinica fork) */}
+          {tags.length > 0 && (
             <Group gap={4} mt={4}>
               {tags.map((tag: string) => (
                 <Pill key={tag} size='sm'>

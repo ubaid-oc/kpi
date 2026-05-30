@@ -11,16 +11,13 @@ bem.GitRev__item = makeBem(bem.GitRev, 'item', 'div')
  * things.
  */
 export default function GitRev() {
-  if (
-    'git_rev' in sessionStore.currentAccount &&
-    sessionStore.currentAccount.git_rev !== false &&
-    sessionStore.currentAccount.git_rev.branch &&
-    sessionStore.currentAccount.git_rev.short
-  ) {
+  if ('git_rev' in sessionStore.currentAccount && sessionStore.currentAccount.git_rev !== false) {
+    const gitRev = sessionStore.currentAccount.git_rev
     return (
       <bem.GitRev>
-        <bem.GitRev__item>branch: {sessionStore.currentAccount.git_rev.branch}</bem.GitRev__item>
-        <bem.GitRev__item>commit: {sessionStore.currentAccount.git_rev.short}</bem.GitRev__item>
+        {!!gitRev.branch && <bem.GitRev__item>branch: {gitRev.branch}</bem.GitRev__item>}
+        {!!gitRev.short && <bem.GitRev__item>commit: {gitRev.short}</bem.GitRev__item>}
+        {!!gitRev.tag && <bem.GitRev__item>tag: {gitRev.tag}</bem.GitRev__item>}
       </bem.GitRev>
     )
   }

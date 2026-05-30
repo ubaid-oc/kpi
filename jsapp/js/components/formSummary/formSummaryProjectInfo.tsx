@@ -127,7 +127,7 @@ export default function FormSummaryProjectInfo(props: FormSummaryProjectInfoProp
             {/* countries */}
             {metadata.country && (
               <bem.FormView__cell m='padding'>
-                <bem.FormView__label>{metadata.country?.label ?? t('Countries')}</bem.FormView__label>
+                <bem.FormView__label>{metadata.country?.label ?? t('Form country')}</bem.FormView__label>
                 {getCountryDisplayString(props.asset)}
               </bem.FormView__cell>
             )}

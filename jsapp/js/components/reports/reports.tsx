@@ -607,7 +607,7 @@ export default function Reports(props: ReportsProps) {
   }
 
   return (
-    <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+    <DocumentTitle title={`${docTitle} | OpenClinica`}>
       <bem.FormView m={formViewModifiers}>
         <bem.ReportView>
           <h1>{t('Reports')}</h1>

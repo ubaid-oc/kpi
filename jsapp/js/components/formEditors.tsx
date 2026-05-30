@@ -1,6 +1,7 @@
 import React from 'react'
 import { type WithRouterProps, withRouter } from '#/router/legacy'
 import { ROUTES } from '#/router/routerConstants'
+import { ASSET_TYPES, type AssetTypeName } from '#/constants'
 import EditableForm from '../editorMixins/EditableForm'
 
 /**
@@ -32,10 +33,31 @@ class LibraryAssetEditorComponent extends React.Component<WithRouterProps & { pa
       parentAssetUid = this.props.params.uid
     }
 
+    // OC fork: the dedicated "Create Template" routes mark the new asset's
+    // type as `template` so EditableForm sends `asset_type: template` on
+    // create (otherwise it falls through to `block`).
+    let desiredAssetType: AssetTypeName | undefined
+    if (
+      this.props.router.path === ROUTES.NEW_LIBRARY_TEMPLATE_ITEM ||
+      this.props.router.path === ROUTES.NEW_LIBRARY_TEMPLATE_ITEM_CHILD
+    ) {
+      desiredAssetType = ASSET_TYPES.template.id
+    }
+    if (this.props.router.path === ROUTES.NEW_LIBRARY_TEMPLATE_ITEM_CHILD) {
+      parentAssetUid = this.props.params.uid
+    }
+
+    // OC fork UX override: creating a child asset (incl. the template-child
+    // route) returns to the top-level library rather than the parent
+    // collection. Upstream reverted this to LIBRARY_ITEM.
     let backRoute: string | null = ROUTES.LIBRARY
-    if (this.props.router.path === ROUTES.NEW_LIBRARY_CHILD && this.props.params.uid) {
-      backRoute = ROUTES.LIBRARY_ITEM.replace(':uid', this.props.params.uid)
-    } else if (this.props.router.searchParams.get('back')) {
+    if (
+      this.props.router.path === ROUTES.NEW_LIBRARY_CHILD ||
+      this.props.router.path === ROUTES.NEW_LIBRARY_TEMPLATE_ITEM_CHILD
+    ) {
+      backRoute = ROUTES.LIBRARY
+    }
+    if (this.props.router.searchParams.get('back')) {
       backRoute = this.props.router.searchParams.get('back')
     }
 
@@ -46,6 +68,7 @@ class LibraryAssetEditorComponent extends React.Component<WithRouterProps & { pa
         assetUid={this.props.params.uid}
         backRoute={backRoute}
         parentAssetUid={parentAssetUid}
+        desiredAssetType={desiredAssetType}
       />
     )
   }

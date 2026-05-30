@@ -9,6 +9,7 @@
  * TODO: reconsile differences in the mantine config at `theme/kobo/index.ts`.
  */
 import 'jquery-ui/ui/widgets/sortable'
+import 'jquery-ui/ui/widgets/resizable'
 import '@mantine/core/styles.css'
 // We import all the weights and styles we actually use here to avoid unnecessary weight (pun intended).
 import '@fontsource/roboto/400.css'
@@ -29,7 +30,15 @@ import moment from 'moment'
 import { Cookies } from 'react-cookie'
 import { createRoot } from 'react-dom/client'
 import Modal from 'react-modal'
+import {
+  addCustomEventListener,
+  checkCrossStorageTimeOut,
+  checkCrossStorageUser,
+  setPeriodicCrossStorageCheck,
+  updateCrossStorageTimeOut,
+} from '#/ocutils'
 import AllRoutes from '#/router/allRoutes'
+import sessionStore from '#/stores/session'
 import { csrfSafeMethod, currentLang } from '#/utils'
 import RegistrationPasswordApp from './registrationPasswordApp'
 
@@ -83,16 +92,66 @@ $.ajaxSetup({
     try {
       // Need to support old token (64 characters - prior to Django 4.1)
       // and new token (32 characters).
-      csrfToken = document.cookie.match(/csrftoken=(\w{32,64})/)[1]
+      csrfToken = document.cookie.match(/occsrftoken_v2=(\w{32,64})/)[1]
     } catch (err) {
       console.error('Cookie not matched')
     }
     if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
       const cookies = new Cookies()
-      xhr.setRequestHeader('X-CSRFToken', csrfToken || cookies.get('csrftoken'))
+      xhr.setRequestHeader('X-CSRFToken', csrfToken || cookies.get('occsrftoken_v2'))
     }
   },
 })
+
+// OpenClinica fork: continuous cross-tab SSO session enforcement.
+// Verifies the SSO user still matches and the shared idle-timeout has not
+// expired, then (for interactions) bumps the timeout. Logs out via the new
+// sessionStore.logOut() API when the user changed or the session expired.
+async function crossStorageCheck() {
+  const currentUserName = sessionStore.currentAccount.username
+  if (currentUserName !== '') {
+    const crossStorageUserName = currentUserName.slice(0, currentUserName.lastIndexOf('+'))
+    try {
+      await checkCrossStorageUser(crossStorageUserName)
+      await checkCrossStorageTimeOut()
+    } catch (err) {
+      if (err === 'logout' || err === 'user-changed') {
+        sessionStore.logOut()
+      }
+    }
+  }
+}
+
+async function crossStorageCheckAndUpdate() {
+  const currentUserName = sessionStore.currentAccount.username
+  if (currentUserName !== '') {
+    const crossStorageUserName = currentUserName.slice(0, currentUserName.lastIndexOf('+'))
+    try {
+      await checkCrossStorageUser(crossStorageUserName)
+      await checkCrossStorageTimeOut()
+      await updateCrossStorageTimeOut()
+    } catch (err) {
+      if (err === 'logout' || err === 'user-changed') {
+        sessionStore.logOut()
+      }
+    }
+  }
+}
+
+;[
+  { element: 'button', event: 'click' },
+  { element: '.btn', event: 'click' },
+  { element: '.questiontypelist__item', event: 'click' },
+  { element: '.group__header__buttons__button', event: 'click' },
+  { element: '.card__settings', event: 'click' },
+  { element: 'body', event: 'keydown' },
+].forEach((elementEvent) => {
+  addCustomEventListener(elementEvent.element, elementEvent.event, () => {
+    crossStorageCheckAndUpdate()
+  })
+})
+
+setPeriodicCrossStorageCheck(crossStorageCheck)
 
 if (document.head.querySelector('meta[name=kpi-root-path]')) {
   // Create the element for rendering the app into

@@ -3,8 +3,6 @@ import { NavLink } from 'react-router-dom'
 import bem from '#/bem'
 import Button from '#/components/common/ButtonNew'
 import LibrarySidebar from '#/components/library/librarySidebar'
-import HelpBubble from '#/components/support/helpBubble'
-import envStore from '#/envStore'
 import pageState from '#/pageState.store'
 import RequireAuth from '#/router/requireAuth'
 import { PROJECTS_ROUTES, ROUTES } from '#/router/routerConstants'
@@ -21,8 +19,7 @@ const AccountSidebar = lazy(() => import('#/account/accountSidebar'))
  * - the leftmost narrow sidebar:
  *   - "Projects" button
  *   - "Library" button
- *   - Github link button
- *   - `HelpBubble` trigger button
+ *   - OpenClinica Form Designer help link (not on Library route)
  * - the wider contextual sidebar, showing "new" button and one of these based on current route:
  *   - list of toggleable Deployed/Draft/Archived projects - when viewing project(s) related routes
  *   - "My Library" and "Public Collections" - when viewing library related routes
@@ -43,9 +40,6 @@ export default function Drawer() {
   if (!sessionStore.isLoggedIn || 'email' in sessionStore.currentAccount === false) {
     return null
   }
-  const username = sessionStore.currentAccount.username
-  const userFullName = sessionStore.currentAccount.extra_details.name ?? ''
-  const userUid = sessionStore.currentAccount.extra_details__uid
 
   return (
     <bem.KDrawer>
@@ -89,11 +83,14 @@ export default function Drawer() {
       </bem.KDrawer__sidebar>
 
       <bem.KDrawer__secondaryIcons>
-        {sessionStore.isLoggedIn && <HelpBubble username={username} userFullName={userFullName} userUid={userUid} />}
-
-        {envStore.isReady && envStore.data.source_code_url && (
-          <a href={envStore.data.source_code_url} className='k-drawer__link' target='_blank' data-tip={t('Source')}>
-            <Icon name='logo-github' />
+        {sessionStore.currentAccount && !isLibrary && (
+          <a
+            href='https://docs.openclinica.com/oc4/design-study/form-designer'
+            className='k-drawer__link'
+            target='_blank'
+            data-tip={t('Learn more about Form Designer')}
+          >
+            <Icon name='help' />
           </a>
         )}
       </bem.KDrawer__secondaryIcons>

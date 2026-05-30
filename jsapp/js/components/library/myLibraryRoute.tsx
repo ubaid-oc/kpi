@@ -5,24 +5,42 @@ import type { DragEvent } from 'react'
 import DocumentTitle from 'react-document-title'
 import Dropzone from 'react-dropzone'
 import type { FileWithPreview } from 'react-dropzone'
-import bem from '#/bem'
+import Select from 'react-select'
+import bem, { makeBem } from '#/bem'
 import AssetsTable from '#/components/assetsTable/assetsTable'
 import { AssetsTableContextName } from '#/components/assetsTable/assetsTableConstants'
 import { ROOT_BREADCRUMBS } from '#/components/library/libraryConstants'
-import { MODAL_TYPES } from '#/constants'
+import { AssetTypeName, MODAL_TYPES } from '#/constants'
 import mixins from '#/mixins'
 import pageState from '#/pageState.store'
 import type { OrderDirection } from '#/projects/projectViews/constants'
 import { validFileTypes } from '#/utils'
+import libraryTypeFilterStore from './libraryTypeFilterStore'
 import myLibraryStore from './myLibraryStore'
 import type { MyLibraryStoreData } from './myLibraryStore'
+import ownedCollectionsStore from './ownedCollectionsStore'
+import './myLibrary.scss'
 
-export default class MyLibraryRoute extends React.Component<{}, MyLibraryStoreData> {
+bem.LibraryActions = makeBem(null, 'library-actions')
+bem.LibraryActionsButtons = makeBem(null, 'library-actions-buttons')
+bem.LibraryActionsButtons__button = makeBem(bem.LibraryActionsButtons, 'button', 'a')
+bem.LibraryTypeFilter = makeBem(null, 'library-type-filter')
+
+const LIBRARY_MANAGEMENT_SUPPORT_URL = 'https://docs.openclinica.com/oc4/help-index/form-designer/library-management/'
+
+// OpenClinica: fork state added on top of the upstream MyLibraryStoreData.
+type MyLibraryRouteState = MyLibraryStoreData & {
+  showAllTags: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  typeFilterVal: any
+}
+
+export default class MyLibraryRoute extends React.Component<{}, MyLibraryRouteState> {
   private unlisteners: Function[] = []
 
   state = this.getFreshState()
 
-  getFreshState(): MyLibraryStoreData {
+  getFreshState(): MyLibraryRouteState {
     return {
       isFetchingData: myLibraryStore.data.isFetchingData,
       assets: myLibraryStore.data.assets,
@@ -35,11 +53,14 @@ export default class MyLibraryRoute extends React.Component<{}, MyLibraryStoreDa
       filterValue: myLibraryStore.data.filterValue,
       currentPage: myLibraryStore.data.currentPage,
       totalPages: myLibraryStore.data.totalPages,
+      showAllTags: false,
+      typeFilterVal: libraryTypeFilterStore.getFilterType(),
     }
   }
 
   componentDidMount() {
     this.unlisteners.push(myLibraryStore.listen(this.myLibraryStoreChanged.bind(this), this))
+    this.unlisteners.push(ownedCollectionsStore.listen(this.myLibraryStoreChanged.bind(this), this))
   }
 
   componentWillUnmount() {
@@ -62,6 +83,18 @@ export default class MyLibraryRoute extends React.Component<{}, MyLibraryStoreDa
 
   onAssetsTableSwitchPage(pageNumber: number) {
     myLibraryStore.setCurrentPage(pageNumber)
+  }
+
+  clickShowAllTagsToggle() {
+    this.setState((prevState) => ({ showAllTags: !prevState.showAllTags }))
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onTypeFilterChange(evt: any) {
+    if (evt.value !== this.state.typeFilterVal) {
+      this.setState({ typeFilterVal: evt })
+      libraryTypeFilterStore.setFilterType(evt)
+    }
   }
 
   /**
@@ -98,8 +131,15 @@ export default class MyLibraryRoute extends React.Component<{}, MyLibraryStoreDa
       )
     }
 
+    const TYPE_FILTER_OPTIONS = [
+      { value: 'all', label: t('Show All') },
+      { value: AssetTypeName.question, label: t('Question') },
+      { value: AssetTypeName.block, label: t('Block') },
+      { value: AssetTypeName.template, label: t('Template') },
+    ]
+
     return (
-      <DocumentTitle title={`${t('My Library')} | KoboToolbox`}>
+      <DocumentTitle title={`${t('Library')} | OpenClinica`}>
         <Dropzone
           onDrop={this.onFileDrop.bind(this)}
           disableClick
@@ -108,8 +148,53 @@ export default class MyLibraryRoute extends React.Component<{}, MyLibraryStoreDa
           activeClassName='dropzone--active'
           accept={validFileTypes()}
         >
+          <bem.LibraryActions>
+            <bem.LibraryActionsButtons
+              m={{
+                'display-all-tags': this.state.showAllTags,
+              }}
+            >
+              <bem.LibraryActionsButtons__button
+                m='library-help-link'
+                href={LIBRARY_MANAGEMENT_SUPPORT_URL}
+                target='_blank'
+                data-tip={t('Learn more about Library Management')}
+              >
+                <i className='k-icon k-icon-help' />
+              </bem.LibraryActionsButtons__button>
+              <bem.LibraryActionsButtons__button
+                m='all-tags-toggle'
+                onClick={this.clickShowAllTagsToggle.bind(this)}
+                data-tip={this.state.showAllTags ? t('Hide all labels') : t('Show all labels')}
+              >
+                <i className='k--icon k-icon-tag' />
+              </bem.LibraryActionsButtons__button>
+            </bem.LibraryActionsButtons>
+            <bem.LibraryTypeFilter>
+              {t('Filter by type:')}
+              &nbsp;
+              <Select
+                className='kobo-select'
+                classNamePrefix='kobo-select'
+                value={this.state.typeFilterVal}
+                isClearable={false}
+                isSearchable={false}
+                options={TYPE_FILTER_OPTIONS}
+                onChange={this.onTypeFilterChange.bind(this)}
+              />
+            </bem.LibraryTypeFilter>
+          </bem.LibraryActions>
+
           <bem.Breadcrumbs m='gray-wrapper'>
             <bem.Breadcrumbs__crumb>{ROOT_BREADCRUMBS.MY_LIBRARY.label}</bem.Breadcrumbs__crumb>
+            {myLibraryStore.getCollectionUid() && (
+              <React.Fragment>
+                <i className='k-icon k-icon-angle-right' />
+                <bem.Breadcrumbs__crumb>
+                  {myLibraryStore.getCollectionData()?.name || t('Collection')}
+                </bem.Breadcrumbs__crumb>
+              </React.Fragment>
+            )}
           </bem.Breadcrumbs>
 
           <AssetsTable
@@ -128,6 +213,7 @@ export default class MyLibraryRoute extends React.Component<{}, MyLibraryStoreDa
             totalPages={typeof this.state.totalPages === 'number' ? this.state.totalPages : undefined}
             onSwitchPage={this.onAssetsTableSwitchPage.bind(this)}
             emptyMessage={contextualEmptyMessage}
+            showAllTags={this.state.showAllTags}
           />
 
           <div className='dropzone-active-overlay'>

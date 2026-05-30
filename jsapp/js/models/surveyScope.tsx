@@ -123,6 +123,142 @@ class SurveyScope {
       groupId: data.groupId,
     })
   }
+
+  // OpenClinica customization (Form Builder): build the unnullified flat survey
+  // content once so it can be reused for library/clone operations.
+  getUnnullifiedContent(assetContent: AssetContent): FlatSurvey {
+    const surv = this.survey.toFlatJSON()
+    /*
+     * Apply translations "hack" again for saving single questions to library
+     * Since `unnullifyTranslations` requires the whole survey, we need to
+     * fish out the saved row and its translation settings out of the unnullified return
+     */
+    return JSON.parse(unnullifyTranslations(JSON.stringify(surv), assetContent))
+  }
+
+  // OpenClinica customization (Form Builder): given a set of already-sliced
+  // survey contents, return the matching choices (for select_one/select_multiple).
+  getContentChoices(unnullifiedContent: FlatSurvey, contents: FlatRow[]): FlatChoice[] {
+    let contentChoices: FlatChoice[] = []
+    if (contents.length > 0) {
+      const contents_kuids = map(contents, '$kuid')
+      const selectSurveyContents = unnullifiedContent.survey.filter(
+        (content) =>
+          (content.type === QUESTION_TYPES.select_one.id || content.type === QUESTION_TYPES.select_multiple.id) &&
+          contents_kuids.indexOf(content['$kuid']) > -1,
+      )
+      if (selectSurveyContents.length > 0) {
+        const selectListNames = map(selectSurveyContents, CHOICE_LISTS.SELECT)
+        contentChoices =
+          unnullifiedContent.choices?.filter((choice) => selectListNames.indexOf(choice.list_name) > -1) || []
+      }
+    }
+    return contentChoices
+  }
+
+  // OpenClinica customization (Form Builder): bulk-add the multi-selected rows
+  // and/or groups to the library as a single 'block' asset. Caller:
+  // jsapp/xlform/src/view.surveyApp.coffee:884 (addSelectedRowsToLibrary).
+  add_rows_to_question_library(rows: Array<Row | Group>, assetContent: AssetContent) {
+    let contents: FlatRow[] = []
+    const unnullifiedContent = this.getUnnullifiedContent(assetContent)
+    const settingsObj = unnullifiedContent.settings
+    const surveyObj = unnullifiedContent.survey
+
+    if (!isEmpty(rows)) {
+      for (const row of rows) {
+        const rowKuid = row.toJSON2().$kuid
+        if ((row.constructor as typeof BaseRow).kls === 'Row') {
+          // regular question
+          const row_content = surveyObj.find((content) => content['$kuid'] === rowKuid)
+          if (row_content && !isEmpty(row_content)) {
+            contents.push(row_content)
+          }
+        } else {
+          // group
+          const startGroupIndexFound = findIndex(surveyObj, (content) => content['$kuid'] === rowKuid)
+          if (startGroupIndexFound > -1) {
+            const endGroupIndexFound = findIndex(surveyObj, (content) => content['$kuid'] === '/' + rowKuid)
+            const group_contents = surveyObj.slice(startGroupIndexFound, endGroupIndexFound + 1)
+            contents = contents.concat(group_contents)
+          }
+        }
+      }
+    }
+
+    const content = JSON.stringify({
+      survey: contents,
+      choices: this.getContentChoices(unnullifiedContent, contents),
+      settings: settingsObj,
+    })
+
+    actions.resources.createResource
+      .triggerAsync({
+        asset_type: ASSET_TYPES.block.id,
+        content: content,
+      })
+      .then(() => {
+        notify(t('selected questions or groups has been added to the library as a block'))
+      })
+  }
+
+  // OpenClinica customization (Form Builder): clone an entire group (including
+  // nested groups + their choices) inline into the open survey. Caller chain:
+  // view.row.coffee:657 clone() -> handleCloneGroup -> actions.survey.addItemAtPosition
+  // -> surveyCompanionStore.addItemAtPosition -> survey.insertSurvey.
+  handleCloneGroup(data: { position: number; itemDict: Group; assetContent: AssetContent; groupId?: string }) {
+    const { position, groupId, itemDict, assetContent } = data
+    let contents: FlatRow[] = []
+
+    const unnullifiedContent = this.getUnnullifiedContent(assetContent)
+    const surveyObj = unnullifiedContent.survey
+    const settingsObj = unnullifiedContent.settings
+    const groupKuid = itemDict.toJSON2().$kuid
+    const groupName = itemDict.toJSON2().name
+
+    if (!isEmpty(surveyObj)) {
+      const startGroupIndexFound = findIndex(
+        surveyObj,
+        (surveyObjItem) => surveyObjItem['$kuid'] === groupKuid && surveyObjItem['name'] === groupName,
+      )
+
+      if (startGroupIndexFound > -1) {
+        const endGroups: number[] = []
+        for (let i = startGroupIndexFound; i < surveyObj.length; i++) {
+          const surveyObjRow = surveyObj[i]
+          if (surveyObjRow['$kuid'] === '/' + groupKuid) {
+            endGroups.push(i)
+          }
+        }
+
+        if (endGroups.length > 0) {
+          for (let i = 0; i < endGroups.length; i++) {
+            const endGroupSurveyObjIndex = endGroups[i]
+            const slicedSurveyObj = surveyObj.slice(startGroupIndexFound, endGroupSurveyObjIndex + 1)
+            const startGroupCount = slicedSurveyObj.filter((obj) => obj['type'] === 'begin_group').length
+            const endGroupCount = slicedSurveyObj.filter((obj) => obj['type'] === 'end_group').length
+            if (startGroupCount === endGroupCount) {
+              contents = slicedSurveyObj
+              break
+            }
+          }
+        }
+      }
+    }
+
+    const content = {
+      survey: contents,
+      choices: this.getContentChoices(unnullifiedContent, contents),
+      settings: settingsObj,
+    }
+
+    actions.survey.addItemAtPosition({
+      position: position,
+      survey: this.survey,
+      itemDict: content,
+      groupId: groupId,
+    })
+  }
 }
 
 export default SurveyScope

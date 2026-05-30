@@ -72,7 +72,7 @@ class FormSummary extends React.Component {
         {userCan('change_asset', this.state) && (
           <button onClick={this.sharingModal}>
             <i className='k-icon k-icon-user-share' />
-            {t('Share project')}
+            {t('Share form')}
             <Icon name='angle-right' size='s' />
           </button>
         )}
@@ -182,7 +182,7 @@ class FormSummary extends React.Component {
     const docTitle = this.state.name || t('Untitled')
 
     return (
-      <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+      <DocumentTitle title={`${docTitle} | OpenClinica`}>
         <bem.FormView m='summary'>
           <LimitNotifications />
           <bem.FormView__row m='panels'>

@@ -71,7 +71,7 @@ export const AssetTagsForm = observer(
         <bem.FormModal__form className='project-settings'>
           <bem.FormModal__item m='wrapper' disabled={this.state.isPending}>
             <bem.FormModal__item>
-              <KoboTagsInput tags={this.state.tags} onChange={this.onTagsChange} />
+              <KoboTagsInput tags={this.state.tags} onChange={this.onTagsChange} placeholder={t('Add label(s)')} />
             </bem.FormModal__item>
           </bem.FormModal__item>
 

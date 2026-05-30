@@ -14,7 +14,7 @@ import LoadingSpinner from '#/components/common/loadingSpinner'
 import TextBox from '#/components/common/textBox'
 import WrappedSelect from '#/components/common/wrappedSelect'
 import managedCollectionsStore from '#/components/library/managedCollectionsStore'
-import { ASSET_TYPES } from '#/constants'
+import { ASSET_TYPES, MODAL_TYPES } from '#/constants'
 import envStore from '#/envStore'
 import mixins from '#/mixins'
 import pageState from '#/pageState.store'
@@ -22,6 +22,7 @@ import { withRouter } from '#/router/legacy'
 import sessionStore from '#/stores/session'
 import { notify } from '#/utils'
 import { renderBackButton } from './modalHelpers'
+import './libraryAssetForm.scss'
 
 /**
  * Modal for creating or updating library asset (collection or template)
@@ -103,9 +104,7 @@ export class LibraryAssetFormComponent extends React.Component {
       t('##type## ##name## created').replace('##type##', this.getFormAssetType()).replace('##name##', response.name),
     )
     pageState.hideModal()
-    if (this.getFormAssetType() === ASSET_TYPES.collection.id) {
-      this.props.router.navigate(`/library/asset/${response.uid}`)
-    } else if (this.getFormAssetType() === ASSET_TYPES.template.id) {
+    if (this.getFormAssetType() === ASSET_TYPES.template.id) {
       this.props.router.navigate(`/library/asset/${response.uid}/edit`)
     }
   }
@@ -187,8 +186,20 @@ export class LibraryAssetFormComponent extends React.Component {
     return this.props.asset ? this.props.asset.asset_type : this.props.assetType
   }
 
+  getNameTitle() {
+    let nameTitle = t('Please enter the name of your new Collection.')
+    if (this.props.formType === MODAL_TYPES.LIBRARY_COLLECTION_CREATE) {
+      nameTitle = t('Please enter the name of your new Collection. Collections can help you better organize your library.')
+    }
+    return nameTitle
+  }
+
+  isCollection() {
+    return this.getFormAssetType() === ASSET_TYPES.collection.id
+  }
+
   isSubmitEnabled() {
-    return !this.state.isPending
+    return !this.state.isPending && this.state.fields.name.trim() !== ''
   }
 
   getSubmitButtonLabel() {
@@ -214,65 +225,75 @@ export class LibraryAssetFormComponent extends React.Component {
     const COUNTRIES = envStore.data.country_choices
 
     return (
-      <bem.FormModal__form className='project-settings'>
+      <bem.FormModal__form className='library-asset-form'>
         <bem.FormModal__item m='wrapper' disabled={this.state.isPending}>
           <bem.FormModal__item>
             <TextBox
               value={this.state.fields.name}
               onChange={this.onNameChange.bind(this)}
-              label={t('Name')}
+              label={this.getNameTitle()}
               placeholder={t('Enter title of ##type## here').replace('##type##', this.getFormAssetType())}
             />
           </bem.FormModal__item>
 
-          <bem.FormModal__item>
-            <TextBox
-              type='text-multiline'
-              value={this.state.fields.description}
-              onChange={this.onDescriptionChange.bind(this)}
-              label={t('Description')}
-              placeholder={t('Enter short description here')}
-            />
-          </bem.FormModal__item>
+          {!this.isCollection() && (
+            <bem.FormModal__item>
+              <TextBox
+                type='text-multiline'
+                value={this.state.fields.description}
+                onChange={this.onDescriptionChange.bind(this)}
+                label={t('Description')}
+                placeholder={t('Enter short description here')}
+              />
+            </bem.FormModal__item>
+          )}
 
-          <bem.FormModal__item>
-            <TextBox
-              value={this.state.fields.organization}
-              onChange={this.onAnyFieldChange.bind(this, 'organization')}
-              label={t('Organization')}
-            />
-          </bem.FormModal__item>
+          {!this.isCollection() && (
+            <bem.FormModal__item>
+              <TextBox
+                value={this.state.fields.organization}
+                onChange={this.onAnyFieldChange.bind(this, 'organization')}
+                label={t('Organization')}
+              />
+            </bem.FormModal__item>
+          )}
 
-          <bem.FormModal__item>
-            <WrappedSelect
-              label={t('Primary Sector')}
-              value={this.state.fields.sector}
-              onChange={this.onAnyFieldChange.bind(this, 'sector')}
-              options={SECTORS}
-              isLimitedHeight
-              isClearable
-            />
-          </bem.FormModal__item>
+          {!this.isCollection() && (
+            <bem.FormModal__item>
+              <WrappedSelect
+                label={t('Primary Sector')}
+                value={this.state.fields.sector}
+                onChange={this.onAnyFieldChange.bind(this, 'sector')}
+                options={SECTORS}
+                isLimitedHeight
+                isClearable
+              />
+            </bem.FormModal__item>
+          )}
 
-          <bem.FormModal__item>
-            <WrappedSelect
-              label={t('Country')}
-              isMulti
-              value={this.state.fields.country}
-              onChange={this.onAnyFieldChange.bind(this, 'country')}
-              options={COUNTRIES}
-              isLimitedHeight
-              isClearable
-            />
-          </bem.FormModal__item>
+          {!this.isCollection() && (
+            <bem.FormModal__item>
+              <WrappedSelect
+                label={t('Country')}
+                isMulti
+                value={this.state.fields.country}
+                onChange={this.onAnyFieldChange.bind(this, 'country')}
+                options={COUNTRIES}
+                isLimitedHeight
+                isClearable
+              />
+            </bem.FormModal__item>
+          )}
 
-          <bem.FormModal__item>
-            <KoboTagsInput
-              tags={this.state.fields.tags}
-              onChange={this.onAnyFieldChange.bind(this, 'tags')}
-              label={t('Tags')}
-            />
-          </bem.FormModal__item>
+          {!this.isCollection() && (
+            <bem.FormModal__item>
+              <KoboTagsInput
+                tags={this.state.fields.tags}
+                onChange={this.onAnyFieldChange.bind(this, 'tags')}
+                label={t('Tags')}
+              />
+            </bem.FormModal__item>
+          )}
         </bem.FormModal__item>
 
         <bem.Modal__footer>

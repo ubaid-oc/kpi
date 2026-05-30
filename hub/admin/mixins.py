@@ -3,7 +3,6 @@ from django.contrib import messages
 from kpi.exceptions import (
     QueryParserBadSyntax,
     QueryParserNotSupportedFieldLookup,
-    SearchQueryTooShortException,
 )
 from kpi.filters import SearchFilter
 
@@ -26,7 +25,6 @@ class AdvancedSearchMixin:
         except (
             QueryParserBadSyntax,
             QueryParserNotSupportedFieldLookup,
-            SearchQueryTooShortException,
         ) as e:
             self.message_user(
                 request,

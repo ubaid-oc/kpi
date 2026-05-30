@@ -153,6 +153,13 @@ bem.FormSidebar = makeBem(null, 'form-sidebar')
 bem.FormSidebar__label = makeBem(bem.FormSidebar, 'label')
 bem.FormSidebar__labelText = makeBem(bem.FormSidebar, 'label-text')
 bem.FormSidebar__labelCount = makeBem(bem.FormSidebar, 'label-count')
+// OpenClinica fork: sidebar collection list elements used by librarySidebar.tsx
+// (owned-collections list with per-collection filter/rename/delete). scss classes
+// `form-sidebar__grouping`, `form-sidebar__item`, `form-sidebar__itemlink` live in
+// jsapp/js/components/library/librarySidebar.scss.
+bem.FormSidebar__grouping = makeBem(bem.FormSidebar, 'grouping')
+bem.FormSidebar__item = makeBem(bem.FormSidebar, 'item')
+bem.FormSidebar__itemlink = makeBem(bem.FormSidebar, 'itemlink')
 
 bem.KDrawer = makeBem(null, 'k-drawer')
 bem.KDrawer__primaryIcons = makeBem(bem.KDrawer, 'primary-icons', 'nav')

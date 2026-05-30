@@ -122,7 +122,7 @@ export default class RESTServicesList extends React.Component<RESTServicesListPr
         <bem.EmptyContent>
           <bem.EmptyContent__icon className='k-icon k-icon-data-sync' />
 
-          <bem.EmptyContent__title>{t("This project doesn't have any REST Services yet!")}</bem.EmptyContent__title>
+          <bem.EmptyContent__title>{t("This form doesn't have any REST Services yet!")}</bem.EmptyContent__title>
 
           <bem.EmptyContent__message>
             {t('You can use REST Services to automatically post submissions to a third-party application.')}

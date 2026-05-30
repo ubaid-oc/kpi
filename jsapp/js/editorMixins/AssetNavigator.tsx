@@ -1,14 +1,11 @@
-import { Center, Checkbox, Group, Loader, MultiSelect, Select, Stack, Text, TextInput } from '@mantine/core'
+import { Center, Group, Loader, Stack, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
-import * as Sentry from '@sentry/react'
 import React, { useState, useRef, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import type { Asset } from '#/api/models/asset'
-import type { TagListResponse } from '#/api/models/tagListResponse'
-import { useAssetsList, useTagsList } from '#/api/react-query/manage-projects-and-library-content'
+import { useAssetsList } from '#/api/react-query/manage-projects-and-library-content'
 import Icon from '#/components/common/icon'
 import { COMMON_QUERIES } from '#/constants'
-import type { LabelValuePair } from '#/dataInterface'
 import AssetNavigatorCard from './AssetNavigatorCard'
 
 // A stub types for sortable
@@ -27,47 +24,14 @@ const SORTABLE_ITEM_CLASS_NAME = 'asset-navigator-sortable-item'
 export default function AssetNavigator() {
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearch] = useDebouncedValue(searchQuery, 500)
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [selectedCollection, setSelectedCollection] = useState<string | null>(null)
-  const [isExpanded, setIsExpanded] = useState(false)
+  // OpenClinica fork: library aside panel defaults to expanded (was assetNavExpanded default).
+  const [isExpanded] = useState(true)
 
-  // Step 1. Fetch Tags for the MultiSelect filter
-  // Note: if `limit` is too big (e.g. `9999`) it causes a deadly timeout whenever Form Builder displays the aside
-  // Library search, so we use `100`. We also keep track of users who have over 100 tags (see below).
-  const tagsListQuery = useTagsList({ limit: 100 })
+  // OpenClinica fork: the Tags and Collection filters are intentionally hidden, so the upstream
+  // tags/collections fetch + filter state were removed. The assets list below is filtered only by
+  // the free-text search box (matching the fork's "search + expand only" library panel).
 
-  let tagsOptions: string[] = []
-  if (tagsListQuery.data?.status === 200) {
-    const tagsOptionsRaw = tagsListQuery.data?.data?.results.map((t: TagListResponse) => t.name)
-    // Because tags API has a bug we need to ensure only unique results are returned:
-    // https://linear.app/kobotoolbox/issue/DEV-1576/duplicated-values-in-apiv2tags-endpoint
-    tagsOptions = [...new Set(tagsOptionsRaw)]
-  }
-
-  useEffect(() => {
-    // We want to know if there are any users who have more than 100 tags. If there is `next` page of results, it
-    // means we have more than 100 (the `limit` above)
-    if (tagsListQuery.data?.status === 200 && typeof tagsListQuery.data?.data.next === 'string') {
-      Sentry.captureMessage('MAX_TAGS_EXCEEDED: Too many tags')
-    }
-  }, [tagsListQuery.data])
-
-  // Step 2. Fetch Collections for the Select filter
-  const collectionListQuery = useAssetsList({
-    q: COMMON_QUERIES.c,
-    // TODO: we only fetch 200 collections, as this is what old code did. Ideally we should handle pagination.
-    limit: 200,
-    ordering: 'name',
-  })
-  let collectionOptions: LabelValuePair[] = []
-  if (collectionListQuery.data?.status === 200 && collectionListQuery.data?.data.results) {
-    collectionOptions = collectionListQuery.data.data.results.map((c: Asset) => ({
-      value: c.uid,
-      label: c.name || t('Unnamed collection'),
-    }))
-  }
-
-  // Step 3. Fetch Main Assets List
+  // Fetch Main Assets List
   function getAssetsListQuery() {
     const queryParts: string[] = []
 
@@ -76,18 +40,7 @@ export default function AssetNavigator() {
       queryParts.push(`(${debouncedSearch})`)
     }
 
-    // Include tags filtering
-    if (selectedTags.length > 0) {
-      // BUG: this doesn't work correctly - it does filter one tag, but if multiple are selected it returns zero values
-      // See: https://linear.app/kobotoolbox/issue/DEV-1581/make-it-possible-to-filter-assets-by-multiple-tags
-      const tagQuery = selectedTags.map((t) => `tags__name__icontains:"${t}"`).join(' AND ')
-      queryParts.push(`(${tagQuery})`)
-    }
-
-    // Include filtering by collection (parent)
-    if (selectedCollection) {
-      queryParts.push(`parent__uid:"${selectedCollection}"`)
-    }
+    // OpenClinica fork: tag/collection filter branches removed along with their (now hidden) controls.
 
     // Ensure we are only getting library items that make sense here (questions, blocks, and templates)
     queryParts.push(COMMON_QUERIES.qbt)
@@ -140,44 +93,17 @@ export default function AssetNavigator() {
         onChange={(event) => setSearchQuery(event.currentTarget.value)}
       />
 
-      {/* Tags filtering */}
-      <MultiSelect
-        data={tagsOptions}
-        value={selectedTags}
-        onChange={setSelectedTags}
-        placeholder='Filter by tags'
-        searchable
-        clearable
-        nothingFoundMessage='No tags found'
-        hidePickedOptions
-        size='md'
-        selectFirstOptionOnChange
-      />
+      {/*
+        OpenClinica fork: the upstream Tags (MultiSelect) and Collection (Select) filters are
+        intentionally omitted here — the library panel must not expose tag-based or
+        collection-based filtering, only free-text search and the (always-on) expanded view.
+      */}
 
-      {/* Collection filtering */}
-      <Select
-        data={collectionOptions}
-        value={selectedCollection}
-        onChange={setSelectedCollection}
-        placeholder='Select collection'
-        searchable
-        clearable
-        size='md'
-        selectFirstOptionOnChange
-      />
-
-      {/* Total count & toggle expanded info */}
-      <Group justify='space-between' align='center'>
+      {/* Total count. OpenClinica fork: 'items found' terminology + no expand-details toggle (always expanded). */}
+      <Group align='center'>
         <Text size='sm' fw={500}>
-          {assetsResponse?.data.results?.length || 0} assets found
+          {assetsResponse?.data.results?.length || 0} items found
         </Text>
-
-        <Checkbox
-          label='Expand details'
-          checked={isExpanded}
-          onChange={(event) => setIsExpanded(event.currentTarget.checked)}
-          size='sm'
-        />
       </Group>
 
       {/* Results */}
@@ -193,7 +119,7 @@ export default function AssetNavigator() {
         </Center>
       ) : assetsResponse?.data.results?.length === 0 ? (
         <Center py='xl'>
-          <Text size='sm'>No assets found</Text>
+          <Text size='sm'>No items found</Text>
         </Center>
       ) : (
         <Stack gap='xs' ref={assetsListRef}>

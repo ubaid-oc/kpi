@@ -881,6 +881,12 @@ export interface AccountResponse {
   date_joined: string
   user_type: string
   /**
+   * OpenClinica fork field. Reflects the customer's `sharedInfra` flag, surfaced
+   * by the `/me` serializer from the session. May be `null`/absent when the
+   * value is not set on the session. Read via `isSharedInfraEnabled()`.
+   */
+  customer_shared_infra?: boolean | null
+  /**
    * Link to a legacy view containing list of projects. No longer used on FE.
    */
   projects_url: string

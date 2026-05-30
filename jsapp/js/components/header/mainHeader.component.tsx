@@ -25,6 +25,9 @@ import {
   isPublicCollectionsRoute,
 } from '#/router/routerUtils'
 import sessionStore from '#/stores/session'
+// OpenClinica fork customization: AccountMenu is intentionally NOT rendered
+// (host shell owns account/logout/language). Import kept for easy re-enable.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import AccountMenu from './accountMenu'
 import GitRev from './gitRev.component'
 import styles from './mainHeader.module.scss'
@@ -109,7 +112,9 @@ const MainHeader = class MainHeader extends React.Component<MainHeaderProps> {
       iconName = getAssetIcon(asset)
     }
 
-    let librarySearchBoxPlaceholder = t('Search My Library')
+    // OpenClinica fork customization: library search placeholder branding
+    // ('Search My Library' -> 'Search Library'). Preserve across upgrades.
+    let librarySearchBoxPlaceholder = t('Search Library')
     if (isPublicCollectionsRoute()) {
       librarySearchBoxPlaceholder = t('Search Public Collections')
     }
@@ -136,7 +141,13 @@ const MainHeader = class MainHeader extends React.Component<MainHeaderProps> {
         {/* Things for My Projects and any Custom View */}
         {isLoggedIn && isAnyProjectsViewRoute() && (
           <div className='mdl-layout__header-searchers'>
-            <SearchBox placeholder={t('Search…')} disabled={this.isSearchBoxDisabled()} />
+            {/*
+              OpenClinica fork customization: forms search placeholder branding
+              ('Search Projects'/'Search…' -> 'Search Forms'). Preserve across
+              upgrades. NOTE: route semantics changed upstream from form-list to
+              projects-view; product should confirm 'Forms' terminology here.
+            */}
+            <SearchBox placeholder={t('Search Forms')} disabled={this.isSearchBoxDisabled()} />
           </div>
         )}
 
@@ -159,7 +170,15 @@ const MainHeader = class MainHeader extends React.Component<MainHeaderProps> {
               <div className={styles.badgeWrapper}>
                 <OrganizationBadge color='dark-gray' />
               </div>
-              <AccountMenu />
+              {/*
+                OpenClinica fork customization: suppress the in-app kpi account
+                menu. OC4 owns account/settings/T&S/language/logout in the
+                study-manager + Keycloak host shell, so kpi must not render its
+                own dropdown. The original fork rendered an empty
+                <bem.AccountBox />; the equivalent today is simply not rendering
+                <AccountMenu />. Preserve across upgrades.
+              */}
+              {/* <AccountMenu /> intentionally not rendered (see comment above). */}
             </div>
           </RequireOrg>
         )}

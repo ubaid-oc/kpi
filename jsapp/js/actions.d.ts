@@ -316,6 +316,20 @@ interface SurveyAddExternalItemCompletedDefinition extends Function {
   listen: (callback: (response: any) => void) => Function
 }
 
+interface SurveyAddItemAtPositionParams {
+  position: number
+  survey: Survey
+  groupId: string | undefined
+  uid?: string
+  itemDict?: any
+}
+interface SurveyAddItemAtPositionDefinition extends Function {
+  (params: SurveyAddItemAtPositionParams): void
+  completed: SurveyAddExternalItemCompletedDefinition
+  failed: GenericFailedDefinition
+  triggerAsync: (params: SurveyAddItemAtPositionParams) => Promise<any>
+}
+
 interface UnsubscribeFromCollectionDefinition extends Function {
   (assetUid: string): void
   listen: (callback: (assetUid: string) => void) => Function
@@ -342,6 +356,7 @@ export declare const actions: {
   }
   survey: {
     addExternalItemAtPosition: SurveyAddExternalItemDefinition
+    addItemAtPosition: SurveyAddItemAtPositionDefinition
   }
   search: object
   resources: {

@@ -33,6 +33,7 @@ actions.auth = Reflux.createActions({
 
 actions.survey = Reflux.createActions({
   addExternalItemAtPosition: { children: ['completed', 'failed'] },
+  addItemAtPosition: { children: ['completed', 'failed'] },
 })
 
 actions.resources = Reflux.createActions({
@@ -120,9 +121,11 @@ actions.resources.createSnapshot.listen((details) => {
 })
 
 actions.resources.updateAsset.listen((uid, values, params = {}) => {
+  window.parent.postMessage('form_saveinprogress', '*')
   dataInterface
     .patchAsset(uid, values)
     .done((asset) => {
+      window.parent.postMessage('form_savecomplete', '*')
       actions.resources.updateAsset.completed(asset)
       if (typeof params.onComplete === 'function') {
         params.onComplete(asset, uid, values)

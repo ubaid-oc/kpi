@@ -163,7 +163,7 @@ class ProjectSettings extends React.Component {
   getBaseTitle() {
     switch (this.props.context) {
       case PROJECT_SETTINGS_CONTEXTS.NEW:
-        return t('Create project')
+        return t('Create form')
       case PROJECT_SETTINGS_CONTEXTS.REPLACE:
         return t('Replace form')
       case PROJECT_SETTINGS_CONTEXTS.EXISTING:
@@ -183,7 +183,7 @@ class ProjectSettings extends React.Component {
       case this.STEPS.IMPORT_URL:
         return t('Import XLSForm')
       case this.STEPS.PROJECT_DETAILS:
-        return t('Project details')
+        return t('Form details')
       default:
         return ''
     }
@@ -498,6 +498,11 @@ class ProjectSettings extends React.Component {
         name: this.state.fields.name,
         settings: this.getSettingsForEndpoint(),
         asset_type: 'survey',
+        content: JSON.stringify({
+          settings: {
+            style: 'pages theme-grid',
+          },
+        }),
       })
       .done((asset) => {
         this.goToFormBuilder(asset.uid)
@@ -854,14 +859,6 @@ class ProjectSettings extends React.Component {
   }
 
   renderStepProjectDetails() {
-    const sectorField = envStore.data.getProjectMetadataField('sector')
-    const sectors = envStore.data.sector_choices
-    const countryField = envStore.data.getProjectMetadataField('country')
-    const countries = envStore.data.country_choices
-    const bothCountryAndSector = sectorField && countryField
-    const operationalPurposeField = envStore.data.getProjectMetadataField('operational_purpose')
-    const operationalPurposes = envStore.data.operational_purpose_choices
-    const collectsPiiField = envStore.data.getProjectMetadataField('collects_pii')
     const descriptionField = envStore.data.getProjectMetadataField('description')
 
     return (
@@ -881,9 +878,9 @@ class ProjectSettings extends React.Component {
             <TextBox
               value={this.state.fields.name}
               onChange={this.onNameChange.bind(this)}
-              errors={this.hasFieldError('name') ? t('Please enter a title for your project!') : false}
+              errors={this.hasFieldError('name') ? t('Please enter a title for your form!') : false}
               label={addRequiredToLabel(this.getNameInputLabel(this.state.fields.name))}
-              placeholder={t('Enter title of project here')}
+              placeholder={t('Enter title of form here')}
             />
           </div>
 
@@ -897,79 +894,6 @@ class ProjectSettings extends React.Component {
                 errors={this.hasFieldError('description') ? t('Please enter a description for your project') : false}
                 label={addRequiredToLabel(descriptionField.label, descriptionField.required)}
                 placeholder={t('Enter short description here')}
-              />
-            </div>
-          )}
-
-          {/* Sector */}
-          {sectorField && (
-            <div className={cx(styles.input, bothCountryAndSector ? styles.sector : null)}>
-              <WrappedSelect
-                label={addRequiredToLabel(sectorField.label, sectorField.required)}
-                value={this.state.fields.sector}
-                onChange={this.onAnyFieldChange.bind(this, 'sector')}
-                options={sectors}
-                isLimitedHeight
-                menuPlacement='top'
-                isClearable
-                error={this.hasFieldError('sector') ? t('Please choose a sector') : false}
-              />
-            </div>
-          )}
-
-          {/* Country */}
-          {countryField && (
-            <div className={cx(styles.input, bothCountryAndSector ? styles.country : null)}>
-              <WrappedSelect
-                label={addRequiredToLabel(countryField.label, countryField.required)}
-                isMulti
-                value={this.state.fields.country}
-                onChange={this.onAnyFieldChange.bind(this, 'country')}
-                options={countries}
-                isLimitedHeight
-                menuPlacement='top'
-                isClearable
-                error={this.hasFieldError('country') ? t('Please select at least one country') : false}
-              />
-            </div>
-          )}
-
-          {/* Operational Purpose of Data */}
-          {operationalPurposeField && (
-            <div className={styles.input}>
-              <WrappedSelect
-                label={addRequiredToLabel(operationalPurposeField.label, operationalPurposeField.required)}
-                value={this.state.fields.operational_purpose}
-                onChange={this.onAnyFieldChange.bind(this, 'operational_purpose')}
-                options={operationalPurposes}
-                isLimitedHeight
-                isClearable
-                error={
-                  this.hasFieldError('operational_purpose')
-                    ? t('Please specify the operational purpose of your project')
-                    : false
-                }
-              />
-            </div>
-          )}
-
-          {/* Does this project collect personally identifiable information? */}
-          {collectsPiiField && (
-            <div className={styles.input}>
-              <WrappedSelect
-                label={addRequiredToLabel(collectsPiiField.label, collectsPiiField.required)}
-                value={this.state.fields.collects_pii}
-                onChange={this.onAnyFieldChange.bind(this, 'collects_pii')}
-                options={[
-                  { value: 'Yes', label: t('Yes') },
-                  { value: 'No', label: t('No') },
-                ]}
-                isClearable
-                error={
-                  this.hasFieldError('collects_pii')
-                    ? t('Please indicate whether or not your project collects personally identifiable information')
-                    : false
-                }
               />
             </div>
           )}
@@ -991,7 +915,7 @@ class ProjectSettings extends React.Component {
                     {this.state.isSubmitPending && t('Please wait…')}
                     {!this.state.isSubmitPending &&
                       this.props.context === PROJECT_SETTINGS_CONTEXTS.NEW &&
-                      t('Create project')}
+                      t('Create form')}
                     {!this.state.isSubmitPending &&
                       this.props.context === PROJECT_SETTINGS_CONTEXTS.REPLACE &&
                       t('Save')}
@@ -1030,16 +954,7 @@ class ProjectSettings extends React.Component {
           {userCan('delete_asset', this.state.formAsset) &&
             this.props.context === PROJECT_SETTINGS_CONTEXTS.EXISTING && (
               <div className={styles.input}>
-                <Button
-                  type='danger'
-                  size='l'
-                  label={
-                    this.state.formAsset.deployment__submission_count > 0
-                      ? t('Delete Project and Data')
-                      : t('Delete Project')
-                  }
-                  onClick={this.deleteProject}
-                />
+                <Button type='danger' size='l' label={t('Delete Form')} onClick={this.deleteProject} />
               </div>
             )}
         </div>

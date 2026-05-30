@@ -14,7 +14,6 @@ import { getRouteAssetUid } from '#/router/routerUtils'
 import AssetBreadcrumbs from './assetBreadcrumbs'
 import AssetContentSummary from './assetContentSummary'
 import AssetInfoBox from './assetInfoBox'
-import AssetPublicButton from './assetPublicButton'
 
 interface AssetRouteProps {
   params: {
@@ -124,7 +123,7 @@ export default class AssetRoute extends React.Component<AssetRouteProps, AssetRo
       this.state.asset.access_types && this.state.asset.access_types.includes(ACCESS_TYPES.subscribed)
 
     return (
-      <DocumentTitle title={`${assetName.final} | KoboToolbox`}>
+      <DocumentTitle title={`${assetName.final} | OpenClinica`}>
         <bem.FormView m='library-asset'>
           <bem.FormView__row>
             <bem.FormView__cell m={['columns', 'columns-right', 'first']}>
@@ -134,8 +133,6 @@ export default class AssetRoute extends React.Component<AssetRouteProps, AssetRo
                   {t('Subscribed')}
                 </bem.FormView__cell>
               )}
-
-              <AssetPublicButton asset={this.state.asset} />
 
               <AssetActionButtons asset={this.state.asset} />
             </bem.FormView__cell>

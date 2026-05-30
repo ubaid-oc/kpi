@@ -80,7 +80,7 @@ test = t('Default response')
 test = t('Repeat')
 test = t('Repeat this group if necessary')
 test = t('Mandatory response')
-test = t('Appearance (advanced)')
+test = t('Appearance')
 test = t('Show all questions in this group on the same screen')
 test = t('Please check your connection and try again.')
 test = t(
@@ -103,7 +103,7 @@ test = t('Manually enter your skip logic in XLSForm code')
 test = t('response value')
 test = t('Are you sure you want to delete this question?')
 test = t('Select One')
-test = t('Select Many')
+test = t('Select Multiple')
 test = t('Unable to deploy')
 
 // legacy strings

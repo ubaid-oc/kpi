@@ -19,6 +19,8 @@ import Alert from '#/components/common/alert'
 import Button from '#/components/common/button'
 import LoadingSpinner from '#/components/common/loadingSpinner'
 import Modal from '#/components/common/modal'
+import TextBox from '#/components/common/textBox'
+import { isEConsentSignatureRow } from '#/components/formBuilder/econsentSignature'
 import {
   type KoboMatrixParserParams,
   getFormBuilderAssetType,
@@ -42,11 +44,13 @@ import {
   type FormStyleDefinition,
   type FormStyleName,
   NAME_MAX_LENGTH,
+  OC_USER_TYPES,
   QuestionTypeName,
   type UpdateStatesValue,
   update_states,
 } from '#/constants'
 import envStore from '#/envStore'
+import sessionStore from '#/stores/session'
 import type { RouterProp } from '#/router/legacy'
 import { ROUTES } from '#/router/routerConstants'
 import dkobo_xlform from '../../xlform/src/_xlform.init'
@@ -73,8 +77,12 @@ bem.CascadePopup = makeBem(null, 'cascade-popup')
 bem.CascadePopup__message = makeBem(bem.CascadePopup, 'message')
 bem.CascadePopup__buttonWrapper = makeBem(bem.CascadePopup, 'buttonWrapper')
 
-const WEBFORM_STYLES_SUPPORT_URL = 'alternative_enketo.html'
 const CHOICE_LIST_SUPPORT_URL = 'cascading_select.html'
+
+// OC fork: OpenClinica Form Designer help docs and a sessionStorage cache for the
+// selected form style.
+const FORM_DESIGNER_SUPPORT_URL = 'https://docs.openclinica.com/oc4/help-index/form-designer/'
+const FORM_STYLE_CACHE_NAME = 'kpi.editable-form.form-style'
 
 const UNSAVED_CHANGES_WARNING = t('You have unsaved changes. Leave form without saving?')
 /** Use usePrompt directly instead for functional components */
@@ -90,6 +98,9 @@ const RECORDING_SUPPORT_URL = 'recording-interviews.html'
 interface LaunchAppData {
   name: string
   settings__style?: FormStyleName
+  // OC fork: round-trip the form id and version number stored in form settings.
+  settings__version?: string
+  settings__form_id?: string
   files: AssetResponseFile[]
   asset_type: AssetTypeName
   asset: AssetResponse
@@ -102,8 +113,13 @@ interface EditableFormButtonStates {
   name?: string
   hasSettings?: boolean
   styleValue?: FormStyleName
+  // OC fork: surface the form id and version values for the "Form information" aside row.
+  versionValue?: string
+  formIdValue?: string
   allButtonsDisabled?: boolean
   saveButtonText?: string
+  // OC fork: text for the header "back" button.
+  backButtonText?: string
 }
 
 interface AsideSettings {
@@ -116,6 +132,9 @@ interface EditableFormProps {
   isNewAsset?: boolean
   backRoute: string | null
   parentAssetUid?: string
+  // OC fork: lets the dedicated "Create Template" routes set `asset_type: template`
+  // on create (otherwise it would fall through to `block`).
+  desiredAssetType?: AssetTypeName
   router: RouterProp
 }
 
@@ -141,6 +160,9 @@ interface EditableFormState extends SurveyStateStoreData {
   name: string
   preventNavigatingOut: boolean
   settings__style?: FormStyleName
+  // OC fork: form id and version number, round-tripped through the form settings.
+  settings__version?: string
+  settings__form_id?: string
   showCascadePopup: boolean
   cascadeLastSelectedRowIndex?: number
   surveyAppRendered: boolean
@@ -162,7 +184,7 @@ export default function EditableForm(props: EditableFormProps) {
     cascadeMessage: undefined,
     cascadeReady: false,
     cascadeTextareaValue: '',
-    desiredAssetType: undefined,
+    desiredAssetType: props.desiredAssetType,
     enketopreviewOverlay: undefined,
     isBackgroundAudioBannerDismissed: false,
     name: '',
@@ -216,12 +238,19 @@ export default function EditableForm(props: EditableFormProps) {
   useEffect(() => {
     if (state.asset) {
       let settingsStyle: FormStyleName | undefined
+      // OC fork: form id and version number live in the form settings alongside `style`.
+      let settingsVersion: string | undefined
+      let settingsFormId: string | undefined
       if (state.asset.content?.settings && !Array.isArray(state.asset.content?.settings)) {
         settingsStyle = state.asset.content.settings.style
+        settingsVersion = state.asset.content.settings.version
+        settingsFormId = state.asset.content.settings.form_id
       }
       launchAppForSurveyContent(state.asset.content, {
         name: state.asset.name,
         settings__style: settingsStyle,
+        settings__version: settingsVersion,
+        settings__form_id: settingsFormId,
         files: state.asset.files,
         asset_type: state.asset.asset_type,
         asset: state.asset,
@@ -239,6 +268,8 @@ export default function EditableForm(props: EditableFormProps) {
     stores.surveyState.listen(onSurveyStateChanged)
 
     return () => {
+      // OC fork: drop the cached form style on unmount.
+      sessionStorage.removeItem(FORM_STYLE_CACHE_NAME)
       unpreventClosingTab()
       cleanupAppForSurveyContent()
     }
@@ -294,6 +325,28 @@ export default function EditableForm(props: EditableFormProps) {
       ...currentState,
       settings__style: settingsStyle,
     }))
+    // OC fork: cache the selected form style so it survives a re-launch.
+    sessionStorage.setItem(FORM_STYLE_CACHE_NAME, settingsStyle ?? '')
+    onSurveyChangeDebounced()
+  }
+
+  // OC fork: form id and version number round-trip through the form settings.
+  // Keep the raw string (even when empty) so that clearing the field persists,
+  // mirroring the fork. The save-time `!== undefined` guard still skips fields
+  // the user never touched (state initializes them as undefined).
+  function onVersionChange(val: string) {
+    setState((currentState) => ({
+      ...currentState,
+      settings__version: val,
+    }))
+    onSurveyChangeDebounced()
+  }
+
+  function onFormIdChange(val: string) {
+    setState((currentState) => ({
+      ...currentState,
+      settings__form_id: val,
+    }))
     onSurveyChangeDebounced()
   }
 
@@ -302,6 +355,8 @@ export default function EditableForm(props: EditableFormProps) {
   }
 
   function onSurveyChange() {
+    // OC fork: notify the host (study-runner iframe) that there are unsaved changes.
+    window.parent.postMessage('form_saveneeded', '*')
     if (!state.asset_updated !== update_states.UNSAVED_CHANGES) {
       preventClosingTab()
     }
@@ -339,6 +394,20 @@ export default function EditableForm(props: EditableFormProps) {
     app?.groupSelectedRows()
   }
 
+  // OC fork: extra toolbar actions. These methods exist on the CoffeeScript SurveyApp
+  // but are not declared in its TS typings, so we reach them via a loose cast.
+  function deleteQuestions() {
+    ;(app as unknown as { deleteSelectedRows?: () => void })?.deleteSelectedRows?.()
+  }
+
+  function duplicateQuestions() {
+    ;(app as unknown as { duplicateSelectedRows?: () => void })?.duplicateSelectedRows?.()
+  }
+
+  function addQuestionsToLibrary() {
+    ;(app as unknown as { addSelectedRowsToLibrary?: () => void })?.addSelectedRowsToLibrary?.()
+  }
+
   function showAll(evt: React.TouchEvent<HTMLButtonElement>) {
     evt.preventDefault()
     evt.currentTarget.blur()
@@ -353,6 +422,30 @@ export default function EditableForm(props: EditableFormProps) {
         state.asset.asset_type === ASSET_TYPES.template.id ||
         state.desiredAssetType === ASSET_TYPES.template.id)
     )
+  }
+
+  // OC fork: OpenClinica hides the upstream Metadata / Details aside sections.
+  function hideMetadata() {
+    return true
+  }
+
+  function hideDetails() {
+    return true
+  }
+
+  // OC fork: account-scoped permission checks for the "Add to Library" toolbar action.
+  // `customer_shared_infra` is being added to the account type by a sibling change;
+  // cast until that lands so this file stays type-clean.
+  function isSharedInfraEnabled() {
+    return (sessionStore.currentAccount as { customer_shared_infra?: boolean }).customer_shared_infra === true
+  }
+
+  function isUserAdmin() {
+    return sessionStore.currentAccount.user_type === OC_USER_TYPES.BUSINESS_ADMIN
+  }
+
+  function canAddToLibrary() {
+    return !isSharedInfraEnabled() || isUserAdmin()
   }
 
   function needsSave() {
@@ -426,6 +519,47 @@ export default function EditableForm(props: EditableFormProps) {
       app.survey.settings.set('style', state.settings__style)
     }
 
+    // OC fork: persist the form id and version number into the form settings.
+    if (state.settings__version !== undefined) {
+      app.survey.settings.set('version', state.settings__version)
+    }
+
+    if (state.settings__form_id !== undefined) {
+      app.survey.settings.set('form_id', state.settings__form_id)
+    }
+
+    // OC fork: eConsent save-time guard. Only one signature item is allowed and it
+    // must have a single response option with value "1".
+    const consentRows = app.survey.rows.filter((row) => isEConsentSignatureRow(row))
+    if (consentRows.length > 0) {
+      if (consentRows.length > 1) {
+        alertify.defaults.theme.ok = 'ajs-cancel'
+        const dialog = alertify.dialog('alert')
+        dialog
+          .set({
+            title: t('Error saving form'),
+            message: t('Consent forms can have only one signature item.'),
+            label: t('Dismiss'),
+          })
+          .show()
+        return
+      } else {
+        const consentRow = consentRows[0] as unknown as { getConsentItemChoiceValue?: () => string }
+        if (consentRow.getConsentItemChoiceValue?.() !== '1') {
+          alertify.defaults.theme.ok = 'ajs-cancel'
+          const dialog = alertify.dialog('alert')
+          dialog
+            .set({
+              title: t('Error saving form'),
+              message: t('Consent items must have a value of "1"'),
+              label: t('Dismiss'),
+            })
+            .show()
+          return
+        }
+      }
+    }
+
     let surveyJSON = surveyToValidJson(app.survey)
     const surveyJSONWithMatrix = koboMatrixParser({ source: surveyJSON }).source
     if (surveyJSONWithMatrix) {
@@ -457,15 +591,17 @@ export default function EditableForm(props: EditableFormProps) {
         params.parent = assetUtils.buildAssetUrl(props.parentAssetUid)
       }
       actions.resources.createResource.triggerAsync(params).then(() => {
-        if (props.router && state.backRoute) {
-          props.router.navigate(state.backRoute)
-        }
+        // OC fork: tell the host iframe the save is done and always return to the Library.
+        window.parent.postMessage('form_savecomplete', '*')
+        props.router.navigate(ROUTES.LIBRARY)
       })
     } else if (assetUid !== '') {
       // TODO: change this into react-query mutation
       actions.resources.updateAsset
         .triggerAsync(assetUid, params)
         .then(() => {
+          // OC fork: tell the host iframe the save is done.
+          window.parent.postMessage('form_savecomplete', '*')
           unpreventClosingTab()
           // We need to invalidate it here to force it to fetch fresh data. Without this a bug will happen with Form
           // Builder showing old data in some scenarios (e.g. after closing Form Builder and immediately visiting again).
@@ -477,7 +613,7 @@ export default function EditableForm(props: EditableFormProps) {
           }))
         })
         .catch((resp: FailResponse) => {
-          var errorMsg = `${t('Your changes could not be saved, likely because of a lost internet connection.')}&nbsp;${t('Keep this window open and try saving again while using a better connection.')}`
+          var errorMsg = `${t('Your changes could not be saved, likely because of a lost internet connection.')}&nbsp;${t('Keep this window open and try saving again while using a better connection.')}&nbsp;${t('Please contact your administrator if this message persists.')}`
           if (resp.statusText !== 'error') {
             errorMsg = escapeHtml(resp.statusText)
           }
@@ -524,16 +660,40 @@ export default function EditableForm(props: EditableFormProps) {
       ooo.name = state.name
       ooo.hasSettings = state.backRoute === ROUTES.FORMS
       ooo.styleValue = state.settings__style
+      // OC fork: form id and version number for the "Form information" aside row.
+      ooo.versionValue = state.settings__version
+      ooo.formIdValue = state.settings__form_id
     } else {
       ooo.allButtonsDisabled = true
     }
+
+    // OC fork: context-dependent save/back button labels.
+    const isNewLibraryAsset = state.backRoute === ROUTES.LIBRARY && !state.asset && state.isNewAsset === true
+
+    let saveButtonText = t('save')
+    let backButtonText = t('back')
+
+    if (state.asset?.asset_type === ASSET_TYPES.survey.id) {
+      saveButtonText = t('save draft')
+    } else {
+      // eslint-disable-next-line no-lonely-if
+      if (isNewLibraryAsset) {
+        saveButtonText = t('create')
+        backButtonText = t('back to library')
+      } else {
+        saveButtonText = t('save changes')
+      }
+    }
+
     if (state.isNewAsset) {
       ooo.saveButtonText = t('create')
     } else if (state.surveySaveFail) {
-      ooo.saveButtonText = `${t('save')} (${t('retry')}) `
+      ooo.saveButtonText = `${saveButtonText} (${t('retry')}) `
     } else {
-      ooo.saveButtonText = t('save')
+      ooo.saveButtonText = `${saveButtonText}`
     }
+    ooo.backButtonText = `${backButtonText}`
+
     return ooo
   }
 
@@ -606,6 +766,9 @@ export default function EditableForm(props: EditableFormProps) {
     // so we need to make sure this stays untouched
     const rawAssetContent = Object.freeze(clonedeep(assetContent))
 
+    // OC fork: seed the form-style cache from the launched asset.
+    sessionStorage.setItem(FORM_STYLE_CACHE_NAME, newState.settings__style ?? '')
+
     const isEmptySurvey =
       assetContent &&
       assetContent.settings &&
@@ -645,7 +808,10 @@ export default function EditableForm(props: EditableFormProps) {
         survey: survey,
         stateStore: stores.surveyState,
         ngScope: skp,
-      })
+        // OC fork: gate the "Add to Library" row action by account permissions.
+        // Not declared in SurveyAppOptions typings, so cast the options object.
+        canAddToLibrary: canAddToLibrary(),
+      } as ConstructorParameters<typeof dkobo_xlform.view.SurveyApp>[0])
 
       setApp(newApp)
 
@@ -675,7 +841,20 @@ export default function EditableForm(props: EditableFormProps) {
     }))
   }
 
+  // OC fork: derive the parent collection uid from the asset's `parent` URL.
+  function getParentUid() {
+    if (state.asset?.parent) {
+      const parentArr = state.asset.parent.split('/')
+      const parentAssetUid = parentArr[parentArr.length - 2]
+      return parentAssetUid
+    } else {
+      return null
+    }
+  }
+
   function safeNavigateToList() {
+    // OC fork: notify the host iframe that we are leaving the form builder.
+    window.parent.postMessage('form_savecomplete', '*')
     if (state.backRoute) {
       props.router.navigate(state.backRoute)
     } else if (props.router.location.pathname.startsWith(ROUTES.LIBRARY)) {
@@ -685,10 +864,32 @@ export default function EditableForm(props: EditableFormProps) {
     }
   }
 
+  // OC fork: navigate back to the parent collection (or the library root when the
+  // asset has no parent).
+  function safeNavigateToCollection() {
+    // OC fork: notify the host iframe that we are leaving the form builder.
+    window.parent.postMessage('form_savecomplete', '*')
+    let targetRoute = state.backRoute
+    if (state.backRoute === ROUTES.LIBRARY) {
+      const parentUid = getParentUid()
+      if (parentUid) {
+        targetRoute = ROUTES.LIBRARY_ITEM.replace(':uid', parentUid)
+      } else {
+        targetRoute = ROUTES.LIBRARY
+      }
+    }
+    if (targetRoute) {
+      props.router.navigate(targetRoute)
+    }
+  }
+
   function safeNavigateToAsset() {
     if (!state.asset || !state.backRoute) {
       return
     }
+
+    // OC fork: notify the host iframe that we are leaving the form builder.
+    window.parent.postMessage('form_savecomplete', '*')
 
     let targetRoute = state.backRoute
     if (state.backRoute === ROUTES.FORMS) {
@@ -703,6 +904,15 @@ export default function EditableForm(props: EditableFormProps) {
     }
 
     props.router.navigate(targetRoute)
+  }
+
+  // OC fork: gate the "back to list" header button. Only show it for non-survey
+  // assets or while on a "/library/new" creation route.
+  function canNavigateToList() {
+    return (
+      state.surveyAppRendered &&
+      (state.asset?.asset_type !== ASSET_TYPES.survey.id || props.router.location.pathname.startsWith('/library/new'))
+    )
   }
 
   function isAddingQuestionsRestricted() {
@@ -746,21 +956,13 @@ export default function EditableForm(props: EditableFormProps) {
   // rendering methods
 
   function renderFormBuilderHeader() {
-    const { previewDisabled, groupable, showAllAvailable, saveButtonText } = buttonStates()
+    const { previewDisabled, groupable, showAllAvailable, saveButtonText, backButtonText } = buttonStates()
 
     return (
       <bem.FormBuilderHeader>
+        {/* OC fork: dropped the kobo logo cell (form designer runs inside the
+            study-runner iframe, where a KoboToolbox logo is the wrong context). */}
         <bem.FormBuilderHeader__row m='primary'>
-          <bem.FormBuilderHeader__cell
-            m={'logo'}
-            data-tip={t('Return to list')}
-            className='left-tooltip'
-            tabIndex='0'
-            onClick={safeNavigateToList}
-          >
-            <i className='k-icon k-icon-kobo' />
-          </bem.FormBuilderHeader__cell>
-
           <bem.FormBuilderHeader__cell m='name'>
             <bem.FormModal__item>
               {renderAssetLabel()}
@@ -792,7 +994,17 @@ export default function EditableForm(props: EditableFormProps) {
               }
             />
 
-            <Button type='text' size='l' onClick={safeNavigateToAsset} startIcon='close' />
+            {/* OC fork: replaced upstream's close (X) button with a text "back"
+                button, gated by canNavigateToList(). */}
+            {canNavigateToList() && (
+              <Button
+                type='text'
+                size='l'
+                isDisabled={!state.surveyAppRendered || !!state.surveyLoadError}
+                onClick={safeNavigateToList}
+                label={backButtonText}
+              />
+            )}
           </bem.FormBuilderHeader__cell>
         </bem.FormBuilderHeader__row>
 
@@ -835,6 +1047,54 @@ export default function EditableForm(props: EditableFormProps) {
               })}
             />
 
+            {/* OC fork: delete / duplicate / add-to-library row actions. Like the
+                group button, these operate on the selected questions and so are
+                disabled when nothing is selected (i.e. !groupable). */}
+            <Button
+              type='text'
+              size='m'
+              isDisabled={!groupable}
+              onClick={deleteQuestions}
+              tooltip={
+                groupable
+                  ? t('Delete selected questions')
+                  : t('Delete questions disabled. Please select at least one question.')
+              }
+              tooltipPosition='left'
+              startIcon='trash'
+            />
+
+            <Button
+              type='text'
+              size='m'
+              isDisabled={!groupable}
+              onClick={duplicateQuestions}
+              tooltip={
+                groupable
+                  ? t('Duplicate selected questions')
+                  : t('Duplicate questions disabled. Please select at least one question.')
+              }
+              tooltipPosition='left'
+              startIcon='duplicate'
+            />
+
+            {canAddToLibrary() && (
+              <Button
+                type='text'
+                size='m'
+                isDisabled={!groupable}
+                onClick={addQuestionsToLibrary}
+                tooltip={
+                  groupable
+                    ? t('Add selected questions to library')
+                    : t('Add selected questions to library disabled. Please select at least one question.')
+                }
+                tooltipPosition='left'
+                startIcon='folder-plus'
+                className='add-questions-to-library'
+              />
+            )}
+
             <Button
               type='text'
               size='m'
@@ -852,6 +1112,13 @@ export default function EditableForm(props: EditableFormProps) {
           <bem.FormBuilderHeader__cell m='verticalRule' />
 
           <bem.FormBuilderHeader__cell m='spacer' />
+
+          {/* OC fork: link to the OpenClinica Form Designer help docs. */}
+          <bem.FormBuilderHeader__cell m='supportUrl'>
+            <a href={FORM_DESIGNER_SUPPORT_URL} target='_blank' data-tip={t('Learn more about Form Designer')}>
+              <i className='k-icon k-icon-help' />
+            </a>
+          </bem.FormBuilderHeader__cell>
 
           <bem.FormBuilderHeader__cell m='verticalRule' />
 
@@ -938,7 +1205,7 @@ export default function EditableForm(props: EditableFormProps) {
   }
 
   function renderAside() {
-    const { styleValue, hasSettings } = buttonStates()
+    const { styleValue, versionValue, formIdValue, hasSettings } = buttonStates()
 
     const isAsideVisible = state.asideLayoutSettingsVisible || state.asideLibrarySearchVisible
 
@@ -947,19 +1214,9 @@ export default function EditableForm(props: EditableFormProps) {
         {state.asideLayoutSettingsVisible && (
           <bem.FormBuilderAside__content>
             <bem.FormBuilderAside__row>
-              <bem.FormBuilderAside__header>
-                {t('Form style')}
-
-                {envStore.isReady && envStore.data.support_url && (
-                  <a
-                    href={envStore.data.support_url + WEBFORM_STYLES_SUPPORT_URL}
-                    target='_blank'
-                    data-tip={t('Read more about form styles')}
-                  >
-                    <i className='k-icon k-icon-help' />
-                  </a>
-                )}
-              </bem.FormBuilderAside__header>
+              {/* OC fork: dropped the kobo "form styles" help anchor; OpenClinica
+                  surfaces its own Form Designer help link in the header instead. */}
+              <bem.FormBuilderAside__header>{t('Form style')}</bem.FormBuilderAside__header>
 
               <label className='kobo-select__label' htmlFor='webform-style'>
                 {hasSettings
@@ -984,7 +1241,25 @@ export default function EditableForm(props: EditableFormProps) {
               />
             </bem.FormBuilderAside__row>
 
-            {hasMetadataAndDetails() && (
+            {/* OC fork: form id and version number, round-tripped through form settings. */}
+            <bem.FormBuilderAside__row>
+              <bem.FormBuilderAside__header>{t('Form information')}</bem.FormBuilderAside__header>
+
+              <bem.FormModal__item>
+                <TextBox type='text' label={t('Form ID')} value={formIdValue || ''} onChange={onFormIdChange} />
+              </bem.FormModal__item>
+
+              <bem.FormModal__item>
+                <TextBox
+                  type='text'
+                  label={t('Version number')}
+                  value={versionValue || ''}
+                  onChange={onVersionChange}
+                />
+              </bem.FormModal__item>
+            </bem.FormBuilderAside__row>
+
+            {hasMetadataAndDetails() && !hideMetadata() && (
               <bem.FormBuilderAside__row>
                 <bem.FormBuilderAside__header>{t('Metadata')}</bem.FormBuilderAside__header>
 
@@ -1020,7 +1295,7 @@ export default function EditableForm(props: EditableFormProps) {
     if (state.surveyLoadError) {
       return (
         <ErrorMessage>
-          <ErrorMessage__strong>{t('Error loading survey:')}</ErrorMessage__strong>
+          <ErrorMessage__strong>{t('Error loading form:')}</ErrorMessage__strong>
           <p>{state.surveyLoadError}</p>
         </ErrorMessage>
       )
@@ -1199,14 +1474,14 @@ export default function EditableForm(props: EditableFormProps) {
 
   if (!state.isNewAsset && !state.asset) {
     return (
-      <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+      <DocumentTitle title={`${docTitle} | OpenClinica`}>
         <LoadingSpinner />
       </DocumentTitle>
     )
   }
 
   return (
-    <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+    <DocumentTitle title={`${docTitle} | OpenClinica`}>
       <>
         {
           /*

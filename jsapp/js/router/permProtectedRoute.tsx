@@ -4,7 +4,7 @@ import { actions } from '#/actions'
 import assetStore from '#/assetStore'
 import LoadingSpinner from '#/components/common/loadingSpinner'
 import type { PermissionCodename } from '#/components/permissions/permConstants'
-import { userCan, userCanPartially } from '#/components/permissions/utils'
+import { userCan, userCanPartially, userWithSameSubdomainAsAssetOwner } from '#/components/permissions/utils'
 import { decodeURLParamWithSlash } from '#/components/processing/routes.utils'
 import type { AssetResponse, FailResponse } from '#/dataInterface'
 import AccessDenied from '#/router/accessDenied'
@@ -169,7 +169,9 @@ class PermProtectedRoute extends React.Component<PermProtectedRouteProps, PermPr
   getUserHasRequiredPermission(asset: AssetResponse, requiredPermission: PermissionCodename) {
     return (
       // we are ok with either full or partial permission
-      userCan(requiredPermission, asset) || userCanPartially(requiredPermission, asset)
+      userWithSameSubdomainAsAssetOwner(asset) ||
+      userCan(requiredPermission, asset) ||
+      userCanPartially(requiredPermission, asset)
     )
   }
 

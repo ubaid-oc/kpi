@@ -28,7 +28,7 @@ const FormNotFound = React.lazy(() => import(/* webpackPrefetch: true */ '#/comp
 export const router = createHashRouter(
   createRoutesFromElements(
     <Route path={ROUTES.ROOT} element={<App />}>
-      <Route path={ROUTES.ROOT} element={<Navigate to={ROUTES.FORMS} replace />} />
+      <Route path={ROUTES.ROOT} element={<Navigate to={ROUTES.LIBRARY} replace />} />
       <Route path={ROUTES.ACCOUNT_ROOT}>{accountRoutes()}</Route>
       {projectsRoutes()}
       <Route path={ROUTES.LIBRARY}>
@@ -55,6 +55,23 @@ export const router = createHashRouter(
             <RequireAuth>
               <LibraryAssetEditor />
             </RequireAuth>
+          }
+        />
+        <Route
+          path={ROUTES.NEW_LIBRARY_TEMPLATE_ITEM}
+          element={
+            <RequireAuth>
+              <LibraryAssetEditor />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path={ROUTES.NEW_LIBRARY_TEMPLATE_ITEM_CHILD}
+          element={
+            <PermProtectedRoute
+              requiredPermissions={[PERMISSIONS_CODENAMES.change_asset]}
+              protectedComponent={LibraryAssetEditor}
+            />
           }
         />
         <Route

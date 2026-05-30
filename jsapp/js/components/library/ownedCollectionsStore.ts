@@ -2,24 +2,32 @@ import findIndex from 'lodash.findindex'
 import { when } from 'mobx'
 import Reflux from 'reflux'
 import { actions } from '#/actions'
+import assetUtils from '#/assetUtils'
 import { ASSET_TYPES } from '#/constants'
 import type { AssetResponse, AssetsResponse, DeleteAssetResponse } from '#/dataInterface'
 import { router } from '#/router/legacy'
 import { isAnyLibraryRoute } from '#/router/routerUtils'
 import sessionStore from '#/stores/session'
 
-export interface ManagedCollectionsStoreData {
+export interface OwnedCollectionsStoreData {
   isFetchingData: boolean
   collections: AssetResponse[]
 }
 
 /**
+ * This store keeps an up to date list of collections owned by the current user.
+ *
+ * It mirrors `managedCollectionsStore` but filters the data down to only the
+ * collections the logged-in user owns (see `assetUtils.isSelfOwned`). This is
+ * the owned-only semantics the fork relies on (e.g. the "Move to" menu in
+ * `assetCollectionActions` should only offer collections the user owns).
+ *
  * @deprecated migrate to react-query whenever you need to adjust things beyond simple rename
  */
-class ManagedCollectionsStore extends Reflux.Store {
+class OwnedCollectionsStore extends Reflux.Store {
   isInitialised = false
 
-  data: ManagedCollectionsStoreData = {
+  data: OwnedCollectionsStoreData = {
     isFetchingData: false,
     collections: [],
   }
@@ -68,7 +76,8 @@ class ManagedCollectionsStore extends Reflux.Store {
   // methods for handling actions
 
   onGetCollectionsCompleted(response: AssetsResponse) {
-    this.data.collections = response.results
+    // Owned-only semantics: keep just the collections owned by the current user.
+    this.data.collections = response.results.filter((asset) => assetUtils.isSelfOwned(asset))
 
     this.data.isFetchingData = false
     this.isInitialised = true
@@ -82,6 +91,18 @@ class ManagedCollectionsStore extends Reflux.Store {
 
   onAssetChangedOrCreated(asset: AssetResponse) {
     if (asset.asset_type === ASSET_TYPES.collection.id) {
+      // Owned-only semantics: a collection that the current user does not own
+      // should not be tracked here. If it was previously owned (e.g. ownership
+      // changed) make sure it gets removed from the list.
+      if (!assetUtils.isSelfOwned(asset)) {
+        const existingIndex = findIndex(this.data.collections, { uid: asset.uid })
+        if (existingIndex !== -1) {
+          this.data.collections.splice(existingIndex, 1)
+          this.trigger(this.data)
+        }
+        return
+      }
+
       let wasUpdated = false
       for (let i = 0; i < this.data.collections.length; i++) {
         if (this.data.collections[i].uid === asset.uid) {
@@ -128,11 +149,11 @@ class ManagedCollectionsStore extends Reflux.Store {
 }
 
 /**
- * This store keeps an up to date list of managed collections.
+ * This store keeps an up to date list of collections owned by the current user.
  *
  * @deprecated migrate to react-query whenever you need to adjust things beyond simple rename
  */
-const managedCollectionsStore = new ManagedCollectionsStore()
-managedCollectionsStore.init()
+const ownedCollectionsStore = new OwnedCollectionsStore()
+ownedCollectionsStore.init()
 
-export default managedCollectionsStore
+export default ownedCollectionsStore

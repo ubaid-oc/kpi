@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 
+import alertify from 'alertifyjs'
 import { useNavigate } from 'react-router-dom'
 import { ACCOUNT_ROUTES } from '#/account/routes.constants'
 import bem from '#/bem'
@@ -45,7 +46,7 @@ export default function AccountMenu() {
         if ('reload' in window.location) {
           window.location.reload()
         } else {
-          window.alert(t('Please refresh the page'))
+          alertify.alert(t('Change language'), t('Please refresh the page'))
         }
       })
     }
