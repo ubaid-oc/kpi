@@ -80,3 +80,23 @@ $kobo-light-amber: hsl(30deg 100% 90%); // #ffe8cc
 $kobo-dark-green: hsl(146deg 71% 31%); // #178949
 $kobo-green: hsl(146deg 72% 75%); // #92edba
 $kobo-light-green: hsl(147deg 69% 95%); // #e3f9db (previously $kobo-lime)
+
+/*
+ * OpenClinica fork compatibility aliases.
+ * Older OC SCSS (and merged form-builder/library styles) reference the previous
+ * lightness-based gray names and pre-rename color names. Map them onto the
+ * current scale so those styles compile unchanged. The old gray numbers are HSL
+ * lightness %, matched to the nearest current step.
+ */
+$kobo-gray-98: $kobo-gray-100;
+$kobo-gray-96: $kobo-gray-200;
+$kobo-gray-92: $kobo-gray-300;
+$kobo-gray-85: $kobo-gray-400;
+$kobo-gray-65: $kobo-gray-500;
+$kobo-gray-55: $kobo-gray-600;
+$kobo-gray-40: $kobo-gray-700;
+$kobo-gray-24: $kobo-gray-800;
+$kobo-gray-14: $kobo-gray-900;
+$kobo-alt-blue: $kobo-mid-blue; // renamed upstream
+$kobo-cloud: $kobo-light-storm; // renamed upstream
+$kobo-lime: $kobo-light-green; // renamed upstream
