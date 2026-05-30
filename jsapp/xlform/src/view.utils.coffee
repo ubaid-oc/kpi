@@ -11,9 +11,6 @@ module.exports = do ->
     eventName = eventName.replace(regex, '-');
     return eventName
 
-<<<<<<< /tmp/kpiport/mf/cur
-  # DEAD CODE TODO: Doesn't seem to be used anywhere?
-=======
   viewUtils.makeEditable = (that, model, selector, {property, transformFunction, options, edit_callback}) ->
     if !(selector instanceof jQuery)
       origSelector = selector
@@ -90,7 +87,7 @@ module.exports = do ->
     selector.on 'click', enable_edit
 
 
->>>>>>> /tmp/kpiport/mf/fork
+  # DEAD CODE TODO: Doesn't seem to be used anywhere?
   viewUtils.reorderElemsByData = (selector, parent, dataAttribute)->
     arr = []
     parentEl = false

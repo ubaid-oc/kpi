@@ -6,19 +6,10 @@
 
 // drawer (sidebar)
 
-<<<<<<< /tmp/kpiport/mf/cur
 .page-wrapper--fixed-drawer .k-drawer {
-=======
-.k-drawer {
-  height: calc(100% - #{$layout-desktop-header-height});
-  top: $layout-desktop-header-height;
-  width: 212px;
-  position: absolute;
->>>>>>> /tmp/kpiport/mf/fork
   left: 0;
 }
 
-<<<<<<< /tmp/kpiport/mf/cur
 .k-drawer {
   @include mdl.box-shadow-mid;
 
@@ -30,15 +21,11 @@
   background-color: colors.$kobo-white;
   height: calc(100% - #{mdl.$layout-desktop-header-height});
   top: mdl.$layout-desktop-header-height;
-  width: variables.$s-drawer-width;
+  // OpenClinica: fixed drawer width (was variables.$s-drawer-width)
+  width: 212px;
   display: flex;
   flex-direction: row;
   border-right: 2px solid colors.$kobo-gray-300;
-=======
-// only add the margin for drawer if drawer exists (e.g. no drawer when logged out)
-.k-drawer + .mdl-layout__content {
-  margin-left: 212px; // for drawer
->>>>>>> /tmp/kpiport/mf/fork
 }
 
 .k-drawer__primary-icons {
@@ -99,12 +86,8 @@
 }
 
 .k-drawer__sidebar {
-<<<<<<< /tmp/kpiport/mf/cur
-  width: calc(100% - #{variables.$drawer-icons-width});
-=======
-  // width: calc(100% - #{$drawer-icons-width});
+  // OpenClinica: full width (was calc(100% - #{variables.$drawer-icons-width}))
   width: 100%;
->>>>>>> /tmp/kpiport/mf/fork
   height: 100%;
   padding: 12px 5px;
   display: flex;
@@ -119,16 +102,13 @@
   }
 
   .page-wrapper--fixed-drawer .k-drawer {
-<<<<<<< /tmp/kpiport/mf/cur
-    left: unset;
-=======
+    // OpenClinica: keep drawer pinned and widen on desktop (was left: unset)
     left: 0;
     width: 282px;
->>>>>>> /tmp/kpiport/mf/fork
   }
 
   // only add the margin for drawer if drawer exists (e.g. no drawer when logged out)
   .k-drawer + .mdl-layout__content {
-    margin-left: variables.$s-drawer-width; // for drawer
+    margin-left: 212px; // for drawer (OpenClinica: was variables.$s-drawer-width)
   }
 }

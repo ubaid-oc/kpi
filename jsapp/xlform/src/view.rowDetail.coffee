@@ -215,10 +215,6 @@ module.exports = do ->
 
 
   viewRowDetail.Templates = {
-<<<<<<< /tmp/kpiport/mf/cur
-    textbox: (cid, key, key_label = key, input_class = '') ->
-      @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" dir="auto" />""", cid, key_label
-=======
     # Escape double quotes in attribute values to prevent broken HTML markup.
     _escapeAttr: (str) -> String(str).replace(/"/g, '&quot;')
 
@@ -227,19 +223,18 @@ module.exports = do ->
       #   placeholder_text = t(placeholder_text)
       escaped = @_escapeAttr(placeholder_text)
       if max_length is ''
-        @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{escaped}" />""", cid, key_label
+        @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" dir="auto" placeholder="#{escaped}" />""", cid, key_label
       else
-        @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{escaped}" maxlength="#{max_length}" />""", cid, key_label
+        @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" dir="auto" placeholder="#{escaped}" maxlength="#{max_length}" />""", cid, key_label
 
     textarea: (cid, key, key_label = key, input_class = '', placeholder_text='', max_length = '') ->
       # if placeholder_text is not ''
       #   placeholder_text = t(placeholder_text)
       escaped = @_escapeAttr(placeholder_text)
       if max_length is ''
-        @field """<textarea name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{escaped}" />""", cid, key_label
+        @field """<textarea name="#{key}" id="#{cid}" class="#{input_class}" dir="auto" placeholder="#{escaped}" />""", cid, key_label
       else
-        @field """<textarea name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{escaped}" maxlength="#{max_length}" />""", cid, key_label
->>>>>>> /tmp/kpiport/mf/fork
+        @field """<textarea name="#{key}" id="#{cid}" class="#{input_class}" dir="auto" placeholder="#{escaped}" maxlength="#{max_length}" />""", cid, key_label
 
     checkbox: (cid, key, key_label = key, input_label = t("Yes")) ->
       input_label = input_label
@@ -257,19 +252,14 @@ module.exports = do ->
       select = """<select name="#{key}" id="#{cid}">"""
 
       for value in values
-<<<<<<< /tmp/kpiport/mf/cur
-        if typeof(value) is 'string'
-          select += """<option value="#{value}">#{value}</option>"""
-        else
+        if Array.isArray(value)
           # HACK FIX: we're expecting an array of this structure [['option', 'Description'], ...] in order
           # to display the option next to some helpful text in a dropdown
           select += """<option value="#{value[0]}">#{value[0]} (#{value[1]})</option>"""
-=======
-        if typeof value == 'object'
+        else if typeof value == 'object'
           select += """<option value="#{value.value}">#{value.text}</option>"""
         else
           select += """<option value="#{value}">#{value}</option>"""
->>>>>>> /tmp/kpiport/mf/fork
 
       select += "</select>"
 
@@ -535,25 +525,10 @@ module.exports = do ->
         @model.set 'value', value
         @model.deduplicate @model.getSurvey(), @model.getSurvey().rowItemNameMaxLength
       )
-<<<<<<< /tmp/kpiport/mf/cur
-      update_view = () =>
-        $inp = @$el.find('input').eq(0)
-        modelval = @model.get("value")
-        if modelval
-          $inp.val modelval
-        else
-          parent_label = @model._parent.getValue('label')
-          if parent_label instanceof Array
-            console.error("Bad input? Why is this an array?", parent_label)
-            parent_label = parent_label[0]
-          sluggified_label = $modelUtils.sluggifyLabel(parent_label)
-          $inp.val sluggified_label
-=======
       @model.on 'change:value', () =>
         @changeHeaderName()
 
       update_view = () => @$el.find('input').eq(0).val(@model.get("value") || '')
->>>>>>> /tmp/kpiport/mf/fork
       update_view()
 
       setTimeout =>
@@ -812,36 +787,7 @@ module.exports = do ->
 
   viewRowDetail.DetailViewMixins.appearance =
     getTypes: () ->
-      fieldListType = ['field-list', 'Show all questions in this group on the same screen']
-      groupTypes = ['select', fieldListType, ['other', 'Advanced']]
-
       types =
-<<<<<<< /tmp/kpiport/mf/cur
-        text: ['multiline', 'numbers']
-        select_one: [
-          'minimal',
-          'autocomplete',
-          'quick',
-          'horizontal-compact',
-          'horizontal',
-          'likert',
-          'compact',
-          'quickcompact',
-          'label',
-          'list-nolabel',
-        ]
-        select_multiple: ['minimal', 'horizontal-compact', 'horizontal', 'compact', 'label', 'list-nolabel']
-        image: ['signature', 'draw', 'annotate']
-        date: ['month-year', 'year']
-        group: groupTypes
-        # `repeat` is a repeating group with the same appearance options
-        repeat: groupTypes
-        # Question Matrix is always 'field-list', regardless of provided type,
-        # so we don't even allow 'other' here
-        kobomatrix: [fieldListType]
-
-      return types[@model._parent.getValue('type').split(' ')[0]]
-=======
         text: ['multiline']
         select_one: ['minimal', 'columns', 'columns-pack', 'columns-4', 'columns no-buttons', 'columns-pack no-buttons', 'columns-4 no-buttons', 'likert', 'image-map']
         select_multiple: ['minimal', 'columns', 'columns-pack', 'columns-4', 'columns no-buttons', 'columns-pack no-buttons', 'columns-4 no-buttons', 'image-map']
@@ -850,7 +796,6 @@ module.exports = do ->
         integer: ['analog-scale horizontal', 'analog-scale horizontal no-ticks', 'analog-scale vertical', 'analog-scale vertical no-ticks', 'analog-scale vertical show-scale']
 
       types[@model_type()]
->>>>>>> /tmp/kpiport/mf/fork
     html: ->
       @$checkbox_samescreen = $('<input/>', { type: "checkbox", id: "checkbox-samescreen", style: 'margin-top: 10px;' })
       @$label_checkbox_samescreen = $('<span/>', { style: 'margin-left: 4px;' }).text(t('Show all questions in this group on the same screen'))
@@ -870,11 +815,7 @@ module.exports = do ->
       @is_checkbox_samescreen = false
       @$el.addClass("card__settings__fields--active")
       if @model_is_group(@model)
-<<<<<<< /tmp/kpiport/mf/cur
-        return viewRowDetail.Templates.dropdown @cid, @model.key, @getTypes(), t("Appearance (advanced)")
-=======
         return viewRowDetail.Templates.textbox @cid, @model.key, t("Appearance"), 'text'
->>>>>>> /tmp/kpiport/mf/fork
       else
         if @model_type() isnt 'calculate'
           appearances = @getTypes()
@@ -1315,9 +1256,6 @@ module.exports = do ->
 
     hideMessage: (fieldClass) ->
       $select = @$('select')
-<<<<<<< /tmp/kpiport/mf/cur
-      $select.addClass('group__appearance')
-=======
       if (fieldClass != '')
         if ($select.closest('div').hasClass(fieldClass))
           $select.closest('div').removeClass(fieldClass)
@@ -1461,7 +1399,6 @@ module.exports = do ->
         @rowView.model.attributes['instance::oc:contactdata'].set 'value', ''
         @rowView.model.attributes['instance::oc:identifier'].set 'value', ''
 
->>>>>>> /tmp/kpiport/mf/fork
       modelValue = @model.get 'value'
 
       # PII (Encrypted) items: The "Use External Value" dropdown is hidden and
@@ -1487,30 +1424,11 @@ module.exports = do ->
           return
 
       if $select.length > 0
-<<<<<<< /tmp/kpiport/mf/cur
-        $input = $('<input/>', {class:'text', type: 'text', width: 'auto'})
-        if modelValue != ''
-          appearanceTypes = @getTypes()
-          # Because appearance types are now `string` or `string[]`, we need to
-          # make a more detailed check to verify the model value is in the list
-          # before selecting it
-          hasValue = false
-          if appearanceTypes
-            for appearanceType in appearanceTypes
-              if typeof appearanceType is 'string'
-                hasValue = modelValue == appearanceType
-              else if Array.isArray(appearanceType)
-                hasValue = modelValue == appearanceType[0]
-
-          if hasValue
-            $select.val(modelValue)
-=======
         if modelValue == ''
           if @model._parent.isConsentItem()
             $select.val('signature')
             @model.set 'value', $select.val()
             @showSignatureMessage()
->>>>>>> /tmp/kpiport/mf/fork
           else
             $select.val('No')
         else

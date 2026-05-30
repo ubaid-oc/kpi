@@ -134,9 +134,6 @@ module.exports = do ->
 
       return
 
-<<<<<<< /tmp/kpiport/mf/cur
-  return MandatorySettingView: MandatorySettingView
-=======
     _showRequiredLogicTab: ->
       return unless @rowView
       @rowView.cardSettingsWrap.find('.js-required-logic-tab').show()
@@ -168,5 +165,4 @@ module.exports = do ->
       $errorIcon = @rowView.cardSettingsWrap.find('.js-required-logic-error')
       $errorIcon.toggle(not hasExpression)
 
-  MandatorySettingView: MandatorySettingView
->>>>>>> /tmp/kpiport/mf/fork
+  return MandatorySettingView: MandatorySettingView

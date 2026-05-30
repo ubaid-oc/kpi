@@ -61,7 +61,6 @@ interface AssetsMetadataRequestData {
 }
 
 export interface SearchAssetsPredefinedParams {
-<<<<<<< /tmp/kpiport/mf/cur
   uid?: string
   pageSize?: number
   page?: number
@@ -72,27 +71,7 @@ export interface SearchAssetsPredefinedParams {
   metadata?: boolean
   collectionsFirst?: boolean
   status?: string
-=======
-  uid?: string;
-  pageSize?: number;
-  page?: number;
-  searchPhrase?: string;
-  filterProperty?: string;
-  filterValue?: string;
-  ordering?: string;
-  metadata?: boolean;
-  collectionsFirst?: boolean;
-  status?: string;
-  filterType?: {value: string; label: string};
-}
-
-interface BulkSubmissionsRequest {
-  query: {
-    [id: string]: any;
-  };
-  confirm?: boolean;
-  submission_ids?: string[];
->>>>>>> /tmp/kpiport/mf/fork
+  filterType?: { value: string; label: string }
 }
 
 export interface BulkSubmissionsRequest {
@@ -572,7 +551,6 @@ interface AssetSummary {
         label: string[]
       }
       bad?: {
-<<<<<<< /tmp/kpiport/mf/cur
         name: string
         index: number
         label: string[]
@@ -580,34 +558,7 @@ interface AssetSummary {
     }
   }
   naming_conflicts?: string[]
-=======
-        name: string;
-        index: number;
-        label: string[];
-      };
-    };
-  };
-  naming_conflicts?: string[];
-  settings_version?: string;
-}
-
-interface AssetReportStylesSpecified {
-  [name: string]: {};
-}
-
-interface AssetReportStylesKuidNames {
-  [name: string]: {};
-}
-
-interface AdvancedSubmissionSchema {
-  type: 'string' | 'object'
-  $description: string
-  url?: string
-  properties?: AdvancedSubmissionSchemaDefinition
-  additionalProperties?: boolean
-  required?: string[]
-  definitions?: {[name: string]: AdvancedSubmissionSchemaDefinition}
->>>>>>> /tmp/kpiport/mf/fork
+  settings_version?: string
 }
 
 interface AssetAdvancedFeatures {
@@ -725,10 +676,10 @@ export interface AnalysisFormJsonField {
  * AssetRequestObject).
  */
 export interface AssetResponse extends AssetRequestObject {
-<<<<<<< /tmp/kpiport/mf/cur
   url: string
   owner: string
   owner__username: string
+  owner__subdomain: string
   owner_label: string
   date_created: string
   last_modified_by: string | null
@@ -746,21 +697,6 @@ export interface AssetResponse extends AssetRequestObject {
     }
     additional_fields: AnalysisFormJsonField[]
   }
-=======
-  url: string;
-  owner: string;
-  owner__username: string;
-  owner__subdomain: string;
-  date_created: string;
-  summary: AssetSummary;
-  date_modified: string;
-  version_id: string|null;
-  version__content_hash?: string|null;
-  version_count?: number;
-  has_deployment: boolean;
-  deployed_version_id: string|null;
-  analysis_form_json?: any;
->>>>>>> /tmp/kpiport/mf/fork
   deployed_versions?: {
     count: number
     next: string | null
@@ -936,13 +872,14 @@ interface SocialAccount {
 }
 
 export interface AccountResponse {
-<<<<<<< /tmp/kpiport/mf/cur
   username: string
+  user_uuid: string
   first_name: string
   last_name: string
   email: string
   server_time: string
   date_joined: string
+  user_type: string
   /**
    * Link to a legacy view containing list of projects. No longer used on FE.
    */
@@ -962,40 +899,10 @@ export interface AccountResponse {
    */
   accepted_tos?: boolean
   extra_details: AccountFieldsValues & {
-=======
-  username: string;
-  user_uuid: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  server_time: string;
-  date_joined: string;
-  user_type: string;
-  projects_url: string;
-  is_superuser: boolean;
-  gravatar: string;
-  is_staff: boolean;
-  last_login: string;
-  extra_details: {
-    name: string;
-    gender: string;
-    sector: string;
-    country: string;
-    organization: string;
-    organization_website: string;
-    bio: string;
-    city: string;
-    require_auth: boolean;
-    twitter: string;
-    linkedin: string;
-    instagram: string;
-    project_views_settings: ProjectViewsSettings;
->>>>>>> /tmp/kpiport/mf/fork
     /** We store this for usage statistics only. */
     last_ui_language?: string
     project_views_settings: ProjectViewsSettings
     // JSON values are the backend reality, but we make assumptions
-<<<<<<< /tmp/kpiport/mf/cur
     [key: string]: Json | ProjectViewsSettings | undefined
   }
   git_rev:
@@ -1014,19 +921,8 @@ export interface AccountResponse {
     uid: string
   }
   extra_details__uid: string
-=======
-    [key: string]: Json | ProjectViewsSettings | undefined;
-  };
-  git_rev: {
-    short: string;
-    long: string;
-    branch: string;
-    tag: boolean;
-  };
-  social_accounts: SocialAccount[];
-  subdomain: string;
-  customer_name: string;
->>>>>>> /tmp/kpiport/mf/fork
+  subdomain: string
+  customer_name: string
 }
 
 export interface AccountRequest {
@@ -1089,11 +985,7 @@ interface AssetSnapshotResponse {
   source: AssetContent
 }
 
-<<<<<<< /tmp/kpiport/mf/cur
-const DEFAULT_PAGE_SIZE = 100
-=======
-export const DEFAULT_PAGE_SIZE = 200;
->>>>>>> /tmp/kpiport/mf/fork
+export const DEFAULT_PAGE_SIZE = 200
 
 interface ExternalServiceRequestData {
   name: string
@@ -1278,9 +1170,8 @@ export const dataInterface: DataInterface = {
     }),
 
   logout: (): JQuery.Promise<AccountResponse | UserNotLoggedInResponse> => {
-<<<<<<< /tmp/kpiport/mf/cur
     const d = $.Deferred()
-    $ajax({ url: `${ROOT_URL}/accounts/logout/`, method: 'POST' })
+    $ajax({ url: `${ROOT_URL}/openid/logout/`, method: 'POST' })
       .done(d.resolve)
       .fail((/*resp, etype, emessage*/) => {
         // logout request wasn't successful, but may have logged the user out
@@ -1297,21 +1188,6 @@ export const dataInterface: DataInterface = {
           .fail(d.fail)
       })
     return d.promise()
-=======
-    const d = $.Deferred();
-    $ajax({url: `${ROOT_URL}/openid/logout/`, method: 'POST'}).done(d.resolve).fail(function (/*resp, etype, emessage*/) {
-      // logout request wasn't successful, but may have logged the user out
-      // querying '/me/' can confirm if we have logged out.
-      dataInterface.selfProfile().done(function (data: {message?: string}){
-        if (data.message === 'user is not logged in') {
-          d.resolve(data);
-        } else {
-          d.reject(data);
-        }
-      }).fail(d.fail);
-    });
-    return d.promise();
->>>>>>> /tmp/kpiport/mf/fork
   },
 
   keycloakLogout: (): JQuery.Promise<any> => {
@@ -1901,26 +1777,20 @@ export const dataInterface: DataInterface = {
   },
 
   searchMyLibraryAssets(params: SearchAssetsPredefinedParams = {}): JQuery.jqXHR<any> {
-    // we only want orphans (assets not inside collection)
-    // unless it's a search
-<<<<<<< /tmp/kpiport/mf/cur
-    let query = COMMON_QUERIES.qbtc
-    if (!params.searchPhrase) {
-      query += ' AND parent:null'
-=======
-    let query: unknown = null;
+    // Pick the predefined query based on the selected filter type, falling back
+    // to "questions, blocks and templates" when no specific type is requested.
+    let query: string
     if (params.filterType?.value === 'question') {
-      query = COMMON_QUERIES.q;
+      query = COMMON_QUERIES.q
     } else if (params.filterType?.value === 'block') {
-      query = COMMON_QUERIES.b;
+      query = COMMON_QUERIES.b
     } else if (params.filterType?.value === 'template') {
-      query = COMMON_QUERIES.t;
+      query = COMMON_QUERIES.t
     } else {
-      query = COMMON_QUERIES.qbt;
+      query = COMMON_QUERIES.qbt
     }
     if (params.uid) {
-      query += ` AND parent__uid:${params.uid}`;
->>>>>>> /tmp/kpiport/mf/fork
+      query += ` AND parent__uid:${params.uid}`
     }
 
     return this._searchAssetsWithPredefinedQuery(params, query)
@@ -2188,31 +2058,4 @@ export const dataInterface: DataInterface = {
       data: data,
     })
   },
-<<<<<<< /tmp/kpiport/mf/cur
 }
-=======
-
-  environment(): JQuery.jqXHR<EnvironmentResponse> {
-    return $ajax({url: `${ROOT_URL}/environment/`});
-  },
-};
-
-// hook up to all AJAX requests to check auth problems
-// eslint-disable-next-line @typescript-eslint/naming-convention
-// $(document).on('ajaxError', (_event, request, settings) => {
-//   if (request.status === 403 || request.status === 401 || request.status === 404) {
-//     // eslint-disable-next-line no-console
-//     console.log('ajaxError');
-//     dataInterface.selfProfile().done((data: {message: string;}) => {
-//       if (data.message === 'user is not logged in') {
-//         dataInterface.checkKeycloakStatus().done(() => {
-//           // eslint-disable-next-line no-console
-//           console.log('retry ajax request');
-//           $.ajax(settings);
-//           return;
-//         });
-//       }
-//     });
-//   }
-// });
->>>>>>> /tmp/kpiport/mf/fork

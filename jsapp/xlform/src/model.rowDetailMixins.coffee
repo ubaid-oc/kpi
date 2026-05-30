@@ -85,10 +85,5 @@ module.exports = do ->
             return names.push(name)
         , includeGroups: true
 
-<<<<<<< /tmp/kpiport/mf/cur
-        return $modelUtils.sluggifyLabel @get('value'), names
+        return $modelUtils.sluggifyLabel @get('value'), names, character_limit, chars_exception
   return rowDetailMixins
-=======
-        $modelUtils.sluggifyLabel @get('value'), names, character_limit, chars_exception
-  rowDetailMixins
->>>>>>> /tmp/kpiport/mf/fork

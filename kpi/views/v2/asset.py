@@ -7,7 +7,6 @@ from django.conf import settings
 from django.db.models import Count, F
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-<<<<<<< /tmp/kpiport/mf/cur
 from drf_spectacular.utils import (
     OpenApiExample,
     OpenApiParameter,
@@ -15,10 +14,6 @@ from drf_spectacular.utils import (
     extend_schema_view,
 )
 from rest_framework import exceptions, renderers, status
-=======
-from django.contrib.auth.models import User
-from rest_framework import exceptions, renderers, status, viewsets
->>>>>>> /tmp/kpiport/mf/fork
 from rest_framework.decorators import action
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -102,8 +97,8 @@ from kpi.serializers.v2.reports import ReportsDetailSerializer
 from kpi.utils.bugfix import repair_file_column_content_and_save
 from kpi.utils.hash import calculate_hash
 from kpi.utils.kobo_to_xlsform import to_xlsform_structure
-<<<<<<< /tmp/kpiport/mf/cur
 from kpi.utils.object_permission import get_database_user, get_objects_for_user
+from kpi.utils.permissions import is_owner_in_subdomain
 from kpi.utils.schema_extensions.examples import generate_example_from_schema
 from kpi.utils.schema_extensions.markdown import read_md
 from kpi.utils.schema_extensions.response import (
@@ -111,13 +106,6 @@ from kpi.utils.schema_extensions.response import (
     open_api_201_created_response,
     open_api_204_empty_response,
     open_api_http_example_response,
-=======
-from kpi.utils.ss_structure_to_mdtable import ss_structure_to_mdtable
-from kpi.utils.permissions import is_owner_in_subdomain
-from kpi.utils.object_permission import (
-    get_database_user,
-    get_objects_for_user,
->>>>>>> /tmp/kpiport/mf/fork
 )
 from kpi.utils.ss_structure_to_mdtable import ss_structure_to_mdtable
 from kpi.utils.strings import to_bool
@@ -395,17 +383,8 @@ class AssetViewSet(
     lookup_field = 'uid'
     lookup_url_kwarg = 'uid_asset'
     pagination_class = AssetPagination
-<<<<<<< /tmp/kpiport/mf/cur
-    permission_classes = (AssetPermission,)
-    ordering_fields = AssetOrderingFilter.DEFAULT_ORDERING_FIELDS + [
-=======
     permission_classes = (IsAuthenticated,)
-    ordering_fields = [
-        'asset_type',
-        'date_modified',
-        'name',
-        'owner__username',
->>>>>>> /tmp/kpiport/mf/fork
+    ordering_fields = AssetOrderingFilter.DEFAULT_ORDERING_FIELDS + [
         'subscribers_count',
     ]
     filter_backends = [
@@ -425,7 +404,6 @@ class AssetViewSet(
         'uid__icontains',
     ]
 
-<<<<<<< /tmp/kpiport/mf/cur
     logged_fields = [
         'has_deployment',
         'id',
@@ -438,7 +416,7 @@ class AssetViewSet(
         'owner.username',
     ]
     log_type = AuditType.PROJECT_HISTORY
-=======
+
     def get_permissions(self):
         # The XML format of a single asset is publicly accessible without
         # authentication, mirroring how AssetSnapshotViewSet treats .xml.
@@ -450,17 +428,6 @@ class AssetViewSet(
         ):
             return []
         return super().get_permissions()
-
-    def get_object(self):
-        if self.request.method in ['PATCH', 'GET']:
-            try:
-                asset = Asset.objects.get(uid=self.kwargs['uid'])
-            except Asset.DoesNotExist:
-                raise Http404
-
-            self.check_object_permissions(self.request, asset)
-            return asset
->>>>>>> /tmp/kpiport/mf/fork
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -998,16 +965,11 @@ class AssetViewSet(
 
     def perform_create_override(self, serializer):
         user = get_database_user(self.request.user)
-<<<<<<< /tmp/kpiport/mf/cur
         serializer.save(
             owner=user,
             created_by=user.username,
             last_modified_by=user.username
         )
-
-    def perform_destroy_override(self, instance):
-=======
-        serializer.save(owner=User.objects.get(username=user))
 
     def _check_subdomain_access(self, asset_owner_id):
         """
@@ -1021,9 +983,8 @@ class AssetViewSet(
         except KeycloakModel.DoesNotExist:
             return
 
-    def perform_destroy(self, instance):
+    def perform_destroy_override(self, instance):
         self._check_subdomain_access(instance.owner.id)
->>>>>>> /tmp/kpiport/mf/fork
         self._bulk_asset_actions(
             {'payload': {'asset_uids': [instance.uid], 'action': 'delete'}}
         )

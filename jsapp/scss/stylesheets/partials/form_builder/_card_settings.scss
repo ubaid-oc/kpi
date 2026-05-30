@@ -1,11 +1,7 @@
-<<<<<<< /tmp/kpiport/mf/cur
+@use 'scss/breakpoints';
 @use 'scss/colors';
 @use 'scss/_variables';
 @use 'scss/stylesheets/partials/form_builder/_common';
-=======
-@use 'scss/breakpoints';
-@use '~kobo-common/src/styles/colors';
->>>>>>> /tmp/kpiport/mf/fork
 
 // ==========================================================================
 // Card settings tabs
@@ -65,26 +61,17 @@
 }
 
 .card__settings__content {
-  background: $oc-settings-bg;
+  background: variables.$oc-settings-bg;
   margin-left: 20%;
-<<<<<<< /tmp/kpiport/mf/cur
   border-left: variables.$thinBorderStyle;
-  min-height: 152px;
-=======
-  border-left: $thinBorderStyle;
   min-height: 230px;
->>>>>>> /tmp/kpiport/mf/fork
 }
 
 .card__settings__fields {
   display: none;
-<<<<<<< /tmp/kpiport/mf/cur
   transition: height 0.3s;
-=======
-  transition: height .3s;
   padding-left: 32px;
   padding-right: 60px;
->>>>>>> /tmp/kpiport/mf/fork
 
   // Temporary
   &.card__settings__fields--active,
@@ -116,17 +103,6 @@
     }
   }
 
-<<<<<<< /tmp/kpiport/mf/cur
-  input[type='text'] {
-    width: 85%;
-    background: inherit;
-    border-width: 1px;
-    border-color: colors.$kobo-gray-300;
-    border-style: solid;
-    padding: 4px 10px;
-    font-size: 15px;
-    color: inherit;
-=======
   // possibly temporary
   &.xlf-dv-constraint_message {
     border-top: 1px solid #d9dde1;
@@ -150,7 +126,7 @@
 
   &.xlf-dv-oc_signature_checkbox_label {
     textarea {
-      min-height: $oc-signature-textarea-min-height;
+      min-height: variables.$oc-signature-textarea-min-height;
       overflow: auto;
       resize: none;
     }
@@ -245,7 +221,6 @@
     font-size: 13px;
     color: #334155;
     box-shadow: 0px 1px 2px 0px #1212170D;
->>>>>>> /tmp/kpiport/mf/fork
 
     &:focus {
       border-color: #3B82F6;
@@ -373,7 +348,7 @@
 }
 
 .card__settings__row-options {
-  background: $oc-settings-bg;
+  background: variables.$oc-settings-bg;
   padding: 0 60px 24px 32px;
   border-radius: 6px;
 }

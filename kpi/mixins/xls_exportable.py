@@ -16,9 +16,6 @@ CUSTOM_COL_APPEND_STRING = 'custom_col_append_string'
 
 
 class XlsExportableMixin:
-<<<<<<< /tmp/kpiport/mf/cur
-    def ordered_xlsform_content(self, kobo_specific_types=False, append=None):
-=======
 
     surveyCols = [
         u'type',
@@ -48,14 +45,11 @@ class XlsExportableMixin:
     choicesCols = [
         u'list_name',
         u'label',
-        u'name', 
+        u'name',
         u'image'
     ]
 
-    def ordered_xlsform_content(self,
-                                kobo_specific_types=False,
-                                append=None):
->>>>>>> /tmp/kpiport/mf/fork
+    def ordered_xlsform_content(self, kobo_specific_types=False, append=None):
         # currently, this method depends on "FormpackXLSFormUtilsMixin"
         content = copy.deepcopy(self.content)
         if append:

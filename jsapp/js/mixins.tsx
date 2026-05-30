@@ -12,6 +12,7 @@ import {
 } from '#/assetQuickActions'
 import assetStore from '#/assetStore'
 import type { AssetStoreData } from '#/assetStore'
+import assetUtils from '#/assetUtils'
 import { dataInterface } from '#/dataInterface'
 import type { AssetResponse, CreateImportRequest, DeploymentResponse, ImportResponse } from '#/dataInterface'
 import pageState from '#/pageState.store'
@@ -326,7 +327,6 @@ const mixins: MixinsObject = {
         }
 
         applyImport(params).then(
-<<<<<<< /tmp/kpiport/mf/cur
           (data) => {
             resolve(data)
           },
@@ -337,133 +337,6 @@ const mixins: MixinsObject = {
       })
       return applyPromise
     },
-=======
-          (data) => {resolve(data);},
-          (data) => {reject(data);}
-        );
-      };
-      reader.readAsDataURL(file);
-    });
-    return applyPromise;
-  },
-
-  /*
-   * returns an interval-driven promise
-   */
-  applyUrlToAsset(url: string, asset: AssetResponse) {
-    const applyPromise = new Promise((resolve, reject) => {
-      const params: ApplyImportParams = {
-        destination: asset.url,
-        url: url,
-        name: asset.name,
-        assetUid: asset.uid,
-      };
-
-      applyImport(params).then(
-        (data) => {resolve(data);},
-        (data) => {reject(data);}
-      );
-    });
-    return applyPromise;
-  },
-
-  _forEachDroppedFile(params: CreateImportRequest = {}) {
-    const totalFiles = params.totalFiles || 1;
-
-    const router = this.props.router;
-    const isProjectReplaceInForm = (
-      this.props.context === PROJECT_SETTINGS_CONTEXTS.REPLACE
-      && routerIsActive('forms')
-      && router.params.uid !== undefined
-    );
-    const isLibrary = routerIsActive(ROUTES.LIBRARY);
-    const multipleFiles = (params.totalFiles && totalFiles > 1) ? true : false;
-    params = assign({library: isLibrary}, params);
-
-    if (params.base64Encoded) {
-      stores.pageState.showModal({
-        type: MODAL_TYPES.UPLOADING_XLS,
-        filename: multipleFiles ? t('## files').replace('##', String(totalFiles)) : params.name,
-      });
-    }
-
-    delete params.totalFiles;
-
-    if (!isLibrary && params.base64Encoded) {
-      const destination = params.destination || this.state.url;
-      if (destination) {
-        params = assign({destination: destination}, params);
-      }
-    }
-
-    if (isLibrary && this.props.params.uid) {
-      params = assign({parent: assetUtils.buildAssetUrl(this.props.params.uid)}, params);
-    }
-
-    actions.resources.createImport(params, (data: ImportResponse) => {
-      // TODO get rid of this barbaric method of waiting a magic number of seconds
-      // to check if import was done - possibly while doing
-      // https://github.com/kobotoolbox/kpi/issues/476
-      window.setTimeout(() => {
-        dataInterface.getImportDetails({
-          uid: data.uid,
-        }).done((importData: ImportResponse) => {
-          if (importData.status === 'complete') {
-            const assetData = importData.messages?.updated || importData.messages?.created;
-            const assetUid = assetData && assetData.length > 0 && assetData[0].uid;
-            if (!isLibrary && multipleFiles) {
-              this.searchDefault();
-              // No message shown for multiple files when successful, to avoid overloading screen
-            } else if (!assetUid) {
-              // TODO: use a more specific error message here
-              notify.error(t('XLSForm Import failed. Check that the XLSForm and/or the URL are valid, and try again using the "Replace form" icon.'));
-              if (params.assetUid) {
-                history.push(`/forms/${params.assetUid}`);
-              }
-            } else {
-              if (isProjectReplaceInForm) {
-                actions.resources.loadAsset({id: assetUid});
-              } else if (!isLibrary) {
-                history.push(`/forms/${assetUid}`);
-              } else {
-                if (this.props.params.uid) {
-                  history.push(ROUTES.LIBRARY_ITEM.replace(':uid', this.props.params.uid));
-                } else {
-                  history.push(ROUTES.LIBRARY);
-                }
-              }
-              notify(t('XLS Import completed'));
-            }
-          } else if (importData.status === 'processing') {
-            // If the import task didn't complete immediately, inform the user accordingly.
-            notify.warning(t('Your upload is being processed. This may take a few moments.'));
-          } else if (importData.status === 'created') {
-            notify.warning(t('Your upload is queued for processing. This may take a few moments.'));
-          } else if (importData.status === 'error') {
-            const errLines = [];
-            errLines.push(t('Import Failed!'));
-            if (params.name) {
-              errLines.push(<code>Name: {params.name}</code>);
-            }
-            if (importData.messages?.error) {
-              errLines.push(<code>${importData.messages.error_type}: ${escapeHtml(importData.messages.error)}</code>);
-            }
-            notify.error(<div>{join(errLines, <br/>)}</div>);
-          } else {
-            notify.error(t('Import Failed!'));
-          }
-        }).fail((failData: ImportResponse) => {
-          notify.error(t('Import Failed!'));
-          log('import failed', failData);
-        });
-        stores.pageState.hideModal();
-      }, 2500);
-    }, (jqxhr: string) => {
-      log('Failed to create import: ', jqxhr);
-      notify.error(t('Failed to create import.'));
-    });
-  },
->>>>>>> /tmp/kpiport/mf/fork
 
     _forEachDroppedFile(params: CreateImportRequest = {}) {
       const totalFiles = params.totalFiles || 1
@@ -481,91 +354,15 @@ const mixins: MixinsObject = {
 
       delete params.totalFiles
 
-<<<<<<< /tmp/kpiport/mf/cur
       if (!isLibrary && params.base64Encoded) {
         const destination = params.destination || this.state.url
         if (destination) {
           params = Object.assign({ destination: destination }, params)
-=======
-            let canAddToParent = false;
-            if (asset.parent) {
-              const foundParentAsset = myLibraryStore.findAssetByUrl(asset.parent);
-              canAddToParent = (
-                typeof foundParentAsset !== 'undefined' &&
-                userCan(PERMISSIONS_CODENAMES.change_asset, foundParentAsset)
-              );
-            }
-
-            actions.resources.cloneAsset({
-              uid: asset.uid,
-              name: value,
-              parent: canAddToParent ? asset.parent : undefined,
-            }, {
-            onComplete: (asset: AssetResponse) => {
-              ok_button.removeAttribute('disabled');
-              dialog.destroy();
-
-              // TODO when on collection landing page and user clones this
-              // collection's child asset, instead of navigating to cloned asset
-              // landing page, it would be better to stay here and refresh data
-              // (if the clone will keep the parent asset)
-              let goToUrl;
-              if (asset.asset_type === ASSET_TYPES.survey.id) {
-                goToUrl = `/forms/${asset.uid}/landing`;
-              } else {
-                goToUrl = `/library`;
-              }
-
-              history.push(goToUrl);
-              notify(t('cloned ##ASSET_TYPE## created').replace('##ASSET_TYPE##', assetTypeLabel));
-            },
-            });
-            // keep the dialog open
-            return false;
-          },
-          oncancel: () => {
-            dialog.destroy();
-          },
-        };
-        dialog.set(opts).show();
-      },
-      cloneAsTemplate: function (sourceUid: string, sourceName: string) {
-        mixins.cloneAssetAsNewType.dialog({
-          sourceUid: sourceUid,
-          sourceName: sourceName,
-          targetType: ASSET_TYPES.template.id,
-          promptTitle: t('Create new template from this project'),
-          promptMessage: t('Enter the name of the new template.'),
-        });
-      },
-      cloneAsSurvey: function (sourceUid: string, sourceName: string) {
-        mixins.cloneAssetAsNewType.dialog({
-          sourceUid: sourceUid,
-          sourceName: sourceName,
-          targetType: ASSET_TYPES.survey.id,
-          promptTitle: t('Create new project from this template'),
-          promptMessage: t('Enter the name of the new project.'),
-        });
-      },
-      edit: function (uid: string) {
-        if (routerIsActive('library')) {
-          history.push(`/library/asset/${uid}/edit`);
-        } else {
-          history.push(`/forms/${uid}/edit`);
         }
-      },
-      delete: function (
-        assetOrUid: AssetResponse | string,
-        name: string,
-        callback: Function
-      ) {
-        let asset: AssetResponse;
-        if (typeof assetOrUid === 'object') {
-          asset = assetOrUid;
-        } else {
-          asset = stores.selectedAsset.asset || stores.allAssets.byUid[assetOrUid];
->>>>>>> /tmp/kpiport/mf/fork
-        }
+      }
+
+      if (isLibrary && this.props.params?.uid) {
+        params = Object.assign({ parent: assetUtils.buildAssetUrl(this.props.params.uid) }, params)
       }
 
       actions.resources.createImport(
@@ -591,6 +388,10 @@ const mixins: MixinsObject = {
                       actions.resources.loadAsset({ id: assetUid })
                     } else if (!isLibrary) {
                       router!.navigate(ROUTES.FORM.replace(':uid', assetUid))
+                    } else if (this.props.params?.uid) {
+                      router!.navigate(ROUTES.LIBRARY_ITEM.replace(':uid', this.props.params.uid))
+                    } else {
+                      router!.navigate(ROUTES.LIBRARY)
                     }
                     notify(t('XLS Import completed'))
                   } else {
@@ -657,7 +458,6 @@ const mixins: MixinsObject = {
 
           this._forEachDroppedFile(params)
         }
-<<<<<<< /tmp/kpiport/mf/cur
         reader.readAsDataURL(file)
       })
 
@@ -666,146 +466,11 @@ const mixins: MixinsObject = {
           let errMsg = t('Upload error: could not recognize Excel file.')
           errMsg += ` (${t('Uploaded file name: ')} ${rejectedFiles[i].name})`
           notify.error(errMsg)
-=======
-        const opts = {
-          title: `${t('Delete')} ${assetTypeLabel} "${safeName}"`,
-          message: msg,
-          labels: {
-            ok: t('Delete'),
-            cancel: t('Cancel'),
-          },
-          onshow: onshow,
-          onok: onok,
-          oncancel: () => {
-            dialog.destroy();
-            $('.alertify-toggle input').prop('checked', false);
-          },
-        };
-        dialog.set(opts).show();
-      },
-      deploy: function () {
-        const asset = stores.selectedAsset.asset;
-        mixins.dmix.deployAsset(asset);
-      },
-      archive: function (assetOrUid: AssetResponse | string, callback: Function) {
-        let asset: AssetResponse;
-        if (typeof assetOrUid === 'object') {
-          asset = assetOrUid;
-        } else {
-          asset = stores.selectedAsset.asset || stores.allAssets.byUid[assetOrUid];
-        }
-        const dialog = alertify.dialog('confirm');
-        const opts = {
-          title: t('Archive Form'),
-          message: `${t('Are you sure you want to archive this project?')} <br/><br/>
-            <strong>${t('Your form will not accept submissions while it is archived.')}</strong>`,
-          labels: {ok: t('Archive'), cancel: t('Cancel')},
-          onok: () => {
-            actions.resources.setDeploymentActive({
-              asset: asset,
-              active: false,
-            });
-            if (typeof callback === 'function') {
-              callback();
-            }
-          },
-          oncancel: () => {
-            dialog.destroy();
-          },
-        };
-        dialog.set(opts).show();
-      },
-      unarchive: function (assetOrUid: AssetResponse | string, callback: Function) {
-        let asset: AssetResponse;
-        if (typeof assetOrUid === 'object') {
-          asset = assetOrUid;
->>>>>>> /tmp/kpiport/mf/fork
         } else {
           notify.error(t('Could not recognize the dropped item(s).'))
           break
         }
-<<<<<<< /tmp/kpiport/mf/cur
       }
-=======
-        const dialog = alertify.dialog('confirm');
-        const opts = {
-          title: t('Unarchive Form'),
-          message: `${t('Are you sure you want to unarchive this project?')}`,
-          labels: {ok: t('Unarchive'), cancel: t('Cancel')},
-          onok: () => {
-            actions.resources.setDeploymentActive({
-              asset: asset,
-              active: true,
-            });
-            if (typeof callback === 'function') {
-              callback();
-            }
-          },
-          oncancel: () => {
-            dialog.destroy();
-          },
-        };
-        dialog.set(opts).show();
-      },
-      sharing: function (uid: string) {
-        stores.pageState.showModal({
-          type: MODAL_TYPES.SHARING,
-          assetid: uid,
-        });
-      },
-      refresh: function () {
-        stores.pageState.showModal({
-          type: MODAL_TYPES.REPLACE_PROJECT,
-          asset: stores.selectedAsset.asset,
-        });
-      },
-      translations: function (uid: string) {
-        stores.pageState.showModal({
-          type: MODAL_TYPES.FORM_LANGUAGES,
-          assetUid: uid,
-        });
-      },
-      encryption: function (uid: string) {
-        stores.pageState.showModal({
-          type: MODAL_TYPES.ENCRYPT_FORM,
-          assetUid: uid,
-        });
-      },
-      removeSharing: function (uid: string) {
-        /**
-         * Extends `removeAllPermissions` from `userPermissionRow.es6`:
-         * Checks for permissions from current user before finding correct
-         * "most basic" permission to remove.
-         */
-        const asset = stores.selectedAsset.asset || stores.allAssets.byUid[uid];
-        const userViewAssetPerm = asset.permissions.find((perm: Permission) => {
-          // Get permissions url related to current user
-          const permUserUrl = perm.user.split('/');
-          return (
-            permUserUrl[permUserUrl.length - 2] === sessionStore.currentAccount.username &&
-            perm.permission === permConfig.getPermissionByCodename(PERMISSIONS_CODENAMES.view_asset)?.url
-          );
-        });
-
-        const dialog = alertify.dialog('confirm');
-        const opts = {
-          title: t('Remove shared form'),
-          message: `${t('Are you sure you want to remove this shared form?')}`,
-          labels: {ok: t('Remove'), cancel: t('Cancel')},
-          onok: () => {
-            // Only non-owners should have the asset removed from their asset list.
-            // This menu option is only open to non-owners so we don't need to check again.
-            const isNonOwner = true;
-            actions.permissions.removeAssetPermission(uid, userViewAssetPerm.url, isNonOwner);
-          },
-          oncancel: () => {
-            dialog.destroy();
-          },
-        };
-        dialog.set(opts).show();
-      },
-
->>>>>>> /tmp/kpiport/mf/fork
     },
   },
   /**

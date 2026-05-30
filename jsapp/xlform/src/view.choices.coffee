@@ -60,13 +60,10 @@ module.exports = do ->
         @addEmptyOption("Option #{i+1}")
         @model.getSurvey()?.trigger('change')
         @$el.children().eq(0).children().eq(i).find('input.option-view-input').select()
-<<<<<<< /tmp/kpiport/mf/cur
-        return
-=======
         setTimeout =>
           @ul.find('li').last().find('.editable-wrapper').trigger('click')
         , 1
->>>>>>> /tmp/kpiport/mf/fork
+        return
       )
 
       @$el.append(btn)
@@ -122,14 +119,9 @@ module.exports = do ->
     render: ->
       @t = $("<i class=\"k-icon k-icon-trash js-remove-option\">")
       @pw = $("<div class=\"editable-wrapper js-option-label-input js-cancel-select-row\">")
-<<<<<<< /tmp/kpiport/mf/cur
       @p = $("<input placeholder=\"#{t("No value")}\" class=\"js-cancel-select-row option-view-input\" dir=\"auto\">")
       @c = $("<code><input type=\"text\" class=\"js-option-name-input js-cancel-select-row\"></input></code>")
-=======
-      @p = $("<input placeholder=\"#{t("This option has no name")}\" class=\"js-cancel-select-row option-view-input\"  data-cy=\"option\">")
-      @c = $("<code><label>#{t("Value:")}</label> <input type=\"text\" class=\"js-option-name-input js-cancel-select-row\"></input></code>")
-      @i = $("<code><label>#{t("Image:")}</label> <input type=\"text\" class=\"js-option-image-input js-cancel-select-row\"></input></code>")
->>>>>>> /tmp/kpiport/mf/fork
+      @i = $("<code><input type=\"text\" class=\"js-option-image-input js-cancel-select-row\"></input></code>")
       @d = $('<div>')
       @optionImageField = 'image'
       if @model
@@ -187,9 +179,6 @@ module.exports = do ->
           valChanged = true if val isnt @model.get('name')
           @model.set('name', val)
           @$el.trigger("choice-list-update", @options.cl.cid)
-<<<<<<< /tmp/kpiport/mf/cur
-        return newValue: val
-=======
           if valChanged
             if @model.getSurvey()?
               @model.getSurvey()?.trigger('change', { cid: @model.cid })
@@ -201,7 +190,6 @@ module.exports = do ->
               else
                 Backbone.trigger('ocConsentRowsEvent', { type: 'consentRowChoiceValue', error: true, value: @model.get('name'), cid: @model.cid })
           return newValue: @model.get('name')
->>>>>>> /tmp/kpiport/mf/fork
       ).bind @
       @pw.html(@p)
 

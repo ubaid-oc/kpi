@@ -12,6 +12,7 @@ import processingRoutes from '#/components/processing/routes'
 import projectsRoutes from '#/projects/routes'
 import PermProtectedRoute from '#/router/permProtectedRoute'
 import { injectRouter } from './legacy'
+import RequireAdmin from './requireAdmin'
 import RequireAuth from './requireAuth'
 import { PROJECTS_ROUTES, ROUTES } from './routerConstants'
 
@@ -35,9 +36,9 @@ export const router = createHashRouter(
         <Route
           path={ROUTES.MY_LIBRARY}
           element={
-            <RequireAuth>
+            <RequireAdmin>
               <MyLibraryRoute />
-            </RequireAuth>
+            </RequireAdmin>
           }
         />
         <Route

@@ -1,36 +1,4 @@
-<<<<<<< /tmp/kpiport/mf/cur
 {% extends "base_simple.html" %}
-=======
-<!DOCTYPE html>
-<html class="no-js">
-<head>
-    {% load static %}
-    {% load render_bundle from webpack_loader %}
-    <script src="{% static 'js/global_t.js' %}"></script>
-    {% render_bundle 'app' 'css' %}
-    {% render_bundle 'app' 'js' %}
-
-<link rel="stylesheet" href="{% static 'css/normalize.min.css' %}">
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>OpenClinica {% block title %}{% endblock %}</title>
-<meta name="description" content="OpenClinica Form Designer">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" href="{% static 'favicon.png' %}" />
-<!-- iPhone + iPad icons -->
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-{% if google_analytics_token %}
-  <meta name="google-analytics-token" content="{{ google_analytics_token }}">
-{% endif %}
-{% block head %}{% endblock %}
-</head>
-<body>
-<div class="registration__bg">
-{% block content %}{% endblock %}
-{% if livereload_address %}
-<script src="{{livereload_address}}"></script>
-{% endif %}
->>>>>>> /tmp/kpiport/mf/fork
 
 {% load static %}
 {% load render_bundle from webpack_loader %}
@@ -42,6 +10,17 @@
 
 {% block head_stylesheets %}
   {% render_bundle 'app' 'css' %}
+{% endblock %}
+
+{% comment %}
+  OpenClinica customization: this app is the OpenClinica Form Designer, not
+  KoboToolbox. Override the page description that base_simple.html renders.
+  NOTE: the brand prefix in <title> ("KoboToolbox ") is hardcoded outside a
+  block in base_simple.html, so it cannot be rebranded to "OpenClinica" from
+  this child template; that change must be made in base_simple.html.
+{% endcomment %}
+{% block head_end %}
+  <meta name="description" content="OpenClinica Form Designer">
 {% endblock %}
 
 {% block body %}

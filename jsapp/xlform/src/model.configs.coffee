@@ -24,14 +24,11 @@ module.exports = do ->
       name: "end"
       label: "end time"
       description: "records when the survey was marked as completed"
-<<<<<<< /tmp/kpiport/mf/cur
-      default: true
+      default: false
     startgeo:
       name: "start-geopoint"
       label: "start geopoint early"
       description: '"warms up" the GPS to make it quicker to get an accurate reading'
-=======
->>>>>>> /tmp/kpiport/mf/fork
       default: false
     today:
       name: "today"
@@ -194,15 +191,6 @@ module.exports = do ->
         defaultValue: 1
       }
     }
-<<<<<<< /tmp/kpiport/mf/cur
-    image: {
-      'max-pixels': {
-        type: configs.paramTypes.maxPixels
-        defaultValue: 2048
-      }
-    }
-=======
->>>>>>> /tmp/kpiport/mf/fork
     select_one: {
       randomize: {
         type: configs.paramTypes.boolean
@@ -223,16 +211,13 @@ module.exports = do ->
 
   configs.columns = [
     "name",
-<<<<<<< /tmp/kpiport/mf/cur
     "file",
-=======
     "bind::oc:itemgroup",
     "bind::oc:briefdescription",
     'bind::oc:description',
     'select_one_from_file_filename',
     'appearance',
     "type",
->>>>>>> /tmp/kpiport/mf/fork
     "label",
     "hint",
     "required",
@@ -275,15 +260,10 @@ module.exports = do ->
       ["kobomatrix", "Advanced Matrix"],
       ["rank__level", "Rank Level"],
       ["select_multiple", "Multiple choice", orOtherOption: true, specifyChoice: true],
-<<<<<<< /tmp/kpiport/mf/cur
-      ["select_one_from_file", "Select one from file"],
+      ["select_one_from_file", "Text"],
       ["select_multiple_from_file", "Select multiple from file"],
       ["xml-external", "External XML"],
       ["background-geopoint", "Background geopoint", supportedByUI: false],
-=======
-      ["select_one_from_file", "Text"],
-      ["xml-external", "External XML"]
->>>>>>> /tmp/kpiport/mf/fork
     ]
 
     class Type

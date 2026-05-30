@@ -46,11 +46,7 @@ class LanguageViewSet(BaseViewSet):
     """
 
     serializer_class = LanguageListSerializer
-<<<<<<< /tmp/kpiport/mf/cur
-    min_search_characters = 2
     permission_classes = []
-=======
->>>>>>> /tmp/kpiport/mf/fork
 
     def get_queryset(self):
         if self.action == 'list':

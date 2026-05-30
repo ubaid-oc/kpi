@@ -13,6 +13,11 @@ def run():
     if should_fix_internal_mfa_app_label():
         fix_internal_mfa_app_label()
 
+    # OpenClinica: repair migration/schema drift introduced by the Keycloak/SSO
+    # upgrades before `manage.py migrate` runs later in scripts/migrate.sh.
+    fix_bossoidc2_keycloak_usertype()
+    fix_oauth2_provider_application_columns()
+
 
 def should_fix_internal_mfa_app_label():
     """
@@ -39,3 +44,69 @@ def fix_internal_mfa_app_label():
         )
         """)
         print(f'Fixing accounts_mfa app migration records. Modified {cursor.rowcount} records in django_migrations')
+
+
+def fix_bossoidc2_keycloak_usertype():
+    """
+    OpenClinica: fake-apply bossoidc2 0003_keycloak_usertype when upgrading from
+    a legacy Keycloak/SSO deployment.
+
+    On older OC deployments the `bossoidc_keycloak` table already carries the
+    user_type column, so running the real migration raises
+    'column "user_type" already exists' (and leaves an InconsistentMigrationHistory
+    if it bails). This reproduces the original
+    `manage.py migrate bossoidc2 0003_keycloak_usertype --fake` intent by inserting
+    a fake django_migrations row when the legacy table exists and the migration has
+    not yet been recorded.
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT EXISTS (SELECT FROM information_schema.tables "
+            "WHERE table_schema = 'public' AND table_name = 'bossoidc_keycloak')"
+        )
+        legacy_table_exists = cursor.fetchone()[0]
+        if not legacy_table_exists:
+            return
+
+        cursor.execute(
+            "SELECT * FROM django_migrations "
+            "WHERE app = 'bossoidc2' AND name = '0003_keycloak_usertype'"
+        )
+        if cursor.fetchone() is not None:
+            return
+
+        cursor.execute(
+            "INSERT INTO django_migrations (app, name, applied) "
+            "VALUES ('bossoidc2', '0003_keycloak_usertype', NOW())"
+        )
+        print(
+            'Fake-applying bossoidc2 0003_keycloak_usertype '
+            '(legacy bossoidc_keycloak table present).'
+        )
+
+
+def fix_oauth2_provider_application_columns():
+    """
+    OpenClinica: repair oauth2_provider schema drift.
+
+    oauth2_provider 0005 may have been recorded as applied without actually
+    creating the `created`/`updated` columns on oauth2_provider_application,
+    which blocks 0006. Adding them here is idempotent (IF NOT EXISTS) and runs
+    before `manage.py migrate` is invoked further down scripts/migrate.sh.
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT EXISTS (SELECT FROM information_schema.tables "
+            "WHERE table_schema = 'public' "
+            "AND table_name = 'oauth2_provider_application')"
+        )
+        table_exists = cursor.fetchone()[0]
+        if not table_exists:
+            return
+
+        cursor.execute("""
+        ALTER TABLE oauth2_provider_application
+          ADD COLUMN IF NOT EXISTS created timestamp with time zone NOT NULL DEFAULT now(),
+          ADD COLUMN IF NOT EXISTS updated timestamp with time zone NOT NULL DEFAULT now()
+        """)
+        print('Repairing oauth2_provider_application schema drift (created/updated columns).')

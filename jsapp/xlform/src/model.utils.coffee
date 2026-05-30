@@ -52,13 +52,8 @@ module.exports = do ->
         collection.parseable = false
         return
 
-<<<<<<< /tmp/kpiport/mf/cur
-  utils.sluggifyLabel = (str, other_names=[])->
-    return utils.sluggify(str, {
-=======
   utils.sluggifyLabel = (str, other_names=[], character_limit=30, chars_exception=false)->
-    utils.sluggify(str, {
->>>>>>> /tmp/kpiport/mf/fork
+    return utils.sluggify(str, {
         preventDuplicates: other_names
         lowerCase: false
         preventDuplicateUnderscores: true

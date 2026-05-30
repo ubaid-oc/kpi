@@ -22,29 +22,19 @@ from kpi.exceptions import (
     QueryParserBadSyntax,
     QueryParserNotSupportedFieldLookup,
 )
-<<<<<<< /tmp/kpiport/mf/cur
 from kpi.models.asset import AssetDeploymentStatus, UserAssetSubscription
 from kpi.utils.django_orm_helper import OrderCustomCharField
-=======
-from kpi.models import Asset, ObjectPermission
-from kpi.models.asset import UserAssetSubscription
-from kpi.utils.query_parser import get_parsed_parameters, parse, ParseError
 from kpi.utils.domain import get_subdomain
 from bossoidc2.models import Keycloak as KeycloakModel
->>>>>>> /tmp/kpiport/mf/fork
 from kpi.utils.object_permission import (
     get_anonymous_user,
     get_database_user,
     get_objects_for_user,
     get_perm_ids_from_code_names,
 )
-<<<<<<< /tmp/kpiport/mf/cur
-from kpi.utils.permissions import is_user_anonymous
+from kpi.utils.permissions import get_subdomain_user_ids, is_user_anonymous
 from kpi.utils.query_parser import ParseError, get_parsed_parameters, parse
 
-=======
-from kpi.utils.permissions import is_user_anonymous, get_subdomain_user_ids
->>>>>>> /tmp/kpiport/mf/fork
 from .models import Asset, ObjectPermission
 
 from kpi.utils.log import logging
@@ -187,9 +177,6 @@ class KpiObjectPermissionsFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
 
         user = request.user
-<<<<<<< /tmp/kpiport/mf/cur
-        if user.is_superuser and view.detail:
-=======
 
         # User can access assets/collections created by users with same subdomain
         model_name = queryset.model._meta.model_name
@@ -212,8 +199,7 @@ class KpiObjectPermissionsFilter(filters.BaseFilterBackend):
                 )
                 raise
 
-        if user.is_superuser and view.action != 'list':
->>>>>>> /tmp/kpiport/mf/fork
+        if user.is_superuser and view.detail:
             # For a list, we won't deluge the superuser with everyone else's
             # stuff. This isn't a list, though, so return it all
             return queryset

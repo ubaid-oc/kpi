@@ -71,10 +71,13 @@ if [[ ! -d "${KPI_SRC_DIR}/staticfiles" ]] || ! python "${KPI_SRC_DIR}/docker/ch
         rm -rf "${KPI_SRC_DIR}/jsapp/compiled"
 
         echo "Syncing \`npm\` packages…"
+        # OpenClinica: `--legacy-peer-deps` is required by OC's extra dependencies
+        # (e.g. the @openclinica/logic-builder github dep). Drop `2>&1` so npm
+        # install/postinstall errors surface instead of being swallowed.
         if ( ! check-dependencies ); then
-            npm install --quiet > /dev/null 2>&1
+            npm install --legacy-peer-deps --quiet > /dev/null
         else
-            npm run postinstall > /dev/null 2>&1
+            npm run postinstall > /dev/null
         fi
 
         echo "Rebuilding client code…"

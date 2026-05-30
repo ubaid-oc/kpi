@@ -1,46 +1,17 @@
-<<<<<<< /tmp/kpiport/mf/cur
 import type { RouterState } from '@remix-run/router'
+import { when } from 'mobx'
 import Reflux from 'reflux'
 import { actions } from '#/actions'
 import assetUtils from '#/assetUtils'
 import { ASSETS_TABLE_COLUMNS, ORDER_DIRECTIONS } from '#/components/assetsTable/assetsTableConstants'
 import type { AssetTypeName } from '#/constants'
+import { DEFAULT_PAGE_SIZE } from '#/dataInterface'
 import type { AssetResponse, AssetsResponse, MetadataResponse, SearchAssetsPredefinedParams } from '#/dataInterface'
 import type { OrderDirection } from '#/projects/projectViews/constants'
 import { router } from '#/router/legacy'
 import { ROUTES } from '#/router/routerConstants'
 import { getCurrentPath, getRouteAssetUid, isAnyLibraryItemRoute } from '#/router/routerUtils'
-=======
-import Reflux from 'reflux';
-import {when} from 'mobx';
-import type {Update} from 'history';
-import assetUtils from 'js/assetUtils';
-import {
-  getCurrentPath,
-  getRouteAssetUid,
-  isAnyLibraryItemRoute,
-} from 'js/router/routerUtils';
-import {actions} from 'js/actions';
-import sessionStore from 'js/stores/session';
-import {
-  ORDER_DIRECTIONS,
-  ASSETS_TABLE_COLUMNS,
-} from 'js/components/assetsTable/assetsTableConstants';
-import type {OrderDirection} from 'js/projects/projectViews/constants';
-import {
-  DEFAULT_PAGE_SIZE,
-} from 'js/dataInterface';
-
-import type {
-  AssetResponse,
-  AssetsResponse,
-  MetadataResponse,
-  SearchAssetsPredefinedParams,
-} from 'js/dataInterface';
-import {ROUTES} from 'js/router/routerConstants';
-import {history} from 'js/router/historyRouter';
-import type {AssetTypeName} from 'js/constants';
->>>>>>> /tmp/kpiport/mf/fork
+import sessionStore from '#/stores/session'
 
 interface SingleCollectionStoreData {
   isFetchingData: boolean
@@ -68,17 +39,10 @@ class SingleCollectionStore extends Reflux.Store {
    * A method for aborting current XHR fetch request.
    * It doesn't need to be defined upfront, but I'm adding it here for clarity.
    */
-<<<<<<< /tmp/kpiport/mf/cur
   abortFetchData?: Function
   previousPath = getCurrentPath()
-  PAGE_SIZE = 100
+  PAGE_SIZE = DEFAULT_PAGE_SIZE
   DEFAULT_ORDER_COLUMN = ASSETS_TABLE_COLUMNS['date-modified']
-=======
-  abortFetchData?: Function;
-  previousPath = getCurrentPath();
-  PAGE_SIZE = DEFAULT_PAGE_SIZE;
-  DEFAULT_ORDER_COLUMN = ASSETS_TABLE_COLUMNS['date-modified'];
->>>>>>> /tmp/kpiport/mf/fork
 
   isInitialised = false
 
@@ -122,7 +86,7 @@ class SingleCollectionStore extends Reflux.Store {
     actions.library.searchMyCollectionMetadata.completed.listen(this.onSearchMetadataCompleted.bind(this))
 
     // Wait for login before starting store
-    when(() => sessionStore.isLoggedIn, this.startupStore.bind(this));
+    when(() => sessionStore.isLoggedIn, this.startupStore.bind(this))
 
     // startup store after config is ready
     actions.permissions.getConfig.completed.listen(this.startupStore.bind(this))
@@ -133,13 +97,8 @@ class SingleCollectionStore extends Reflux.Store {
    * otherwise wait until route changes to a library (see `onRouteChange`)
    */
   startupStore() {
-<<<<<<< /tmp/kpiport/mf/cur
-    if (!this.isInitialised && isAnyLibraryItemRoute() && !this.data.isFetchingData) {
-      this.fetchData(true)
-=======
     if (!this.isInitialised && isAnyLibraryItemRoute() && !this.data.isFetchingData && sessionStore.isLoggedIn) {
-      this.fetchData(true);
->>>>>>> /tmp/kpiport/mf/fork
+      this.fetchData(true)
     }
   }
 

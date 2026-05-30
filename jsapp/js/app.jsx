@@ -28,6 +28,7 @@ import { isInvalidatedPasswordRouteBlockerActive, isTOSAgreementRouteBlockerActi
 import TOSAgreement from '#/router/tosAgreement.component'
 import { router, routerGetAssetId, withRouter } from './router/legacy'
 import { Tracking } from './router/useTracking'
+import { UserPilotRouteTracking } from './router/userPilotTracking'
 import { themeKobo } from './theme'
 import ToasterConfig from './toasterConfig'
 
@@ -106,6 +107,7 @@ class App extends React.Component {
           <MantineProvider theme={themeKobo}>
             <RootContextProvider>
               <Tracking />
+              <UserPilotRouteTracking />
               <ToasterConfig />
 
               {this.shouldDisplayMainLayoutElements() && <div className='header-stretch-bg' />}

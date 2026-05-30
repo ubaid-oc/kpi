@@ -19,10 +19,7 @@ from kobo.apps.audit_log.base_views import AuditLoggedNoUpdateModelViewSet
 from kobo.apps.audit_log.models import AuditType
 from kobo.apps.openrosa.libs.utils.logger_tools import http_open_rosa_error_handler
 from kpi.authentication import DigestAuthentication, EnketoSessionAuthentication
-<<<<<<< /tmp/kpiport/mf/cur
-=======
-from kpi.constants import PERM_VIEW_ASSET, X_OPENROSA_ACCEPT_CONTENT_LENGTH
->>>>>>> /tmp/kpiport/mf/fork
+from kpi.constants import X_OPENROSA_ACCEPT_CONTENT_LENGTH
 from kpi.exceptions import SubmissionIntegrityError
 from kpi.filters import RelatedAssetPermissionsFilter
 from kpi.highlighters import highlight_xform
@@ -453,47 +450,20 @@ class AssetSnapshotViewSet(OpenRosaViewSetMixin, AuditLoggedNoUpdateModelViewSet
         # **Not** part of the OpenRosa API
         snapshot = self.get_object()
         if snapshot.details.get('status') == 'success':
-<<<<<<< /tmp/kpiport/mf/cur
-            data = {
-                'server_url': reverse(
+            # OpenClinica customization: build a direct `?form=` preview URL
+            # pointing at the XML detail endpoint instead of using Enketo's
+            # preview API (which posts a server_url back). This avoids the
+            # `requests.post`/`enketo_flush_cached_preview` round-trip.
+            preview_url = '{}/{}?form={}'.format(
+                settings.ENKETO_URL,
+                settings.ENKETO_PREVIEW_ENDPOINT,
+                reverse(
                     viewname='assetsnapshot-detail',
+                    format='xml',
                     kwargs={'uid_asset_snapshot': snapshot.uid},
                     request=request,
                 ),
-                'form_id': snapshot.uid,
-            }
-
-            # Use Enketo API to create preview instead of `preview?form=`,
-            # which does not load any form media files.
-            response = requests.post(
-                f'{settings.ENKETO_URL}/{settings.ENKETO_PREVIEW_ENDPOINT}',
-                # bare tuple implies basic auth
-                auth=(settings.ENKETO_API_KEY, ''),
-                data=data
             )
-            response.raise_for_status()
-
-            # Ask Celery to remove the preview from its XSLT cache after some
-            # reasonable delay; see
-            # https://github.com/enketo/enketo-express/issues/357
-            enketo_flush_cached_preview.apply_async(
-                kwargs=data,  # server_url and form_id
-                countdown=settings.ENKETO_FLUSH_CACHED_PREVIEW_DELAY,
-            )
-
-            json_response = response.json()
-            preview_url = json_response.get('preview_url')
-=======
-            preview_url = "{}/{}?form={}".format(
-                              settings.ENKETO_URL,
-                              settings.ENKETO_PREVIEW_ENDPOINT,
-                              reverse(viewname='assetsnapshot-detail',
-                                      format='xml',
-                                      kwargs={'uid': snapshot.uid},
-                                      request=request,
-                                      ),
-                            )
->>>>>>> /tmp/kpiport/mf/fork
 
             return HttpResponseRedirect(preview_url)
         else:

@@ -7,20 +7,6 @@
   }
 }
 
-<<<<<<< /tmp/kpiport/mf/cur
-  .mandatory-setting__row {
-    &.mandatory-setting__row--custom {
-      .mandatory-settings-input-wrapper {
-        margin-top: 5px;
-        display: block;
-      }
-
-      input[type='radio']:not(:checked) ~ .mandatory-settings-input-wrapper {
-        visibility: hidden;
-        height: 0;
-        overflow: hidden;
-        margin-top: 0;
-=======
 .js-card-settings-required-logic.card__settings__fields--active {
   margin-top: -15px;
 }
@@ -45,7 +31,6 @@
 
       input[type='text'] {
         border-color: colors.$kobo-red;
->>>>>>> /tmp/kpiport/mf/fork
       }
     }
   }

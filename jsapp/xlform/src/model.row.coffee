@@ -11,17 +11,11 @@ $aliases = require './model.aliases'
 $rowDetail = require './model.rowDetail'
 $choices = require './model.choices'
 $skipLogicHelpers = require './mv.skipLogicHelpers'
-<<<<<<< /tmp/kpiport/mf/cur
 readParameters = require('#/components/formBuilder/formBuilderUtils').readParameters
 writeParameters = require('#/components/formBuilder/formBuilderUtils').writeParameters
 txtid = require('#/utils').txtid
 notify = require('#/utils').notify
-=======
-readParameters = require('../../js/components/formBuilder/formBuilderUtils').readParameters
-writeParameters = require('../../js/components/formBuilder/formBuilderUtils').writeParameters
-notify = require('js/utils').notify
-econsentSignature = require('../../js/components/formBuilder/econsentSignature')
->>>>>>> /tmp/kpiport/mf/fork
+econsentSignature = require('#/components/formBuilder/econsentSignature')
 
 module.exports = do ->
   row = {}

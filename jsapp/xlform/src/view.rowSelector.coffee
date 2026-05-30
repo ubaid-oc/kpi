@@ -4,11 +4,8 @@ $baseView = require './view.pluggedIn.backboneView'
 $viewTemplates = require './view.templates'
 $icons = require './view.icons'
 $configs = require './model.configs'
-<<<<<<< /tmp/kpiport/mf/cur
 writeParameters = require('#/components/formBuilder/formBuilderUtils').writeParameters
-=======
 econsentSignature = require('../../js/components/formBuilder/econsentSignature')
->>>>>>> /tmp/kpiport/mf/fork
 
 module.exports = do ->
   viewRowSelector = {}
@@ -80,20 +77,15 @@ module.exports = do ->
       @line.html $viewTemplates.$$render('xlfRowSelector.line', "")
       @line.find('.row__questiontypes__new-question-name').val(@question_name)
       $menu = @line.find(".row__questiontypes__list")
-<<<<<<< /tmp/kpiport/mf/cur
       availableFiles = @options.survey.availableFiles || []
-      for mrow in $icons.grouped()
-        menurow = $("<div>", class: "questiontypelist__row").appendTo $menu
-        for mitem, i in mrow when mitem
-          if availableFiles.length is 0 and ['select_one_from_file', 'select_multiple_from_file'].includes(mitem.get('id'))
-=======
       econsentIcon = null
       for mrow in $icons.grouped()
         menurow = $("<div>", class: "questiontypelist__row").appendTo $menu
         for mitem, i in mrow when mitem
+          if availableFiles.length is 0 and ['select_one_from_file', 'select_multiple_from_file'].includes(mitem.get('id'))
+            continue
           if mitem.get('id') is 'econsent_signature'
             econsentIcon = mitem
->>>>>>> /tmp/kpiport/mf/fork
             continue
           menurow.append $viewTemplates.$$render('xlfRowSelector.cell', mitem.attributes)
 
@@ -103,7 +95,6 @@ module.exports = do ->
 
       @scrollFormBuilder('+=220')
       @$('.questiontypelist__item').click _.bind(@onSelectNewQuestionType, @)
-<<<<<<< /tmp/kpiport/mf/cur
 
       # Keyboard navigation
       toggleKeyboardNavigation = false
@@ -162,8 +153,6 @@ module.exports = do ->
         if evt.which == $ENTER
           currentListRow.eq(columnIndex).children().eq(rowIndex).trigger('click')
         return
-=======
->>>>>>> /tmp/kpiport/mf/fork
       return
 
     shrink: ->
@@ -216,12 +205,6 @@ module.exports = do ->
       rowDetails =
         type: rowType
 
-<<<<<<< /tmp/kpiport/mf/cur
-      # For calculate question type we assume that what user wrote in the label input is the calculation value
-      # Otherwise we just go with the label we already came up with above
-      if rowType is 'calculate'
-        rowDetails.calculation = questionLabelValue
-=======
       if rowType is 'pii_encrypted'
         rowDetails.type = 'text'
         rowDetails['bind::oc:external'] = 'contactdata'
@@ -240,7 +223,6 @@ module.exports = do ->
 
       if questionLabelValue != ''
         rowDetails.name = questionLabelValue.toLowerCase().replace(/ /g,"_").replace(/\W/g, '')
->>>>>>> /tmp/kpiport/mf/fork
       else
         if rowType is 'calculate'
           rowDetails.name = 'calculation'
@@ -254,7 +236,6 @@ module.exports = do ->
         survey = @options.survey
         options.at = 0
 
-<<<<<<< /tmp/kpiport/mf/cur
       # For some questions we start off with some parameters having default values.
       # The code was added mostly for `image` to have some initial `max-pixels`.
       typeConfig = $configs.questionParams[rowType]
@@ -266,20 +247,14 @@ module.exports = do ->
       if (Object.keys(initialParameters).length > 0)
         rowDetails.parameters = writeParameters(initialParameters)
 
-      # Here we add the row to the survey
-=======
       rowDetails.isNewRow = true
 
->>>>>>> /tmp/kpiport/mf/fork
+      # Here we add the row to the survey
       newRow = survey.addRow(rowDetails, options)
       # …and link it up (TODO what?)
       newRow.linkUp(warnings: [], errors: [])
-<<<<<<< /tmp/kpiport/mf/cur
-
-=======
       if rowType is 'econsent_signature'
         econsentSignature.ensureEConsentSignatureStructure(newRow, '')
->>>>>>> /tmp/kpiport/mf/fork
       @hide()
       return
 

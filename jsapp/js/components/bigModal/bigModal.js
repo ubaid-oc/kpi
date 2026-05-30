@@ -113,8 +113,16 @@ class BigModal extends React.Component {
         this.setModalTitle(t('Collection details'))
         break
 
+      case MODAL_TYPES.LIBRARY_COLLECTION_CREATE:
+        this.setState({ title: t('Create Collection'), modalClass: 'modal--top-aligned' })
+        break
+
+      case MODAL_TYPES.LIBRARY_COLLECTION_EDIT:
+        this.setState({ title: t('Edit Collection'), modalClass: 'modal--top-aligned' })
+        break
+
       case MODAL_TYPES.ASSET_TAGS:
-        this.setModalTitle(t('Edit tags'))
+        this.setState({ title: t('Edit label(s)'), modalClass: 'modal--top-aligned' })
         break
 
       case MODAL_TYPES.LIBRARY_UPLOAD:
@@ -314,11 +322,14 @@ class BigModal extends React.Component {
               onSetModalTitle={this.setModalTitle}
             />
           )}
-          {this.props.params.type === MODAL_TYPES.LIBRARY_COLLECTION && (
+          {(this.props.params.type === MODAL_TYPES.LIBRARY_COLLECTION ||
+            this.props.params.type === MODAL_TYPES.LIBRARY_COLLECTION_CREATE ||
+            this.props.params.type === MODAL_TYPES.LIBRARY_COLLECTION_EDIT) && (
             <LibraryAssetForm
               asset={this.props.params.asset}
               assetType={ASSET_TYPES.collection.id}
               onSetModalTitle={this.setModalTitle}
+              formType={this.props.params.type}
             />
           )}
           {this.props.params.type === MODAL_TYPES.ASSET_TAGS && <AssetTagsForm asset={this.props.params.asset} />}

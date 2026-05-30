@@ -137,15 +137,9 @@ module.exports = do ->
             <div class="noop card__indicator__icon"><i class="card__header-icon"></i></div>
           </div>
           <div class="card__text">
-<<<<<<< /tmp/kpiport/mf/cur
-            <input type="text" placeholder="#{t("Question label is required")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort" dir="auto">
-            <br />
-            <input type="text" placeholder="#{t("Question hint")}" class="card__header-hint js-card-hint js-cancel-select-row js-cancel-sort" dir="auto">
-=======
             <div class="card__header-name js-cancel-select-row js-cancel-sort"></div>
-            <textarea rows="1" placeholder="#{t("Enter question label (required for item to be visible)")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort"></textarea>
-            <input type="text" placeholder="#{t("Enter question hint (optional)")}" class="card__header-hint js-card-hint js-cancel-select-row js-cancel-sort">
->>>>>>> /tmp/kpiport/mf/fork
+            <textarea rows="1" placeholder="#{t("Enter question label (required for item to be visible)")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort" dir="auto"></textarea>
+            <input type="text" placeholder="#{t("Enter question hint (optional)")}" class="card__header-hint js-card-hint js-cancel-select-row js-cancel-sort" dir="auto">
           </div>
           <div class="card__buttons">
             <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings" data-button-name="settings"><i class="k-icon k-icon-edit"></i></span>
@@ -171,10 +165,6 @@ module.exports = do ->
     return template
 
   # Empty js-group-icon is only sometimes used, but we need to reserve space for it
-<<<<<<< /tmp/kpiport/mf/cur
-  groupView = ()->
-    template = """
-=======
   groupView = (surveyView)->
     addToLibraryButton = ''
     if surveyView.canAddToLibrary
@@ -183,8 +173,7 @@ module.exports = do ->
             <i class="k-icon k-icon-folder-plus"></i>
           </span>
       """
-    """
->>>>>>> /tmp/kpiport/mf/fork
+    template = """
     <div class="survey__row__item survey__row__item--group group card js-select-row">
       <header class="group__header">
         <div class="group__header__icon js-group-icon">
@@ -223,11 +212,7 @@ module.exports = do ->
             <div class="noop card__indicator__icon"><i class="card__header-icon k-icon k-icon-matrix"></i></div>
           </div>
           <div class="card__text">
-<<<<<<< /tmp/kpiport/mf/cur
-            <input type="text" placeholder="#{t("Question label is required")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort" dir="auto">
-=======
-            <input type="text" placeholder="#{t("Item label is required")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort">
->>>>>>> /tmp/kpiport/mf/fork
+            <input type="text" placeholder="#{t("Item label is required")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort" dir="auto">
           </div>
           <div class="card__buttons">
             <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings" data-button-name="settings"><i class="k-icon k-icon-edit"></i></span>
@@ -405,19 +390,7 @@ module.exports = do ->
               name="#{uniqueName}"
               value="custom" #{if modifier is 'custom' then 'checked' else ''}
             >
-<<<<<<< /tmp/kpiport/mf/cur
-            <span class="radio__label">#{t('Custom logic')}</span>
-            <label class="mandatory-settings-input-wrapper">
-              <input
-                type="text"
-                class="js-mandatory-setting-custom-text"
-                value=""
-                placeholder="#{t('Mandatory when this formula is true')}"
-              >
-            </label>
-=======
             <span class="radio__label">#{t('Conditional')}</span>
->>>>>>> /tmp/kpiport/mf/fork
           </label>
           """}
         </div>
@@ -487,26 +460,6 @@ module.exports = do ->
     """
     return template
 
-<<<<<<< /tmp/kpiport/mf/cur
-  return {
-    xlfRowView: xlfRowView
-    unsupportedRowView: unsupportedRowView
-    expandChoiceList: expandChoiceList
-    mandatorySettingSelector: mandatorySettingSelector
-    paramsSettingsField: paramsSettingsField
-    paramsSimple: paramsSimple
-    selectQuestionExpansion: selectQuestionExpansion
-    groupView: groupView
-    rowErrorView: rowErrorView
-    koboMatrixView: koboMatrixView
-    scoreView: scoreView
-    rankView: rankView
-    groupSettingsView: groupSettingsView
-    rowSettingsView: rowSettingsView
-    iconTooltip: iconTooltip
-    lockedFeatures: lockedFeatures
-  }
-=======
   defaultValuePanel = () ->
     """
     <div class="default-value-panel">
@@ -546,22 +499,24 @@ module.exports = do ->
     </div>
     """
 
-  xlfRowView: xlfRowView
-  expandChoiceList: expandChoiceList
-  mandatorySettingSelector: mandatorySettingSelector
-  requiredLogicPanel: requiredLogicPanel
-  paramsSettingsField: paramsSettingsField
-  paramsSimple: paramsSimple
-  selectQuestionExpansion: selectQuestionExpansion
-  groupView: groupView
-  rowErrorView: rowErrorView
-  calculationPanel: calculationPanel
-  koboMatrixView: koboMatrixView
-  scoreView: scoreView
-  rankView: rankView
-  groupSettingsView: groupSettingsView
-  rowSettingsView: rowSettingsView
-  defaultValuePanel: defaultValuePanel
-  iconTooltip: iconTooltip
-  lockedFeatures: lockedFeatures
->>>>>>> /tmp/kpiport/mf/fork
+  return {
+    xlfRowView: xlfRowView
+    unsupportedRowView: unsupportedRowView
+    expandChoiceList: expandChoiceList
+    mandatorySettingSelector: mandatorySettingSelector
+    requiredLogicPanel: requiredLogicPanel
+    paramsSettingsField: paramsSettingsField
+    paramsSimple: paramsSimple
+    selectQuestionExpansion: selectQuestionExpansion
+    groupView: groupView
+    rowErrorView: rowErrorView
+    calculationPanel: calculationPanel
+    koboMatrixView: koboMatrixView
+    scoreView: scoreView
+    rankView: rankView
+    groupSettingsView: groupSettingsView
+    rowSettingsView: rowSettingsView
+    defaultValuePanel: defaultValuePanel
+    iconTooltip: iconTooltip
+    lockedFeatures: lockedFeatures
+  }

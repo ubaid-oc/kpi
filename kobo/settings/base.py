@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import string
 import subprocess
 import warnings
@@ -37,17 +38,6 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY', '@25)**hc^rjaiagb4#&q*84hr*uscsxwr-cv#
 # SECURITY WARNING: If enabled, outer web server must filter out the `X-Forwarded-Proto` header.
 SECURE_PROXY_SSL_HEADER = env.tuple('SECURE_PROXY_SSL_HEADER', str, None)
 
-<<<<<<< /tmp/kpiport/mf/cur
-public_request_scheme = env.str('PUBLIC_REQUEST_SCHEME', 'https').lower()
-
-if public_request_scheme == 'https' or SECURE_PROXY_SSL_HEADER:
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-
-# These HSTS settings are sometimes overriden via nginx like in the `kobo-helm-chart`
-# repository or by the AWS ALB/Azure app gateway. If you see the header returned
-# with other values, check these places first
-=======
 COOKIES_ARE_SECURE = (
     env.str('PUBLIC_REQUEST_SCHEME', '').lower() == 'https'
     or bool(SECURE_PROXY_SSL_HEADER)
@@ -59,7 +49,9 @@ if COOKIES_ARE_SECURE:
 # SameSite=None requires the Secure flag; fall back to 'Lax' when not serving over HTTPS
 _default_samesite = 'None' if COOKIES_ARE_SECURE else 'Lax'
 
->>>>>>> /tmp/kpiport/mf/fork
+# These HSTS settings are sometimes overriden via nginx like in the `kobo-helm-chart`
+# repository or by the AWS ALB/Azure app gateway. If you see the header returned
+# with other values, check these places first
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool('SECURE_HSTS_INCLUDE_SUBDOMAINS', False)
 SECURE_HSTS_PRELOAD = env.bool('SECURE_HSTS_PRELOAD', False)
 SECURE_HSTS_SECONDS = env.int('SECURE_HSTS_SECONDS', 0)
@@ -69,17 +61,6 @@ SECURE_HSTS_SECONDS = env.int('SECURE_HSTS_SECONDS', 0)
 USE_X_FORWARDED_HOST = env.bool('USE_X_FORWARDED_HOST', False)
 
 # Domain must not exclude KoBoCAT when sharing sessions
-<<<<<<< /tmp/kpiport/mf/cur
-SESSION_COOKIE_DOMAIN = env.str('SESSION_COOKIE_DOMAIN', None)
-if SESSION_COOKIE_DOMAIN:
-    SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'kobonaut')
-    # The trusted CSRF origins must encompass Enketo's subdomain. See
-    # https://docs.djangoproject.com/en/2.2/ref/settings/#std:setting-CSRF_TRUSTED_ORIGINS
-    trusted_domains = [
-        f'{public_request_scheme}://*{SESSION_COOKIE_DOMAIN}',
-    ]
-    CSRF_TRUSTED_ORIGINS = trusted_domains
-=======
 # NOTE: For multi-tenant setups with separate subdomains, keep cookie domains as None
 # to ensure each subdomain has its own isolated session and CSRF tokens
 ALLOWED_DOMAINS = [
@@ -108,7 +89,6 @@ if CSRF_COOKIE_SAMESITE == 'None':
 
 SESSION_SAVE_EVERY_REQUEST = True
 
->>>>>>> /tmp/kpiport/mf/fork
 ENKETO_CSRF_COOKIE_NAME = env.str('ENKETO_CSRF_COOKIE_NAME', '__csrf')
 
 # Instances of this model will be treated as allowed origins; see
@@ -196,7 +176,6 @@ INSTALLED_APPS = (
     'kobo.apps.mass_emails.MassEmailsConfig',
     'kobo.apps.trackers.TrackersConfig',
     'kobo.apps.trash_bin.TrashBinAppConfig',
-<<<<<<< /tmp/kpiport/mf/cur
     'kobo.apps.markdownx_uploader.MarkdownxUploaderAppConfig',
     'kobo.apps.form_disclaimer.FormDisclaimerAppConfig',
     'kobo.apps.openrosa.apps.logger.app.LoggerAppConfig',
@@ -209,11 +188,10 @@ INSTALLED_APPS = (
     'kobo.apps.long_running_migrations.app.LongRunningMigrationAppConfig',
     'kobo.apps.user_reports.apps.UserReportsConfig',
     'drf_spectacular',
-=======
+    # OpenClinica apps
     'oc',
     'bossoidc2',
     'mozilla_django_oidc',
->>>>>>> /tmp/kpiport/mf/fork
 )
 
 MIDDLEWARE = [
@@ -222,35 +200,27 @@ MIDDLEWARE = [
     'django_dont_vary_on.middleware.RemoveUnneededVaryHeadersMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-<<<<<<< /tmp/kpiport/mf/cur
+    # 'oc.middleware.session.OCSessionMiddleware',
     'hub.middleware.LocaleMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'allauth.usersessions.middleware.UserSessionsMiddleware',
-=======
-    # 'oc.middleware.session.OCSessionMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
->>>>>>> /tmp/kpiport/mf/fork
     'django.middleware.common.CommonMiddleware',
     'kobo.apps.audit_log.middleware.create_project_history_log_middleware',
     # Still needed really?
     'kobo.apps.openrosa.libs.utils.middleware.LocaleMiddlewareWithTweaks',
     'django.middleware.csrf.CsrfViewMiddleware',
-<<<<<<< /tmp/kpiport/mf/cur
-    'corsheaders.middleware.CorsMiddleware',
-=======
     # 'oc.middleware.csrf.OCCsrfViewMiddleware',
->>>>>>> /tmp/kpiport/mf/fork
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'kobo.apps.openrosa.libs.utils.middleware.RestrictedAccessMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-<<<<<<< /tmp/kpiport/mf/cur
     'kobo.apps.openrosa.libs.utils.middleware.HTTPResponseNotAllowedMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-=======
+    # OpenClinica: X-Frame-Options is disabled so the form designer can be
+    # embedded in the study-designer iframe; frame embedding is controlled via
+    # CSP frame-ancestors instead. CSP middleware is always active here (rather
+    # than only when ENABLE_CSP=True) for the same reason.
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
->>>>>>> /tmp/kpiport/mf/fork
     'hub.middleware.UsernameInResponseHeaderMiddleware',
     'django_userforeignkey.middleware.UserForeignKeyMiddleware',
     'django_request_cache.middleware.RequestCacheMiddleware',
@@ -948,39 +918,8 @@ django.conf.locale.LANG_INFO.update(EXTRA_LANG_INFO)
 DJANGO_LANGUAGE_CODES = env.str(
     'DJANGO_LANGUAGE_CODES',
     default=(
-<<<<<<< /tmp/kpiport/mf/cur
-        'am '  # Amharic
-        'ar '  # Arabic
-        'bn '  # Bengali
-        'cs '  # Czech
-        'de '  # German
-        'en '  # English
-        'es '  # Spanish
-        'fa '  # Persian/Farsi
-        'fr '  # French
-        'hi '  # Hindi
-        'hu '  # Hungarian
-        'id '  # Indonesian
-        'ja '  # Japanese
-        'km '  # Khmer
-        'ku '  # Kurdish
-        'ln '  # Lingala
-        'my '  # Burmese/Myanmar
-        'ny '  # Chewa/Chichewa/Nyanja
-        'ne '  # Nepali
-        'pl '  # Polish
-        'pt '  # Portuguese
-        'ru '  # Russian
-        'sw '  # Swahili
-        'th '  # Thai
-        'tr '  # Turkish
-        'uk '  # Ukrainian
-        'vi '  # Vietnamese
-        'yo '  # Yoruba
-        'zh-hans'  # Chinese Simplified
-=======
+        # OpenClinica deploys with English only.
         'en'  # English
->>>>>>> /tmp/kpiport/mf/fork
     )
 )
 LANGUAGES = [
@@ -996,11 +935,6 @@ LOCALE_PATHS = (os.path.join(BASE_DIR, 'locale'),)
 
 USE_I18N = False
 
-<<<<<<< /tmp/kpiport/mf/cur
-=======
-USE_L10N = False
-
->>>>>>> /tmp/kpiport/mf/fork
 USE_TZ = True
 
 CAN_LOGIN_AS = lambda request, target_user: request.user.is_superuser
@@ -1087,13 +1021,10 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # SessionAuthentication and BasicAuthentication would be included by
         # default
-<<<<<<< /tmp/kpiport/mf/cur
-        'kpi.authentication.SessionAuthentication',
-=======
+        # OpenClinica: OIDC (Keycloak) authentication classes added for SSO.
         'mozilla_django_oidc.contrib.drf.OIDCAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        'kpi.authentication.SessionAuthentication',
         'oidc_auth.authentication.BearerTokenAuthentication',
->>>>>>> /tmp/kpiport/mf/fork
         'kpi.authentication.BasicAuthentication',
         'kpi.authentication.TokenAuthentication',
         'kpi.authentication.OAuth2Authentication',
@@ -1313,17 +1244,11 @@ TEMPLATES = [
 
 DEFAULT_SUBMISSIONS_COUNT_NUMBER_OF_DAYS = 31
 GOOGLE_ANALYTICS_TOKEN = os.environ.get('GOOGLE_ANALYTICS_TOKEN')
-<<<<<<< /tmp/kpiport/mf/cur
+# OpenClinica: Userpilot SDK token (CSP rules for it are applied below).
+USER_PILOT_SDK_TOKEN = os.environ.get('USER_PILOT_SDK_TOKEN')
 SENTRY_JS_DSN = None
 if SENTRY_JS_DSN_URL := env.url('SENTRY_JS_DSN', default=None):
     SENTRY_JS_DSN = SENTRY_JS_DSN_URL.geturl()
-=======
-USER_PILOT_SDK_TOKEN = os.environ.get('USER_PILOT_SDK_TOKEN')
-RAVEN_JS_DSN_URL = env.url('RAVEN_JS_DSN', default=None)
-RAVEN_JS_DSN = None
-if RAVEN_JS_DSN_URL:
-    RAVEN_JS_DSN = RAVEN_JS_DSN_URL.geturl()
->>>>>>> /tmp/kpiport/mf/fork
 
 # replace this with the pointer to the KoboCAT server, if it exists
 KOBOCAT_URL = os.environ.get('KOBOCAT_URL', 'https://change-me.invalid')
@@ -1408,7 +1333,13 @@ ENKETO_FLUSH_CACHED_PREVIEW_DELAY = 1800  # seconds
 # Content Security Policy (CSP)
 # CSP should "just work" by allowing any possible configuration
 # however CSP_EXTRA_DEFAULT_SRC is provided to allow for custom additions
-if env.bool('ENABLE_CSP', False):
+# OpenClinica: csp.middleware.CSPMiddleware is always included in MIDDLEWARE
+# (see above) so the form designer can be embedded in an iframe. Only append it
+# here if it is somehow missing, to avoid listing the middleware twice.
+if (
+    env.bool('ENABLE_CSP', False)
+    and 'csp.middleware.CSPMiddleware' not in MIDDLEWARE
+):
     MIDDLEWARE.append('csp.middleware.CSPMiddleware')
 local_unsafe_allows = [
     "'unsafe-eval'",
@@ -1493,14 +1424,13 @@ if csp_report_uri:  # Let environ validate uri, but set as string
     CSP_REPORT_URI = csp_report_uri.geturl()
 CSP_REPORT_ONLY = env.bool('CSP_REPORT_ONLY', False)
 
-<<<<<<< /tmp/kpiport/mf/cur
-""" Celery configuration """
-=======
-# OC Instance URL
-ENKETO_FORM_OC_INSTANCE_URL = os.environ.get('ENKETO_FORM_OC_INSTANCE_URL', '//build.openclinica-dev.io/form-service/api/storage/artifacts/clinicaldata.xml')
+# OpenClinica: OC Instance URL used by Enketo form rendering.
+ENKETO_FORM_OC_INSTANCE_URL = os.environ.get(
+    'ENKETO_FORM_OC_INSTANCE_URL',
+    '//build.openclinica-dev.io/form-service/api/storage/artifacts/clinicaldata.xml',
+)
 
-''' Celery configuration '''
->>>>>>> /tmp/kpiport/mf/fork
+""" Celery configuration """
 # Celery 4.0 New lowercase settings.
 # Uppercase settings can be used when using a PREFIX
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#new-lowercase-settings
@@ -2291,7 +2221,6 @@ THUMB_CONF = {
     'small': 240,
 }
 
-<<<<<<< /tmp/kpiport/mf/cur
 SUPPORTED_MEDIA_UPLOAD_TYPES = [
     'image/jpeg',
     'image/png',
@@ -2373,7 +2302,7 @@ SECURE_REFERRER_POLICY = env(
     'SECURE_REFERRER_POLICY',
     default='strict-origin-when-cross-origin',
 )
-=======
+
 # OpenClinica Keycloak Settings
 X_OPENROSA_ACCEPT_CONTENT_LENGTH_DEFAULT = os.environ.get('X_OPENROSA_ACCEPT_CONTENT_LENGTH_DEFAULT', '100000000')
 OC_BUILD_URL = os.environ.get('OC_BUILD_URL', '')
@@ -2403,4 +2332,3 @@ if KEYCLOAK_AUTH_URI != '' and KEYCLOAK_CLIENT_ID != '' and KEYCLOAK_CLIENT_SECR
         public_uri=PUBLIC_URI_FOR_KEYCLOAK,
         client_secret=KEYCLOAK_CLIENT_SECRET
     )
->>>>>>> /tmp/kpiport/mf/fork

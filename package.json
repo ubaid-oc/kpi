@@ -12,6 +12,7 @@
     "@mantine/form": "^7.16.2",
     "@mantine/hooks": "^7.15.0",
     "@mapbox/leaflet-omnivore": "^0.3.4",
+    "@openclinica/logic-builder": "github:OpenClinica/logic-builder#ea77c653bbaff233a24489b1d66e5947c2eb8b44",
     "@placemarkio/check-geojson": "^0.1.14",
     "@sentry/react": "^7.120.3",
     "@tanstack/react-query": "^5.85.5",
@@ -21,11 +22,8 @@
     "backbone-validation": "^0.11.5",
     "chai-deep-equal-ignore-undefined": "^1.1.1",
     "classnames": "^2.3.1",
-<<<<<<< /tmp/kpiport/mf/cur
     "coffeelint-no-implicit-returns": "^0.0.6",
-=======
     "cross-storage": "^1.0.0",
->>>>>>> /tmp/kpiport/mf/fork
     "fuse.js": "^6.4.3",
     "immer": "^10.1.1",
     "immutable": "^3.8.2",
@@ -77,17 +75,12 @@
     "react-textarea-autosize": "^8.5.9",
     "reflux": "^6.4.1",
     "reflux-core": "^1.0.0",
-<<<<<<< /tmp/kpiport/mf/cur
     "rtl-detect": "^1.1.2",
     "select2": "^3.5.2-browserify",
-    "use-immer": "^0.10.0",
-    "wretch": "^2.9.0",
-=======
-    "select2": "3.5.2-browserify",
-    "spark-md5": "^3.0.1",
     "underscore": ">=1.12.1",
+    "use-immer": "^0.10.0",
     "userpilot": "1.4.2",
->>>>>>> /tmp/kpiport/mf/fork
+    "wretch": "^2.9.0",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
@@ -114,21 +107,15 @@
     "@testing-library/react": "^16.3.0",
     "@types/backbone": "^1.4.23",
     "@types/chai": "^4.3.1",
-<<<<<<< /tmp/kpiport/mf/cur
     "@types/coffeescript": "^2.5.7",
+    "@types/cross-storage": "^0.8.30",
+    "@types/google.analytics": "^0.0.42",
     "@types/gtag.js": "^0.0.20",
     "@types/jest": "^29.5.13",
     "@types/jquery": "^3.5.33",
     "@types/leaflet": "^1.9.20",
     "@types/leaflet.heat": "^0.2.5",
     "@types/leaflet.markercluster": "^1.5.5",
-=======
-    "@types/cross-storage": "^0.8.30",
-    "@types/google.analytics": "^0.0.42",
-    "@types/gtag.js": "^0.0.12",
-    "@types/jquery": "^3.5.10",
-    "@types/lodash": "^4.14.179",
->>>>>>> /tmp/kpiport/mf/fork
     "@types/lodash.clonedeep": "^4.5.6",
     "@types/lodash.debounce": "^4.0.7",
     "@types/lodash.escape": "^4.0.7",
@@ -150,25 +137,14 @@
     "@types/react-infinite-scroller": "^1.2.5",
     "@types/react-mixin": "^2.0.37",
     "@types/react-modal": "^3.13.1",
-<<<<<<< /tmp/kpiport/mf/cur
     "@types/react-table": "^6.8.5",
     "@types/react-tagsinput": "^3.20.6",
     "@types/reflux": "^6.4.6",
     "@types/rtl-detect": "^1.0.3",
+    "@types/underscore": "^1.11.5",
     "@types/zxcvbn": "^4.4.4",
     "@vusion/webfonts-generator": "^0.8.0",
     "autoprefixer": "^10.4.19",
-=======
-    "@types/react-select": "^4.0.18",
-    "@types/react-tagsinput": "^3.19.9",
-    "@types/reflux": "^6.4.3",
-    "@types/underscore": "^1.11.5",
-    "@typescript-eslint/eslint-plugin": "^5.12.0",
-    "@typescript-eslint/parser": "^5.12.0",
-    "@vusion/webfonts-generator": "^0.7.3",
-    "@webpack-cli/serve": "^1.6.1",
-    "autoprefixer": "^9.8.1",
->>>>>>> /tmp/kpiport/mf/fork
     "chai": "^4.2.0",
     "chai-exclude": "^2.1.0",
     "chart.js": "^4.4.0",
@@ -178,8 +154,8 @@
     "coffee-loader": "^0.9.0",
     "coffeelint": "^1.16.2",
     "coffeescript": "^1.12.0",
-<<<<<<< /tmp/kpiport/mf/cur
     "concurrently": "^9.2.1",
+    "css-element-queries": "^1.2.3",
     "css-loader": "^6.11.0",
     "eslint": "^9.17.0",
     "eslint-formatter-compact": "^8.40.0",
@@ -212,30 +188,6 @@
     "replace-in-file": "^6.3.5",
     "sass": "^1.92.1",
     "sass-loader": "^16.0.5",
-=======
-    "css-element-queries": "^1.2.3",
-    "css-loader": "^6.7.1",
-    "eslint": "^8.18.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-react": "^7.30.1",
-    "eslint-plugin-storybook": "^0.6.8",
-    "fork-ts-checker-webpack-plugin": "^8.0.0",
-    "lodash.isequal": "^4.5.0",
-    "mocha": "^7.1.2",
-    "mocha-chrome": "^2.2.0",
-    "moment": ">=2.29.4",
-    "object-assign": "^4.1.1",
-    "patch-package": "^6.5.1",
-    "postcss": ">=7.0.36",
-    "postcss-loader": "^4.2.0",
-    "prettier": "^2.7.1",
-    "react-hot-loader": "3.1.0",
-    "react-refresh": "^0.14.0",
-    "replace-in-file": "^6.0.0",
-    "sass": "^1.41.0",
-    "sass-loader": "^10.1.1",
-    "source-map-loader": "^3.0.1",
->>>>>>> /tmp/kpiport/mf/fork
     "speed-measure-webpack-plugin": "^1.5.0",
     "storybook": "^9.0.0-beta.11",
     "storybook-addon-remix-react-router": "^3.1",
@@ -253,7 +205,6 @@
     "wait-on": "^9.0.4",
     "webpack": "^5.105.0",
     "webpack-bundle-tracker": "^1.5.0",
-<<<<<<< /tmp/kpiport/mf/cur
     "webpack-cli": "^6.0.1",
     "webpack-dev-middleware": "^6.1.3",
     "webpack-dev-server": "^5.2.2",
@@ -270,12 +221,6 @@
     },
     "storybook": "$storybook",
     "coffee-script": "$coffeescript"
-=======
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-middleware": "^5.3.1",
-    "webpack-dev-server": "^4.13.2",
-    "webpack-extract-translation-keys-plugin": "^6.0.0"
->>>>>>> /tmp/kpiport/mf/fork
   },
   "scripts": {
     "preinstall": "npm run hint",

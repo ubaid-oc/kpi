@@ -40,63 +40,18 @@ export const ROOT_URL = (() => {
     // Strip trailing slashes
     rootPath = rootPathEl.content.replace(/\/*$/, '')
   }
-<<<<<<< /tmp/kpiport/mf/cur
   return `${window.location.protocol}//${window.location.host}${rootPath}`
 })()
-=======
-  return `${window.location.protocol}//${window.location.host}${rootPath}`;
-})();
 
-export const ANON_USERNAME = 'AnonymousUser';
-export const ANON_USER_TYPE = 'AnonymousUserType';
-export const ANON_USER_SUBDOMAIN = 'AnonymousSubdomain';
+// OpenClinica anonymous-session defaults, consumed by the session store to
+// represent a not-yet-authenticated user (username comes from `#/users/utils`).
+export const ANON_USER_TYPE = 'AnonymousUserType'
+export const ANON_USER_SUBDOMAIN = 'AnonymousSubdomain'
 
 export const OC_USER_TYPES = Object.freeze({
   BUSINESS_ADMIN: 'Business Admin',
   USER: 'User',
-});
-
-export type PermissionCodename =
-  | 'add_submissions'
-  | 'change_asset'
-  | 'change_metadata_asset'
-  | 'change_submissions'
-  | 'delete_submissions'
-  | 'discover_asset'
-  | 'manage_asset'
-  | 'partial_submissions'
-  | 'validate_submissions'
-  | 'view_asset'
-  | 'view_submissions';
-
-/**
- * BAD CODE™ A hardcoded list of permissions codenames.
- *
- * All of them are really defined on backend, and we get them through the
- * permissions config endpoint, but as we need these names to reference them in
- * the code to build the UI it's a necessary evil.
- *
- * NOTE: to know what these permissions permit see `kpi/permissions.py` file,
- * where you have to match the classes with endpoints and their HTTP methods.
- */
-type PermissionsCodenames = {[P in PermissionCodename]: PermissionCodename};
-export const PERMISSIONS_CODENAMES: PermissionsCodenames = {
-  // Is user able to view asset - mostly handled by Backend just not returning
-  // asset in the results or direct endpoint.
-  view_asset: 'view_asset',
-
-  // Is user able to edit asset, i.e. to change anything in the asset endpoint,
-  // so: editing in Form Builder, changing tags, changing settings, replace XLS,
-  // change translations, move between collection, archive, unarchive, delete…
-  change_asset: 'change_asset',
-
-  // Is asset discoverable in public lists.
-  discover_asset: 'discover_asset',
-
-  // Is user able to manage some aspects of asset (it is different from editing)
-  // such as: saving export settings, sharing asset (in future)…
-  manage_asset: 'manage_asset',
->>>>>>> /tmp/kpiport/mf/fork
+})
 
 export enum EnketoActions {
   edit = 'edit',
@@ -165,7 +120,6 @@ export const update_states: Record<UpdateStatesKey, UpdateStatesValue> = {
   SAVE_FAILED: 'SAVE_FAILED',
 }
 
-<<<<<<< /tmp/kpiport/mf/cur
 export type FormStyleName =
   | ''
   | 'theme-grid no-text-transform'
@@ -173,33 +127,20 @@ export type FormStyleName =
   | 'pages'
   | 'theme-grid pages no-text-transform'
   | 'theme-grid pages'
-=======
-export const AVAILABLE_FORM_STYLES = [
-  {value: '', label: t('Simple - single page')},
-  {value: 'pages', label: t('Simple - multiple pages')},
-  {value: 'theme-grid', label: t('Grid - single page')},
-  {value: 'pages theme-grid', label: t('Grid - multiple pages')},
-];
->>>>>>> /tmp/kpiport/mf/fork
 
 export interface FormStyleDefinition {
   value: FormStyleName
   label: string
 }
 
+// OpenClinica presents a simplified set of four form styles (single/multiple
+// pages × default/grid) rather than KoBo's six. Values use the canonical
+// `FormStyleName` ordering so they validate against the type above.
 export const AVAILABLE_FORM_STYLES: FormStyleDefinition[] = [
-  { value: '', label: t('Default - single page') },
-  { value: 'theme-grid no-text-transform', label: t('Grid theme') },
-  { value: 'theme-grid', label: t('Grid theme with headings in ALL CAPS') },
-  { value: 'pages', label: t('Multiple pages') },
-  {
-    value: 'theme-grid pages no-text-transform',
-    label: t('Grid theme + Multiple pages'),
-  },
-  {
-    value: 'theme-grid pages',
-    label: t('Grid theme + Multiple pages + headings in ALL CAPS'),
-  },
+  { value: '', label: t('Simple - single page') },
+  { value: 'pages', label: t('Simple - multiple pages') },
+  { value: 'theme-grid', label: t('Grid - single page') },
+  { value: 'theme-grid pages', label: t('Grid - multiple pages') },
 ]
 
 /**
@@ -328,13 +269,12 @@ type QuestionTypes = Record<QuestionTypeName, QuestionTypeDefinition>
  * Definitions of user oriented question types.
  */
 export const QUESTION_TYPES: QuestionTypes = Object.freeze({
-<<<<<<< /tmp/kpiport/mf/cur
   acknowledge: {
     label: t('Acknowledge'),
     icon: 'qt-acknowledge',
     id: QuestionTypeName.acknowledge,
   },
-  audio: { label: t('Audio'), icon: 'qt-audio', id: QuestionTypeName.audio },
+  audio: { label: t('Audio Upload'), icon: 'qt-audio', id: QuestionTypeName.audio },
   'background-audio': {
     label: t('Background Audio'),
     icon: 'qt-background-audio',
@@ -366,12 +306,17 @@ export const QUESTION_TYPES: QuestionTypes = Object.freeze({
     icon: 'qt-decimal',
     id: QuestionTypeName.decimal,
   },
+  econsent_signature: {
+    label: t('eConsent Signature'),
+    icon: 'qt-acknowledge',
+    id: QuestionTypeName.econsent_signature,
+  },
   'xml-external': {
     label: t('External XML'),
     icon: 'qt-external-xml',
     id: QuestionTypeName['xml-external'],
   },
-  file: { label: t('File'), icon: 'qt-file', id: QuestionTypeName.file },
+  file: { label: t('File Upload'), icon: 'qt-file', id: QuestionTypeName.file },
   geopoint: {
     label: t('Point'),
     icon: 'qt-point',
@@ -380,9 +325,9 @@ export const QUESTION_TYPES: QuestionTypes = Object.freeze({
   geoshape: { label: t('Area'), icon: 'qt-area', id: QuestionTypeName.geoshape },
   geotrace: { label: t('Line'), icon: 'qt-line', id: QuestionTypeName.geotrace },
   hidden: { label: t('Hidden'), icon: 'qt-hidden', id: QuestionTypeName.hidden },
-  image: { label: t('Photo'), icon: 'qt-photo', id: QuestionTypeName.image },
+  image: { label: t('Photo Upload'), icon: 'qt-photo', id: QuestionTypeName.image },
   integer: {
-    label: t('Number'),
+    label: t('Integer'),
     icon: 'qt-number',
     id: QuestionTypeName.integer,
   },
@@ -396,12 +341,12 @@ export const QUESTION_TYPES: QuestionTypes = Object.freeze({
   rank: { label: t('Ranking'), icon: 'qt-ranking', id: QuestionTypeName.rank },
   score: { label: t('Rating'), icon: 'qt-rating', id: QuestionTypeName.score },
   select_multiple: {
-    label: t('Select Many'),
+    label: t('Select Multiple'),
     icon: 'qt-select-many',
     id: QuestionTypeName.select_multiple,
   },
   select_multiple_from_file: {
-    label: t('Select Many from File'),
+    label: t('Select Multiple from File'),
     icon: 'qt-select-many-from-file',
     id: QuestionTypeName.select_multiple_from_file,
   },
@@ -411,46 +356,19 @@ export const QUESTION_TYPES: QuestionTypes = Object.freeze({
     id: QuestionTypeName.select_one,
   },
   select_one_from_file: {
-    label: t('Select One from File'),
+    label: t('Select One (External List)'),
     icon: 'qt-select-one-from-file',
     id: QuestionTypeName.select_one_from_file,
   },
   text: { label: t('Text'), icon: 'qt-text', id: QuestionTypeName.text },
   time: { label: t('Time'), icon: 'qt-time', id: QuestionTypeName.time },
-  video: { label: t('Video'), icon: 'qt-video', id: QuestionTypeName.video },
+  video: { label: t('Video Upload'), icon: 'qt-video', id: QuestionTypeName.video },
+  pii_encrypted: {
+    label: t('PII (Encrypted)'),
+    icon: 'lock',
+    id: QuestionTypeName.pii_encrypted,
+  },
 })
-=======
-  acknowledge: {label: t('Acknowledge'), icon: 'qt-acknowledge', id: QuestionTypeName.acknowledge},
-  audio: {label: t('Audio Upload'), icon: 'qt-audio', id: QuestionTypeName.audio},
-  barcode: {label: t('Barcode / QR Code'), icon: 'qt-barcode', id: QuestionTypeName.barcode},
-  calculate: {label: t('Calculate'), icon: 'qt-calculate', id: QuestionTypeName.calculate},
-  date: {label: t('Date'), icon: 'qt-date', id: QuestionTypeName.date},
-  datetime: {label: t('Date & time'), icon: 'qt-date-time', id: QuestionTypeName.datetime},
-  decimal: {label: t('Decimal'), icon: 'qt-decimal', id: QuestionTypeName.decimal},
-  econsent_signature: {label: t('eConsent Signature'), icon: 'econsent-signature', id: QuestionTypeName.econsent_signature},
-  'xml-external': {label: t('External XML'), icon: 'qt-external-xml', id: QuestionTypeName['xml-external']},
-  file: {label: t('File Upload'), icon: 'qt-file', id: QuestionTypeName.file},
-  geopoint: {label: t('Point'), icon: 'qt-point', id: QuestionTypeName.geopoint},
-  geoshape: {label: t('Area'), icon: 'qt-area', id: QuestionTypeName.geoshape},
-  geotrace: {label: t('Line'), icon: 'qt-line', id: QuestionTypeName.geotrace},
-  hidden: {label: t('Hidden'), icon: 'qt-hidden', id: QuestionTypeName.hidden},
-  image: {label: t('Photo Upload'), icon: 'qt-photo', id: QuestionTypeName.image},
-  integer: {label: t('Integer'), icon: 'qt-number', id: QuestionTypeName.integer},
-  kobomatrix: {label: t('Question Matrix'), icon: 'qt-question-matrix', id: QuestionTypeName.kobomatrix},
-  note: {label: t('Note'), icon: 'qt-note', id: QuestionTypeName.note},
-  range: {label: t('Range'), icon: 'qt-range', id: QuestionTypeName.range},
-  rank: {label: t('Ranking'), icon: 'qt-ranking', id: QuestionTypeName.rank},
-  score: {label: t('Rating'), icon: 'qt-rating', id: QuestionTypeName.score},
-  select_multiple: {label: t('Select Multiple'), icon: 'qt-select-many', id: QuestionTypeName.select_multiple},
-  select_multiple_from_file: {label: t('Select Multiple from File'), icon: 'qt-select-many-from-file', id: QuestionTypeName.select_multiple_from_file},
-  select_one: {label: t('Select One'), icon: 'qt-select-one', id: QuestionTypeName.select_one},
-  select_one_from_file: {label: t('Select One (External List)'), icon: 'qt-select-one-from-file', id: QuestionTypeName.select_one_from_file},
-  text: {label: t('Text'), icon: 'qt-text', id: QuestionTypeName.text},
-  time: {label: t('Time'), icon: 'qt-time', id: QuestionTypeName.time},
-  video: {label: t('Video Upload'), icon: 'qt-video', id: QuestionTypeName.video},
-  pii_encrypted: {label: t('PII (Encrypted)'), icon: 'lock', id: QuestionTypeName.pii_encrypted},
-});
->>>>>>> /tmp/kpiport/mf/fork
 
 /**
  * These are the types of survey rows that users can create in FormBuilder (as
@@ -515,18 +433,7 @@ export const COMMON_QUERIES = Object.freeze({
   qbtc: '(asset_type:question OR asset_type:block OR asset_type:template OR asset_type:collection)',
 })
 
-<<<<<<< /tmp/kpiport/mf/cur
-export const ACCESS_TYPES = createEnum(['owned', 'shared', 'public', 'subscribed', 'superuser'])
-=======
-export const ACCESS_TYPES = createEnum([
-  'owned',
-  'shared',
-  'public',
-  'subscribed',
-  'superuser',
-  'subdomain',
-]);
->>>>>>> /tmp/kpiport/mf/fork
+export const ACCESS_TYPES = createEnum(['owned', 'shared', 'public', 'subscribed', 'superuser', 'subdomain'])
 
 /**
  * These are the types of survey rows that mark the beginning of a group. They

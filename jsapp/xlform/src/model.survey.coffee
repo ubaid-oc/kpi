@@ -91,11 +91,7 @@ module.exports = do ->
         survey.choices.add(options: rowlist.options.toJSON())
         new_row.get('type').set('list', rowlist)
       name_detail = new_row.get('name')
-<<<<<<< /tmp/kpiport/mf/cur
-      return name_detail.set 'value', name_detail.deduplicate(survey)
-=======
-      name_detail.set 'value', name_detail.deduplicate(survey, @rowItemNameMaxLength)
->>>>>>> /tmp/kpiport/mf/fork
+      return name_detail.set 'value', name_detail.deduplicate(survey, @rowItemNameMaxLength)
 
     _ensure_row_list_is_copied: (row)->
       if !row.rows && rowlist = row.getList()

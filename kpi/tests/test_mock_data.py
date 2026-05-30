@@ -9,7 +9,6 @@ from kobo.apps.kobo_auth.shortcuts import User
 from kobo.apps.reports import report_data
 from kpi.models import Asset
 
-<<<<<<< /tmp/kpiport/mf/cur
 F1 = {
     'survey': [
         {'$kuid': 'Uf89NP4VX', 'type': 'start', 'name': 'start'},
@@ -31,7 +30,7 @@ F1 = {
             'select_from_list_name': 'choice_list_2',
             'required': 'true',
             'label': [
-                'Select Many',
+                'Select Multiple',
                 'Muchos seleccione',
                 '\u0627\u062e\u062a\u0631 \u0627\u0644\u0639\u062f\u064a\u062f',
             ],
@@ -243,105 +242,6 @@ SUBMISSION_DATA = OrderedDict(
 def _get_stats_object(
     pack, version_ids, submissions=None, lang=None, split_by=None
 ):
-=======
-F1 = {'survey': [{'$kuid': 'Uf89NP4VX', 'type': 'start', 'name': 'start'},
-                  {'$kuid': 'ZtZBY7XHX', 'type': 'end', 'name': 'end'},
-                  {'name': 'Select_one', 'select_from_list_name': 'choice_list_1', 'required': 'true',
-                   'label': ['Select one', 'Seleccione uno',
-                              '\u0627\u062e\u062a\u0631 \u0648\u0627\u062d\u062f\u0627'], '$kuid': 'WXOeQ4Nc0',
-                   'type': 'select_one'},
-                  {'name': 'Select_Many', 'select_from_list_name': 'choice_list_2', 'required': 'true',
-                   'label': ['Select Multiple', 'Muchos seleccione',
-                              '\u0627\u062e\u062a\u0631 \u0627\u0644\u0639\u062f\u064a\u062f'], '$kuid': 'BC6BNP91R',
-                   'type': 'select_multiple'},
-                  {'$kuid': '0e7sTrQzo', 'required': 'true', 'type': 'text', 'name': 'Text',
-                   'label': ['Text', 'Texto', '\u0646\u0635']},
-                  {'$kuid': 'ZzKb8DeQu', 'required': 'true', 'type': 'integer', 'name': 'Number',
-                   'label': ['Number', 'N\xfamero', '\u0639\u062f\u062f']},
-                  {'$kuid': 'gLEDxsNZo', 'required': 'true', 'type': 'decimal', 'name': 'Decimal',
-                   'label': ['Decimal', 'Decimal', '\u0639\u062f\u062f \u0639\u0634\u0631\u064a']},
-                  {'$kuid': 'pt2w8z3Xk', 'required': 'true', 'type': 'date', 'name': 'Date',
-                   'label': ['Date', 'Fecha', '\u062a\u0627\u0631\u064a\u062e']},
-                  {'$kuid': '3xn0tP9AI', 'required': 'true', 'type': 'time', 'name': 'Time',
-                   'label': ['Time', 'Hora', '\u0645\u0631\u0629']},
-                  {'$kuid': 'w0nYPBtT0', 'required': 'true', 'type': 'datetime', 'name': 'Date_and_time',
-                   'label': ['Date and time', 'Fecha y hora',
-                              '\u0627\u0644\u062a\u0627\u0631\u064a\u062e \u0648 \u0627\u0644\u0648\u0642\u062a']},
-                  {'$kuid': '0dovjhXG6', 'required': 'false', 'type': 'geopoint', 'name': 'GPS',
-                   'label': ['GPS', 'GPS',
-                              '\u0646\u0638\u0627\u0645 \u062a\u062d\u062f\u064a\u062f \u0627\u0644\u0645\u0648\u0627\u0642\u0639']},
-                  {'$kuid': 'NI2fsrYZI', 'required': 'true', 'type': 'image', 'name': 'Photo',
-                   'label': ['Photo', 'Foto',
-                              '\u0635\u0648\u0631\u0629 \u0641\u0648\u062a\u0648\u063a\u0631\u0627\u0641\u064a\u0629']},
-                  {'$kuid': 'FlfOVztW3', 'required': 'true', 'type': 'audio', 'name': 'Audio',
-                   'label': ['Audio', 'Audio', '\u0633\u0645\u0639\u064a']},
-                  {'$kuid': 'GdNV76Ily', 'required': 'true', 'type': 'video', 'name': 'Video',
-                   'label': ['Video', 'V\xeddeo', '\u0641\u064a\u062f\u064a\u0648']},
-                  {'$kuid': 'EDuWkTREB', 'required': 'false', 'type': 'note',
-                   'name': 'Note_Should_not_be_displayed',
-                   'label': ['Note (Should not be displayed!)', 'Nota (no se represente!)',
-                              '\u0645\u0644\u0627\u062d\u0638\u0629 (\u064a\u062c\u0628 \u0623\u0646 \u0644\u0627 \u064a\u062a\u0645 \u0639\u0631\u0636!)']},
-                  {'$kuid': 'hwik7tNXF', 'required': 'true', 'type': 'barcode', 'name': 'Barcode',
-                   'label': ['Barcode', 'C\xf3digo de barras', '\u0627\u0644\u0628\u0627\u0631\u0643\u0648\u062f']},
-                  {'$kuid': 'NTBElbRcj', 'required': 'true', 'type': 'acknowledge', 'name': 'Acknowledge',
-                   'label': ['Acknowledge', 'Reconocer', '\u0627\u0639\u062a\u0631\u0641']},
-                  {'calculation': '1', '$kuid': 'x6zr1MtmP', 'required': 'false', 'type': 'calculate',
-                   'name': 'calculation'}], 'translations': [None, 'Espa\xf1ol', 'Arabic'], 'choices': [
-    {'$kuid': 'xm4h0m4kK', 'list_name': 'choice_list_1', 'name': 'option_1',
-     'label': ['First option', 'Primera opci\xf3n',
-                '\u0627\u0644\u062e\u064a\u0627\u0631 \u0627\u0644\u0623\u0648\u0644']},
-    {'$kuid': 'slcf0IezR', 'list_name': 'choice_list_1', 'name': 'option_2',
-     'label': ['Second option', 'Segunda opci\xf3n',
-                '\u0627\u0644\u062e\u064a\u0627\u0631 \u0627\u0644\u062b\u0627\u0646\u064a']},
-    {'$kuid': 'G7myzY2qX', 'list_name': 'choice_list_2', 'name': 'option_1',
-     'label': ['First option', 'Primera opci\xf3n',
-                '\u0627\u0644\u062e\u064a\u0627\u0631 \u0627\u0644\u0623\u0648\u0644']},
-    {'$kuid': 'xUd28PPBs', 'list_name': 'choice_list_2', 'name': 'option_2',
-     'label': ['Second option', 'Segunda opci\xf3n',
-                '\u0627\u0644\u062e\u064a\u0627\u0631 \u0627\u0644\u062b\u0627\u0646\u064a']}]}
-
-SUBMISSION_DATA = OrderedDict([
-    ("start",
-     ["2016-06-0%dT12:00:00.000-04:00" % n for n in [1, 2, 3, 4]]),
-    ("end",
-     ["2016-06-0%dT11:0%d:00.000-04:00" % (n, n) for n in [1, 2, 3, 4]]),
-    ("Select_one",
-     ["option_1", "option_1", "option_2", "option_1"]),
-    ("Select_Many",
-     ["option_1", "option_2", "option_1 option_2", ""]),
-    ("Text",
-     ["a", "b", "c", "a"]),
-    ("Number",
-     [1, 2, 3, 2]),
-    ("Decimal",
-     [1.5, 2.5, 3.5, 3.5]),
-    ("Date",
-     ["2016-06-0%d" % n for n in [1, 2, 3, 5]]),
-    ("Time",
-     ["%d:00:00" % n for n in [1, 2, 3, 5]]),
-    ("Date_and_time",
-     ["2016-06-0%dT12:00:00.000-04:00" % n for n in [1, 2, 3, 5]]),
-    ("GPS",
-     ["1%d.43 -2%d.54 1 0" % (n, n) for n in [5, 7, 8, 5]]),
-    ("Photo",
-     ["photo_%d.jpg" % (n) for n in [1, 2, 3, 4]]),
-    ("Audio",
-     ["audio_%d.jpg" % (n) for n in [4, 3, 2, 1]]),
-    ("Video",
-     ["video_%d.jpg" % (n) for n in [6, 7, 8, 9]]),
-    ("Note_Should_not_be_displayed",
-     [None, None, None, None]),
-    ("Barcode",
-     ["barcode%d" % (n) for n in [9, 7, 7, 6]]),
-    ("Acknowledge",
-     [None, None, None, None]),
-    ("calculation",
-     ["1", "1", "1", "1"]),
-])
-
-
-def _get_stats_object(pack, version_ids, submissions=None, lang=None, split_by=None):
->>>>>>> /tmp/kpiport/mf/fork
     if submissions == None:
         raise ValueError('submissions must be provided')
     report = pack.autoreport(versions=version_ids)

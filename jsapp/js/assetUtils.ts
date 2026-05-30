@@ -54,13 +54,9 @@ export function getAssetOwnerDisplayName(username: string) {
   if (sessionStore.currentAccount?.username && sessionStore.currentAccount.username === username) {
     return t('me')
   } else {
-<<<<<<< /tmp/kpiport/mf/cur
-    return username
-=======
     // Strip instance suffix (e.g. "root+cust2" → "root") for display only
-    const plusIndex = username.lastIndexOf('+');
-    return plusIndex !== -1 ? username.substring(0, plusIndex) : username;
->>>>>>> /tmp/kpiport/mf/fork
+    const plusIndex = username.lastIndexOf('+')
+    return plusIndex !== -1 ? username.substring(0, plusIndex) : username
   }
 }
 
@@ -305,69 +301,6 @@ export function getAssetIcon(asset: AssetResponse): IconName {
   }
 }
 
-<<<<<<< /tmp/kpiport/mf/cur
-=======
-/**
- * Opens a modal for editing asset details.
- */
-export function modifyDetails(asset: AssetResponse) {
-  let modalType;
-  if (asset.asset_type === ASSET_TYPES.template.id) {
-    modalType = MODAL_TYPES.LIBRARY_TEMPLATE;
-  } else if (asset.asset_type === ASSET_TYPES.collection.id) {
-    modalType = MODAL_TYPES.LIBRARY_COLLECTION_EDIT;
-  }
-  if (modalType) {
-    stores.pageState.showModal({
-      type: modalType,
-      asset: asset,
-    });
-  } else {
-    throw new Error(`Unsupported asset type: ${asset.asset_type}.`);
-  }
-}
-
-/**
- * Opens a modal for sharing asset.
- */
-export function share(asset: AssetResponse) {
-  stores.pageState.showModal({
-    type: MODAL_TYPES.SHARING,
-    assetid: asset.uid,
-  });
-}
-
-/**
- * Opens a modal for modifying asset languages and translation strings.
- */
-export function editLanguages(asset: AssetResponse) {
-  stores.pageState.showModal({
-    type: MODAL_TYPES.FORM_LANGUAGES,
-    asset: asset,
-  });
-}
-
-/**
- * Opens a modal for modifying asset tags (also editable in Details Modal).
- */
-export function editTags(asset: AssetResponse) {
-  stores.pageState.showModal({
-    type: MODAL_TYPES.ASSET_TAGS,
-    asset: asset,
-  });
-}
-
-/**
- * Opens a modal for replacing an asset using a file.
- */
-export function replaceForm(asset: AssetResponse) {
-  stores.pageState.showModal({
-    type: MODAL_TYPES.REPLACE_PROJECT,
-    asset: asset,
-  });
-}
-
->>>>>>> /tmp/kpiport/mf/fork
 export type SurveyFlatPaths = {
   [P in string]: string
 }

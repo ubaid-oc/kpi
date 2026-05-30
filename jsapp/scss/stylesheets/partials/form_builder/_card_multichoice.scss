@@ -91,17 +91,9 @@
 
   code {
     font-weight: 600;
-<<<<<<< /tmp/kpiport/mf/cur
-    font-size: 11px;
-    font-family: mdl.$font;
-    background-color: colors.$kobo-gray-300;
-    padding: 2px;
-    margin: 2px;
-=======
     font-size: 12px;
-    font-family: $font;
+    font-family: mdl.$font;
     padding: 0;
->>>>>>> /tmp/kpiport/mf/fork
     width: 25%;
     text-align: initial;
     display: inline-block;
@@ -112,17 +104,13 @@
       display: inline-block;
       width: 15%;
       padding-left: 4px;
-<<<<<<< /tmp/kpiport/mf/cur
-      color: colors.$kobo-gray-700;
-=======
       padding-top: 8px;
-      color: colors.$kobo-gray-40;
->>>>>>> /tmp/kpiport/mf/fork
+      color: colors.$kobo-gray-700;
     }
 
     span, input[type="text"] {
       width: 83%;
-      border: $thinBorderStyle;
+      border: variables.$thinBorderStyle;
       border-radius: 5px;
       padding: 8px 4px 2px 2px;
       font-size: 12px;
@@ -146,12 +134,7 @@
       text-align: right;
       display: inline-block;
       float: right;
-<<<<<<< /tmp/kpiport/mf/cur
-      width: 60% !important;
       color: variables.$linkColor;
-=======
-      color: $linkColor;
->>>>>>> /tmp/kpiport/mf/fork
       line-height: inherit;
     }
   }

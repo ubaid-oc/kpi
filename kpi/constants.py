@@ -127,7 +127,6 @@ ASSET_SEARCH_DEFAULT_FIELD_LOOKUPS = [
     'uid__icontains',
 ]
 
-<<<<<<< /tmp/kpiport/mf/cur
 SKIP_HEAVY_MIGRATIONS_GUIDANCE = (
     """
     This migration might take a while. If it is too slow, you may want to
@@ -205,7 +204,6 @@ UNSUPPORTED_INLINE_MIMETYPES = [
     'image/heic',
     'image/heif',
 ]
-=======
+
 # OpenClinica
 X_OPENROSA_ACCEPT_CONTENT_LENGTH = "X-OpenRosa-Accept-Content-Length"
->>>>>>> /tmp/kpiport/mf/fork

@@ -9,10 +9,6 @@ from django.test import RequestFactory, TestCase, override_settings
 
 from kpi.constants import API_NAMESPACES
 from kpi.exceptions import (
-<<<<<<< /tmp/kpiport/mf/cur
-=======
-    QueryParserBadSyntax,
->>>>>>> /tmp/kpiport/mf/fork
     QueryParserNotSupportedFieldLookup,
     SearchQueryTooShortException,
 )

@@ -18,30 +18,10 @@ from taggit.utils import require_instance_manager
 from formpack.utils.flatten_content import flatten_content
 from formpack.utils.json_hash import json_hash
 from formpack.utils.kobo_locking import strip_kobo_locking_profile
-<<<<<<< /tmp/kpiport/mf/cur
 from kobo.apps.data_collectors.models import DataCollectorGroup
 from kobo.apps.reports.constants import DEFAULT_REPORTS_KEY, SPECIFIC_REPORTS_KEY
 from kobo.apps.subsequences.utils.supplement_data import get_analysis_form_json
 from kobo.apps.subsequences.utils.versioning import migrate_advanced_features
-=======
-from jsonschema import validate as jsonschema_validate
-from bs4 import BeautifulSoup
-from pyxform import builder, xls2json
-from pyxform.errors import PyXFormError
-
-from kobo.apps.reports.constants import (
-    SPECIFIC_REPORTS_KEY,
-    DEFAULT_REPORTS_KEY,
-)
-from kobo.apps.subsequences.advanced_features_params_schema import (
-    ADVANCED_FEATURES_PARAMS_SCHEMA,
-)
-from kobo.apps.subsequences.utils import (
-    advanced_feature_instances,
-    advanced_submission_jsonschema,
-)
-from kobo.apps.subsequences.utils.parse_known_cols import parse_known_cols
->>>>>>> /tmp/kpiport/mf/fork
 from kpi.constants import (
     ASSET_TYPE_BLOCK,
     ASSET_TYPE_COLLECTION,
@@ -76,12 +56,9 @@ from kpi.fields import KpiUidField, LazyDefaultJSONBField
 from kpi.mixins import (
     FormpackXLSFormUtilsMixin,
     ObjectPermissionMixin,
-    StandardizeSearchableFieldMixin,
-<<<<<<< /tmp/kpiport/mf/cur
-    XlsExportableMixin,
-=======
     OCFormUtilsMixin,
->>>>>>> /tmp/kpiport/mf/fork
+    StandardizeSearchableFieldMixin,
+    XlsExportableMixin,
 )
 from kpi.models.abstract_models import AbstractTimeStampedModel
 from kpi.models.asset_file import AssetFile
@@ -203,24 +180,15 @@ class KpiTaggableManager(_TaggableManager):
         super().add(*tags_out, **kwargs)
 
 
-<<<<<<< /tmp/kpiport/mf/cur
 class Asset(
     ObjectPermissionMixin,
     DeployableMixin,
     XlsExportableMixin,
     FormpackXLSFormUtilsMixin,
     StandardizeSearchableFieldMixin,
+    OCFormUtilsMixin,
     AbstractTimeStampedModel,
 ):
-=======
-class Asset(ObjectPermissionMixin,
-            DeployableMixin,
-            XlsExportableMixin,
-            FormpackXLSFormUtilsMixin,
-            StandardizeSearchableFieldMixin,
-            OCFormUtilsMixin,
-            models.Model):
->>>>>>> /tmp/kpiport/mf/fork
     name = models.CharField(max_length=255, blank=True, default='')
     date_deployed = models.DateTimeField(null=True)
     content = models.JSONField(default=dict)
@@ -551,12 +519,9 @@ class Asset(ObjectPermissionMixin,
         Can be disabled / skipped by calling with parameter:
         asset.save(adjust_content=False)
         """
-<<<<<<< /tmp/kpiport/mf/cur
         self.__normalize_settings_and_translations(self.content)
-=======
         self._adjust_content_custom_column(self.content)
         self._adjust_content_media_column_before_standardize(self.content)
->>>>>>> /tmp/kpiport/mf/fork
         self._standardize(self.content)
         self._adjust_content_media_column(self.content)
         self._revert_custom_column(self.content)
@@ -914,7 +879,6 @@ class Asset(ObjectPermissionMixin,
 
     @staticmethod
     def optimize_queryset_for_list(queryset):
-<<<<<<< /tmp/kpiport/mf/cur
         """Used by serializers to improve performance when listing assets"""
         queryset = (
             queryset.defer(
@@ -929,6 +893,7 @@ class Asset(ObjectPermissionMixin,
                 # In Django 1.9+, "select_related() prohibits non-relational fields
                 # for nested relations."
                 'owner',
+                'parent',
             )
             .prefetch_related(
                 # `Prefetch(..., to_attr='prefetched_list')` stores the prefetched
@@ -945,35 +910,6 @@ class Asset(ObjectPermissionMixin,
                 ),
                 Prefetch('asset_export_settings'),
             )
-=======
-        """ Used by serializers to improve performance when listing assets """
-        queryset = queryset.defer(
-            # Avoid pulling these from the database because they are often huge
-            # and we don't need them for list views.
-            'content', 'report_styles'
-        ).select_related(
-            # We only need `username`, but `select_related('owner__username')`
-            # actually pulled in the entire `auth_user` table under Django 1.8.
-            # In Django 1.9+, "select_related() prohibits non-relational fields
-            # for nested relations."
-            'owner',
-            'parent',
-        ).prefetch_related(
-            'permissions__permission',
-            'permissions__user',
-            # `Prefetch(..., to_attr='prefetched_list')` stores the prefetched
-            # related objects in a list (`prefetched_list`) that we can use in
-            # other methods to avoid additional queries; see:
-            # https://docs.djangoproject.com/en/1.8/ref/models/querysets/#prefetch-objects
-            Prefetch('tags', to_attr='prefetched_tags'),
-            Prefetch(
-                'asset_versions',
-                queryset=AssetVersion.objects.order_by(
-                    '-date_modified'
-                ).only('uid', 'asset', 'date_modified', 'deployed'),
-                to_attr='prefetched_latest_versions',
-            ),
->>>>>>> /tmp/kpiport/mf/fork
         )
         return queryset
 
@@ -1127,11 +1063,9 @@ class Asset(ObjectPermissionMixin,
                 self._deployment_data.pop('_stored_data_key', None)
                 self.__copy_hidden_fields()
 
-<<<<<<< /tmp/kpiport/mf/cur
         self.set_deployment_status()
-=======
+
         self._survey_column_oc_save_adjustments()
->>>>>>> /tmp/kpiport/mf/fork
 
         super().save(
             force_insert=force_insert,

@@ -27,11 +27,8 @@ module.exports = do ->
   templates['row.defaultValuePanel']        = row_templates.defaultValuePanel
   templates['row.rowErrorView']             = row_templates.rowErrorView
   templates['row.xlfRowView']               = row_templates.xlfRowView
-<<<<<<< /tmp/kpiport/mf/cur
   templates['row.unsupportedRowView']       = row_templates.unsupportedRowView
-=======
   templates['row.calculationPanel']         = row_templates.calculationPanel
->>>>>>> /tmp/kpiport/mf/fork
   templates['row.scoreView']                = row_templates.scoreView
   templates['row.rankView']                 = row_templates.rankView
   templates['surveyApp']                    = surveyApp_templates.surveyApp

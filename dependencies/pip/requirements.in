@@ -87,12 +87,8 @@ pillow-heif<1  # temporary 20260226
 psycopg
 pymongo<4.11.0  # for compatibility with unmaintained mongomock; see https://github.com/mongomock/mongomock/issues/912
 python-dateutil
-<<<<<<< /tmp/kpiport/mf/cur
-pyxform==3.0.0
-psutil
-=======
 -e git+https://github.com/OpenClinica/pyxform.git#egg=pyxform
->>>>>>> /tmp/kpiport/mf/fork
+psutil
 requests
 regex
 responses
@@ -100,11 +96,8 @@ shortuuid
 sqlparse
 static3
 tabulate
-<<<<<<< /tmp/kpiport/mf/cur
-ua-parser<1  # temporary 20260226
-=======
 tldextract
->>>>>>> /tmp/kpiport/mf/fork
+ua-parser<1  # temporary 20260226
 uWSGI
 Werkzeug
 xlrd

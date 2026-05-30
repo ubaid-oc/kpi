@@ -31,14 +31,9 @@ $z-modal-x: 10;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-<<<<<<< /tmp/kpiport/mf/cur
-  max-width: 90%;
-  max-height: 95%;
-=======
   min-width: 40%;
   max-width: 99%;
   max-height: 99%;
->>>>>>> /tmp/kpiport/mf/fork
   overflow-x: auto;
   visibility: hidden;
 
@@ -122,32 +117,18 @@ $z-modal-x: 10;
 }
 
 .modal__title {
-<<<<<<< /tmp/kpiport/mf/cur
   margin: 0;
-  padding: 24px 30px;
-  font-size: 18px;
-=======
-  margin: 0px;
   padding: 10px;
   font-size: 14px;
   font-weight: 500;
->>>>>>> /tmp/kpiport/mf/fork
   line-height: 22px;
 }
 
 .modal__x {
   z-index: $z-modal-x;
-<<<<<<< /tmp/kpiport/mf/cur
-  color: colors.$kobo-white;
-  background-color: inherit;
-  padding: 8px;
-  margin: 11px 15px 11px 11px;
-  border-radius: 50%;
-=======
   color: colors.$kobo-gray-55;
   padding: 0;
   margin: 10px 5px;
->>>>>>> /tmp/kpiport/mf/fork
   font-size: 20px;
   cursor: pointer;
 
@@ -174,13 +155,8 @@ $z-modal-x: 10;
 .modal__subheader {
   background: colors.$kobo-gray-200;
   padding: 20px 30px;
-<<<<<<< /tmp/kpiport/mf/cur
-  margin: -30px -30px 20px;
-  color: colors.$kobo-gray-700;
-=======
   margin: 0 -20px 20px;
-  color: colors.$kobo-gray-40;
->>>>>>> /tmp/kpiport/mf/fork
+  color: colors.$kobo-gray-700;
 
   i {
     margin: 5px 10px 10px 3px;
@@ -325,11 +301,7 @@ $modal-custom-header-height: 60px;
 
 .enketo-holder {
   // resets modal window paddings
-<<<<<<< /tmp/kpiport/mf/cur
-  margin: -30px;
-=======
   margin: 0 -20px;
->>>>>>> /tmp/kpiport/mf/fork
 
   .enketo-loading-message {
     p {

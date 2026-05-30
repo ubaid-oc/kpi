@@ -16,19 +16,10 @@ from rest_framework import exceptions, serializers
 from rest_framework.fields import empty
 from rest_framework.reverse import reverse
 
-<<<<<<< /tmp/kpiport/mf/cur
-from kobo.apps.organizations.constants import ORG_ADMIN_ROLE
-from kobo.apps.organizations.utils import get_real_owner
-=======
 from bossoidc2.models import Keycloak as KeycloakModel
 
-from kobo.apps.trash_bin.exceptions import (
-    TrashIntegrityError,
-    TrashTaskInProgressError,
-)
-from kobo.apps.trash_bin.models.project import ProjectTrash
-from kobo.apps.trash_bin.utils import move_to_trash, put_back
->>>>>>> /tmp/kpiport/mf/fork
+from kobo.apps.organizations.constants import ORG_ADMIN_ROLE
+from kobo.apps.organizations.utils import get_real_owner
 from kobo.apps.reports.constants import FUZZY_VERSION_PATTERN
 from kobo.apps.reports.report_data import build_formpack
 from kobo.apps.subsequences.utils.supplement_data import get_analysis_form_json
@@ -63,7 +54,7 @@ from kpi.utils.project_views import (
     user_has_project_view_asset_perm,
     view_has_perm,
 )
-<<<<<<< /tmp/kpiport/mf/cur
+from kpi.utils.permissions import get_subdomain_user_ids
 from kpi.utils.schema_extensions.fields import (
     HyperlinkedIdentityFieldWithSchemaField,
     PaginatedApiFieldWithSchemaField,
@@ -103,11 +94,6 @@ from ...schema_extensions.v2.assets.fields import (
     XFormLinkField,
     XLSLinkField,
 )
-=======
-from kpi.utils.permissions import get_subdomain_user_ids
-from .asset_version import AssetVersionListSerializer
-from .asset_permission_assignment import AssetPermissionAssignmentSerializer
->>>>>>> /tmp/kpiport/mf/fork
 from .asset_export_settings import AssetExportSettingsSerializer
 from .asset_file import AssetFileSerializer
 from .asset_permission_assignment import AssetPermissionAssignmentReadSerializer
@@ -261,12 +247,6 @@ class AssetBulkActionsSerializer(serializers.Serializer):
                 deny=False
             ).count()
         else:
-<<<<<<< /tmp/kpiport/mf/cur
-            objects_count = Asset.objects.filter(
-                owner__in=user_filter,
-                uid__in=asset_uids,
-            ).count()
-=======
             try:
                 kc_user = KeycloakModel.objects.get(user=self.__user)
                 subdomain_user_ids = KeycloakModel.objects.filter(
@@ -278,10 +258,9 @@ class AssetBulkActionsSerializer(serializers.Serializer):
                 ).count()
             except KeycloakModel.DoesNotExist:
                 objects_count = Asset.objects.filter(
-                    owner=self.__user,
+                    owner__in=user_filter,
                     uid__in=asset_uids,
                 ).count()
->>>>>>> /tmp/kpiport/mf/fork
 
         if objects_count != len(asset_uids):
             raise exceptions.PermissionDenied()
@@ -351,7 +330,7 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         schema_field=UserURLRelativeHyperlinkedRelatedField,
         view_name='user-kpi-detail', lookup_field='username', read_only=True)
     owner__username = serializers.ReadOnlyField(source='owner.username')
-<<<<<<< /tmp/kpiport/mf/cur
+    owner__subdomain = serializers.SerializerMethodField()
     owner_label = serializers.SerializerMethodField()
     url = HyperlinkedIdentityFieldWithSchemaField(
         schema_field=AssetHyperlinkedURLField,
@@ -359,11 +338,6 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         lookup_url_kwarg='uid_asset',
         view_name='asset-detail',
     )
-=======
-    owner__subdomain = serializers.SerializerMethodField()
-    url = HyperlinkedIdentityField(
-        lookup_field='uid', view_name='asset-detail')
->>>>>>> /tmp/kpiport/mf/fork
     asset_type = serializers.ChoiceField(choices=ASSET_TYPES)
     settings = WriteableJsonWithSchemaField(
         schema_field=SettingsField, required=False, allow_blank=True
@@ -451,12 +425,13 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Asset
         lookup_field = 'uid'
-<<<<<<< /tmp/kpiport/mf/cur
         fields = (
             'url',
             'owner',
             'owner__username',
+            'owner__subdomain',
             'parent',
+            'parent__name',
             'settings',
             'asset_type',
             'files',
@@ -512,62 +487,6 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
             'last_modified_by'
         )
         read_only_fields = ('last_modified_by', 'uid')
-=======
-        fields = ('url',
-                  'owner',
-                  'owner__username',
-                  'owner__subdomain',
-                  'parent',
-                  'parent__name',
-                  'settings',
-                  'asset_type',
-                  'summary',
-                  'date_created',
-                  'date_modified',
-                  'date_deployed',
-                  'version_id',
-                  'version__content_hash',
-                  'version_count',
-                  'has_deployment',
-                  'deployed_version_id',
-                  'deployed_versions',
-                  'deployment__identifier',
-                  'deployment__links',
-                  'deployment__active',
-                  'deployment__data_download_links',
-                  'deployment__submission_count',
-                  'report_styles',
-                  'report_custom',
-                  'advanced_features',
-                  'advanced_submission_schema',
-                  'analysis_form_json',
-                  'map_styles',
-                  'map_custom',
-                  'content',
-                  'downloads',
-                  'embeds',
-                  'xform_link',
-                  'hooks_link',
-                  'tag_string',
-                  'uid',
-                  'kind',
-                  'xls_link',
-                  'name',
-                  'assignable_permissions',
-                  'permissions',
-                  'effective_permissions',
-                  'exports',
-                  'export_settings',
-                  'settings',
-                  'data',
-                  'children',
-                  'subscribers_count',
-                  'status',
-                  'access_types',
-                  'data_sharing',
-                  'paired_data',
-                  )
->>>>>>> /tmp/kpiport/mf/fork
         extra_kwargs = {
             'parent': {
                 'lookup_field': 'uid',
@@ -705,9 +624,6 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
             {'codename': perm} for perm in set(project_view_perms + asset_perms)
         ]
 
-<<<<<<< /tmp/kpiport/mf/cur
-    @extend_schema_field(OpenApiTypes.INT)
-=======
     def get_parent__name(self, obj):
         """
         Return the parent asset's name if parent exists, otherwise None
@@ -716,7 +632,7 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
             return obj.parent.name
         return None
 
->>>>>>> /tmp/kpiport/mf/fork
+    @extend_schema_field(OpenApiTypes.INT)
     def get_version_count(self, obj):
         try:
             return len(obj.prefetched_latest_versions)
@@ -982,23 +898,11 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
             request=self.context.get('request', None),
         )
 
-<<<<<<< /tmp/kpiport/mf/cur
-    @extend_schema_field(AccessTypeField)
-    def get_access_types(self, asset):
-=======
-    def get_export_settings(self, obj: Asset) -> ReturnList:
-        return AssetExportSettingsSerializer(
-            AssetExportSettings.objects.filter(asset=obj),
-            many=True,
-            read_only=True,
-            context=self.context,
-        ).data
-
     def get_owner__subdomain(self, obj: Asset) -> str:
         return KeycloakModel.objects.get(user=obj.owner).subdomain
 
-    def get_access_types(self, obj):
->>>>>>> /tmp/kpiport/mf/fork
+    @extend_schema_field(AccessTypeField)
+    def get_access_types(self, asset):
         """
         Handles the detail endpoint but also takes advantage of the
         `AssetViewSet.get_serializer_context()` "cache" for the list endpoint,
@@ -1023,7 +927,7 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         kc_owner = None
         try:
             kc_user = KeycloakModel.objects.get(user=request.user)
-            kc_owner = KeycloakModel.objects.get(user=obj.owner)
+            kc_owner = KeycloakModel.objects.get(user=asset.owner)
         except KeycloakModel.DoesNotExist:
             pass
 
@@ -1250,7 +1154,6 @@ class AssetListSerializer(AssetSerializer):
         # WARNING! If you're changing something here, please update
         # `Asset.optimize_queryset_for_list()`; otherwise, you'll cause an
         # additional database query for each asset in the list.
-<<<<<<< /tmp/kpiport/mf/cur
         fields = (
             'url',
             'date_created',
@@ -1260,6 +1163,7 @@ class AssetListSerializer(AssetSerializer):
             'summary',
             'owner__username',
             'parent',
+            'parent__name',
             'uid',
             'tag_string',
             'settings',
@@ -1287,39 +1191,6 @@ class AssetListSerializer(AssetSerializer):
             'owner_label',
             'last_modified_by',
         )
-=======
-        fields = ('url',
-                  'date_created',
-                  'date_modified',
-                  'date_deployed',
-                  'owner',
-                  'summary',
-                  'owner__username',
-                  'parent',
-                  'parent__name',
-                  'uid',
-                  'tag_string',
-                  'settings',
-                  'kind',
-                  'name',
-                  'asset_type',
-                  'version_id',
-                  'has_deployment',
-                  'deployed_version_id',
-                  'deployment__identifier',
-                  'deployment__active',
-                  'deployment__submission_count',
-                  'permissions',
-                  'export_settings',
-                  'downloads',
-                  'data',
-                  'subscribers_count',
-                  'status',
-                  'access_types',
-                  'children',
-                  'data_sharing'
-                  )
->>>>>>> /tmp/kpiport/mf/fork
 
     def get_permissions(self, asset):
         try:

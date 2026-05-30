@@ -27,14 +27,9 @@ econsentSignature = require('../../js/components/formBuilder/econsentSignature')
 # https://github.com/kobotoolbox/kpi/issues/3977
 multiConfirm = require('#/alertify').multiConfirm
 alertify = require('alertifyjs')
-<<<<<<< /tmp/kpiport/mf/cur
 constants = require('#/constants')
 notify = require('#/utils').notify
-=======
-constants = require('js/constants')
-notify = require('js/utils').notify
-arrayMiddleOut = require('js/ocutils').processArrayMiddleOut
->>>>>>> /tmp/kpiport/mf/fork
+arrayMiddleOut = require('#/ocutils').processArrayMiddleOut
 
 module.exports = do ->
   class BaseRowView extends Backbone.View
@@ -369,21 +364,12 @@ module.exports = do ->
         @$label.prop('placeholder', t('Label not needed for Calculate questions'))
 
       if 'getList' of @model and (cl = @model.getList())
-<<<<<<< /tmp/kpiport/mf/cur
-        @$card.addClass('card--selectquestion card--expandedchoices')
-        @is_expanded = true
-        isSortableDisabled = (
-          @isLockable() and
-          @hasRestriction(LockingRestrictionName.choice_order_edit)
-        )
-        @listView = new $viewChoices.ListView(model: cl, rowView: @).render(isSortableDisabled)
-=======
         if !econsentSignature.isEConsentSignatureRow(@model)
           @$card.addClass('card--selectquestion card--expandedchoices')
           @is_expanded = true
           isSortableDisabled = (
             @isLockable() and
-            @hasRestriction(LOCKING_RESTRICTIONS.choice_order_edit.name)
+            @hasRestriction(LockingRestrictionName.choice_order_edit)
           )
           @listView = new $viewChoices.ListView(model: cl, rowView: @).render(isSortableDisabled)
 
@@ -391,7 +377,6 @@ module.exports = do ->
         name_detail = @model.get('name')
         name_detail.set 'value', name_detail.deduplicate(@model.getSurvey(), @model.getSurvey().rowItemNameMaxLength, '-')
         @$name.html(@model.getValue('name'))
->>>>>>> /tmp/kpiport/mf/fork
 
       @cardSettingsWrap = @$('.card__settings').eq(0)
       @defaultRowDetailParent = @cardSettingsWrap.find('.js-card-settings-row-options').eq(0)

@@ -2,16 +2,7 @@
 
 @import '~select2/select2.css';
 
-<<<<<<< /tmp/kpiport/mf/cur
 @include meta.load-css('~normalize.css');
-=======
-@import "./fonts/roboto";
-@import "../fonts/k-icons";
-@import "~select2/select2.css";
-@import "~react-table/react-table.css";
-@import "~alertifyjs/build/css/alertify.css";
-@import "~jquery-ui/themes/base/all.css";
->>>>>>> /tmp/kpiport/mf/fork
 
 @include meta.load-css('variables');
 
@@ -22,6 +13,8 @@
 @include meta.load-css('/node_modules/alertifyjs/build/css/alertify.css');
 @include meta.load-css('./libs/alertify.overrides');
 @include meta.load-css('/node_modules/react-table/react-table.css');
+// OpenClinica changes
+@include meta.load-css('/node_modules/jquery-ui/themes/base/all.css');
 @include meta.load-css('./libs/react-select.overrides');
 
 // Form Builder related stylesheets

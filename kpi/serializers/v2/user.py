@@ -7,12 +7,8 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.relations import HyperlinkedIdentityField
 
-<<<<<<< /tmp/kpiport/mf/cur
-from kobo.apps.kobo_auth.shortcuts import User
-=======
 from bossoidc2.models import Keycloak as KeycloakModel
-
->>>>>>> /tmp/kpiport/mf/fork
+from kobo.apps.kobo_auth.shortcuts import User
 from kpi.constants import ASSET_TYPE_COLLECTION, PERM_DISCOVER_ASSET
 from kpi.models.asset import Asset, UserAssetSubscription
 from kpi.models.object_permission import ObjectPermission
@@ -34,23 +30,14 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = User
-<<<<<<< /tmp/kpiport/mf/cur
         fields = (
             'url',
             'username',
             'date_joined',
             'public_collection_subscribers_count',
             'public_collections_count',
+            'subdomain',
         )
-=======
-        fields = ('url',
-                  'username',
-                  'date_joined',
-                  'public_collection_subscribers_count',
-                  'public_collections_count',
-                  'subdomain'
-                  )
->>>>>>> /tmp/kpiport/mf/fork
 
     @extend_schema_field(OpenApiTypes.DATETIME)
     def get_date_joined(self, obj):

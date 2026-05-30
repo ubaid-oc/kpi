@@ -130,13 +130,8 @@ class ImportExportTask(models.Model):
         asynchronous task runner (Celery)
         """
         with transaction.atomic():
-<<<<<<< /tmp/kpiport/mf/cur
             _refetched_self = self._meta.model.objects.select_for_update().get(
                 pk=self.pk
-=======
-            _refetched_self = (
-                self._meta.model.objects.select_for_update().get(pk=self.pk)
->>>>>>> /tmp/kpiport/mf/fork
             )
             self.status = _refetched_self.status
             del _refetched_self

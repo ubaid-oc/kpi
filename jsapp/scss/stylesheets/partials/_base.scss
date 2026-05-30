@@ -89,15 +89,12 @@ textarea {
 }
 
 :focus {
-<<<<<<< /tmp/kpiport/mf/cur
   outline: none;
 }
 
 :focus-visible {
-  outline: 1px solid colors.$kobo-blue;
-=======
+  // OpenClinica customization: suppress the focus outline entirely.
   outline: none !important;
->>>>>>> /tmp/kpiport/mf/fork
 }
 
 i {

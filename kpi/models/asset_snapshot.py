@@ -2,13 +2,8 @@ import copy
 import traceback
 
 from django.conf import settings
-from django.db import models
-<<<<<<< /tmp/kpiport/mf/cur
-=======
 from django.conf import settings as django_settings
-from rest_framework.reverse import reverse
-
->>>>>>> /tmp/kpiport/mf/fork
+from django.db import models
 from formpack import FormPack
 from bs4 import BeautifulSoup
 from pyxform import builder, xls2json
@@ -18,15 +13,11 @@ from kobo.apps.openrosa.apps.logger.xform_instance_parser import add_uuid_prefix
 from kpi.constants import API_NAMESPACES
 from kpi.fields import KpiUidField
 from kpi.interfaces.open_rosa import OpenRosaFormListInterface
-<<<<<<< /tmp/kpiport/mf/cur
-from kpi.mixins import FormpackXLSFormUtilsMixin, XlsExportableMixin
-=======
 from kpi.mixins import (
     FormpackXLSFormUtilsMixin,
     XlsExportableMixin,
     OCFormUtilsMixin,
 )
->>>>>>> /tmp/kpiport/mf/fork
 from kpi.utils.hash import calculate_hash
 from kpi.utils.log import logging
 from kpi.utils.models import DjangoModelABCMetaclass
@@ -197,16 +188,6 @@ class AssetSnapshot(
         self.source = _source
         return super().save(*args, **kwargs)
 
-<<<<<<< /tmp/kpiport/mf/cur
-    def generate_xml_from_source(
-        self,
-        source,
-        include_note=False,
-        root_node_name=None,
-        form_title=None,
-        id_string=None,
-    ):
-=======
     def _adjust_content_media_column_before_generate_xml(self, content):
 
         media_columns = {"audio": "media::audio", "image": "media::image", "video": 'media::video'}
@@ -332,13 +313,14 @@ class AssetSnapshot(
         if 'survey_header' not in content:
             content['survey_header'] = [{ col : "" for col in self.surveyCols}]
 
-    def generate_xml_from_source(self,
-                                 source,
-                                 include_note=False,
-                                 root_node_name=None,
-                                 form_title=None,
-                                 id_string=None):
->>>>>>> /tmp/kpiport/mf/fork
+    def generate_xml_from_source(
+        self,
+        source,
+        include_note=False,
+        root_node_name=None,
+        form_title=None,
+        id_string=None,
+    ):
 
         if not root_node_name:
             if self.asset and self.asset.uid:
@@ -376,21 +358,6 @@ class AssetSnapshot(
 
         warnings = []
         details = {}
-<<<<<<< /tmp/kpiport/mf/cur
-
-        try:
-            xml = FormPack(
-                {'content': source_copy},
-                root_node_name=root_node_name,
-                id_string=id_string,
-                title=form_title,
-            )[0].to_xml(warnings=warnings)
-
-            details.update({
-                'status': 'success',
-                'warnings': warnings,
-            })
-=======
         xml = ''
         generation_error = None
         generation_traceback = None
@@ -398,10 +365,12 @@ class AssetSnapshot(
 
         # Step 1: try FormPack to generate XML
         try:
-            xml = FormPack({'content': source_copy},
-                           root_node_name=root_node_name,
-                           id_string=id_string,
-                           title=form_title)[0].to_xml(warnings=warnings)
+            xml = FormPack(
+                {'content': source_copy},
+                root_node_name=root_node_name,
+                id_string=id_string,
+                title=form_title,
+            )[0].to_xml(warnings=warnings)
         except PyXFormError as formpack_err:
             formpack_error = formpack_err
             # Step 2: FormPack failed; fall back to pyxform directly
@@ -413,7 +382,6 @@ class AssetSnapshot(
             except Exception as err:
                 generation_error = err
                 generation_traceback = traceback.format_exc()
->>>>>>> /tmp/kpiport/mf/fork
         except Exception as err:
             generation_error = err
             generation_traceback = traceback.format_exc()

@@ -30,13 +30,8 @@ module.exports = do ->
       <div class="row__questiontypes row__questiontypes--namer">
         #{closeRowSelectorButton}
         <form class="row__questiontypes__form" action="javascript:void(0);" >
-<<<<<<< /tmp/kpiport/mf/cur
-          <input type="text" class="js-cancel-sort mdl-textfield__input" dir="auto" />
+          <input type="text" class="js-cancel-sort mdl-textfield__input" dir="auto" placeholder="#{t('Enter question text')}" />
           <button class="kobo-button kobo-button--storm">+ #{t("Add Question")}</button>
-=======
-          <input type="text" class="js-cancel-sort mdl-textfield__input" data-cy="textfield_input" placeholder="#{t('Enter question text')}" />
-          <button class="kobo-button kobo-button--storm" data-cy="add_question" >+ #{t("Add Question")}</button>
->>>>>>> /tmp/kpiport/mf/fork
         </form>
       </div>
     """

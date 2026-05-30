@@ -1,10 +1,4 @@
-<<<<<<< /tmp/kpiport/mf/cur
-=======
-# coding: utf-8
-
 from django.conf import settings
-from django.contrib.auth.models import User
->>>>>>> /tmp/kpiport/mf/fork
 from django.template.response import TemplateResponse
 from rest_framework import exceptions
 from rest_framework.authtoken.models import Token
@@ -23,13 +17,6 @@ def home(request):
     return TemplateResponse(request, 'index.html')
 
 
-<<<<<<< /tmp/kpiport/mf/cur
-=======
-def browser_tests(request):
-    return TemplateResponse(request, "browser_tests.html")
-
-
->>>>>>> /tmp/kpiport/mf/fork
 def modern_browsers(request):
     return TemplateResponse(request, 'modern_browsers.html')
 
