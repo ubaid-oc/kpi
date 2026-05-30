@@ -175,13 +175,15 @@ class CurrentUserSerializer(serializers.ModelSerializer):
     def get_user_type(self, obj):
         request = self.context.get('request', False)
         if request and request.user:
-            return KeycloakModel.objects.get(user=request.user).user_type
+            keycloak = KeycloakModel.objects.filter(user=request.user).first()
+            return keycloak.user_type if keycloak else None
         return None
 
     def get_subdomain(self, obj):
         request = self.context.get('request', False)
         if request and request.user:
-            return KeycloakModel.objects.get(user=request.user).subdomain
+            keycloak = KeycloakModel.objects.filter(user=request.user).first()
+            return keycloak.subdomain if keycloak else None
         return None
 
     def get_user_uuid(self, obj):

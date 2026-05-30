@@ -138,20 +138,30 @@ async function crossStorageCheckAndUpdate() {
   }
 }
 
-;[
-  { element: 'button', event: 'click' },
-  { element: '.btn', event: 'click' },
-  { element: '.questiontypelist__item', event: 'click' },
-  { element: '.group__header__buttons__button', event: 'click' },
-  { element: '.card__settings', event: 'click' },
-  { element: 'body', event: 'keydown' },
-].forEach((elementEvent) => {
-  addCustomEventListener(elementEvent.element, elementEvent.event, () => {
-    crossStorageCheckAndUpdate()
+// Wire cross-storage activity listeners once the DOM is ready. The kobo bundle
+// can execute before <body> exists, so attaching here at module load would throw.
+function wireCrossStorageActivityListeners() {
+  ;[
+    { element: 'button', event: 'click' },
+    { element: '.btn', event: 'click' },
+    { element: '.questiontypelist__item', event: 'click' },
+    { element: '.group__header__buttons__button', event: 'click' },
+    { element: '.card__settings', event: 'click' },
+    { element: 'body', event: 'keydown' },
+  ].forEach((elementEvent) => {
+    addCustomEventListener(elementEvent.element, elementEvent.event, () => {
+      crossStorageCheckAndUpdate()
+    })
   })
-})
 
-setPeriodicCrossStorageCheck(crossStorageCheck)
+  setPeriodicCrossStorageCheck(crossStorageCheck)
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', wireCrossStorageActivityListeners)
+} else {
+  wireCrossStorageActivityListeners()
+}
 
 if (document.head.querySelector('meta[name=kpi-root-path]')) {
   // Create the element for rendering the app into
