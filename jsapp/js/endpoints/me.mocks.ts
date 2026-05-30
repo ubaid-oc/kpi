@@ -38,4 +38,9 @@ export const meMockResponse: AccountResponse = {
     uid: 'orgWiPMsyx4oNEHXfqGhrbzt',
   },
   extra_details__uid: 'uTcCX9wL5royoPb4mHWcBz',
+  // OpenClinica fork fields (always present from the OC me endpoint at runtime)
+  user_uuid: 'uTcCX9wL5royoPb4mHWcBz',
+  user_type: 'admin',
+  subdomain: 'zefir',
+  customer_name: 'Zefir Inc',
 }

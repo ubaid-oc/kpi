@@ -679,7 +679,8 @@ export interface AssetResponse extends AssetRequestObject {
   url: string
   owner: string
   owner__username: string
-  owner__subdomain: string
+  /** OpenClinica multi-tenant subdomain of the asset owner (optional; absent on generic/upstream fixtures). */
+  owner__subdomain?: string
   owner_label: string
   date_created: string
   last_modified_by: string | null
