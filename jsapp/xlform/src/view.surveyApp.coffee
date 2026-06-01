@@ -88,7 +88,10 @@ module.exports = do ->
       $et.addClass('card__settings__tabs__tab--active')
 
       $et.parents('.card__settings').find(".card__settings__fields--active").removeClass('card__settings__fields--active')
-      $et.parents('.card__settings').find(".js-card-settings-#{tabId}").addClass('card__settings__fields--active')
+      $activePanel = $et.parents('.card__settings').find(".js-card-settings-#{tabId}").addClass('card__settings__fields--active')
+
+      if tabId is 'default-value' or tabId is 'calculation'
+        $activePanel.find('textarea').first().focus()
 
     surveyRowSortableStop: (evt)->
       @survey.trigger('change')
