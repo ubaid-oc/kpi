@@ -93,6 +93,8 @@ module.exports = do ->
 
       if tabId in ['default-value', 'calculation']
         $activePanel.find('textarea').first().focus()
+      else if tabId is 'repeat-count'
+        $activePanel.find('input').first().focus()
 
     surveyRowSortableStop: (evt)->
       @survey.trigger('change')

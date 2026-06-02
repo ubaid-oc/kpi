@@ -631,45 +631,30 @@ module.exports = do ->
           $textarea.blur()
 
   viewRowDetail.DetailViewMixins._isRepeat =
-    onOcCustomEvent: (ocCustomEventArgs) ->
-      questionId = @model._parent.cid
-      sender = ocCustomEventArgs.sender
-      senderValue = ocCustomEventArgs.value
-      senderQuestionId = sender._parent.cid
-      if (sender.key is 'repeat_count') and (questionId is senderQuestionId)
-        @$repeat_count.val(senderValue)
     html: ->
-      @$label_repeat_count = $('<span/>', { style: 'display: block; margin-top: 10px;' }).text(t('Automatic Repeat Count') + ":")
-      @$repeat_count = $('<input/>', { style: 'margin-top: 10px; width:85%;' }).attr('placeholder', t('(leave blank to allow users to add and remove repeats)'))
       @$el.addClass("card__settings__fields--active")
       viewRowDetail.Templates.checkbox @cid, @model.key, t("Repeat"), t("Repeat this group if necessary")
     afterRender: ->
-      @$('.settings__input').append(@$label_repeat_count)
-      @$('.settings__input').append(@$repeat_count)
-      @$repeat_count.attr('disabled', true)
+      $cardSettings = @rowView.cardSettingsWrap
+      $repeatCountTab = $cardSettings.find('.js-repeat-count-tab')
 
-      if @model.getValue()?
-        @$repeat_count.attr('disabled', @model.getValue() == false)
+      updateTabVisibility = =>
+        if @model.getValue()
+          $repeatCountTab.removeClass('repeat-count-tab--hidden')
+        else
+          $repeatCountTab.addClass('repeat-count-tab--hidden')
 
-      changeRepeatCountValue: ->
-        Backbone.trigger('ocCustomEvent', { sender: @model, value: @$repeat_count.val() })
+      updateTabVisibility()
 
       @model.on 'change:value', () =>
-        @$repeat_count.attr('disabled', @model.getValue() == false)
         if @model.getValue() == false
-          @$repeat_count.val('')
-          @changeRepeatCountValue()
-
-      @$repeat_count.on 'blur', () =>
-        @changeRepeatCountValue()
-      @$repeat_count.on 'change', () =>
-        @changeRepeatCountValue()
-      @$repeat_count.on 'keyup', () =>
-        @changeRepeatCountValue()
-      @$repeat_count.on 'keypress', (evt) =>
-        if evt.key is 'Enter' or evt.keyCode is 13
-          evt.preventDefault()
-          @$repeat_count.blur()
+          # If currently on the repeat-count tab, switch back to row-options
+          $activeTab = $cardSettings.find('.card__settings__tabs__tab--active')
+          if $activeTab.data('cardSettingsTabId') is 'repeat-count'
+            $cardSettings.find('[data-card-settings-tab-id="row-options"]').trigger('click')
+          # Signal repeat_count mixin to clear its value
+          Backbone.trigger('ocCustomEvent', { sender: @model, value: '' })
+        updateTabVisibility()
 
       @listenForCheckboxChange()
 
@@ -681,12 +666,37 @@ module.exports = do ->
       senderQuestionId = sender._parent.cid
       if (sender.key is '_isRepeat') and (questionId is senderQuestionId)
         @model.set('value', senderValue)
+        @$input?.val(senderValue)
+    insertInDOM: (rowView) ->
+      target = rowView.cardSettingsWrap.find('.js-card-settings-repeat-count').eq(0)
+      @_insertInDOM target
     html: ->
-      setTimeout =>
-          modelValue = @model.getValue()
-          Backbone.trigger('ocCustomEvent', { sender: @model, value: modelValue })
-        , 1
+      @$el.addClass('card__settings__fields--active')
+      $header = $('<h4/>', { class: 'repeat-count-panel__header' }).text(t('Repeat Count - how many times should this group repeat?'))
+      $hint = $('<p/>', { class: 'repeat-count-panel__hint' }).text(t('This group has repeating enabled. Enter an expression to set the number of repeats automatically, or leave blank to allow users to add and remove repeats manually.'))
+      @$input = $('<input/>', {
+        type: 'text'
+        class: 'repeat-count-panel__input'
+        placeholder: t('e.g. ${NUM_VISITS}')
+      })
+      @$el.append($header).append($hint).append(@$input)
+
+      fireChange = =>
+        @model.set('value', @$input.val())
+
+      @$input.on 'blur', fireChange
+      @$input.on 'change', fireChange
+      @$input.on 'keyup', fireChange
+      @$input.on 'keypress', (evt) =>
+        if evt.key is 'Enter' or evt.keyCode is 13
+          evt.preventDefault()
+          @$input.blur()
+
       false
+    afterRender: ->
+      modelValue = @model.getValue()
+      if modelValue
+        @$input.val(modelValue)
 
   # handled by mandatorySettingSelector
   viewRowDetail.DetailViewMixins.required =
