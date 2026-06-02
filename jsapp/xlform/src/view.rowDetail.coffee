@@ -664,9 +664,9 @@ module.exports = do ->
       sender = ocCustomEventArgs.sender
       senderValue = ocCustomEventArgs.value
       senderQuestionId = sender._parent.cid
-      if (sender.key is '_isRepeat') and (questionId is senderQuestionId)
-        @model.set('value', senderValue)
-        @$input?.val(senderValue)
+      if (sender.key is '_isRepeat') and (questionId is senderQuestionId) and not senderValue
+        @model.set('value', '')
+        @$input?.val('')
     insertInDOM: (rowView) ->
       target = rowView.cardSettingsWrap.find('.js-card-settings-repeat-count').eq(0)
       @_insertInDOM target
@@ -682,7 +682,9 @@ module.exports = do ->
       @$el.append($header).append($hint).append(@$input)
 
       fireChange = =>
-        @model.set('value', @$input.val())
+        val = @$input.val()
+        if @model.get('value') isnt val
+          @model.set('value', val)
 
       @$input.on 'blur', fireChange
       @$input.on 'change', fireChange
@@ -695,7 +697,7 @@ module.exports = do ->
       false
     afterRender: ->
       modelValue = @model.getValue()
-      if modelValue
+      if modelValue?
         @$input.val(modelValue)
 
   # handled by mandatorySettingSelector
