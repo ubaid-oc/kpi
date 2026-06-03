@@ -25,6 +25,37 @@ export function isEConsentSignatureItemTypeAllowed(): boolean {
   return isEConsentEnabledStatus(getStudyEConsentModuleStatus());
 }
 
+/**
+ * Append ?econsent=… to a hash-router path (e.g. /library/asset/new).
+ * Pass eConsentStatus from React Router searchParams when navigating; otherwise
+ * reads from the current URL hash.
+ */
+export function appendEConsentQueryToPath(
+  path: string,
+  eConsentStatus?: string | null,
+): string {
+  const status = eConsentStatus ?? getStudyEConsentModuleStatus();
+  if (!isEConsentEnabledStatus(status)) {
+    return path;
+  }
+  const [pathname, queryString] = path.split('?');
+  const params = new URLSearchParams(queryString || '');
+  params.set('econsent', status as string);
+  const query = params.toString();
+  return query ? `${pathname}?${query}` : path;
+}
+
+/**
+ * Build a #/… href with econsent preserved (for plain hash links in library tables).
+ */
+export function buildHashHrefWithEConsent(
+  hashPath: string,
+  eConsentStatus?: string | null,
+): string {
+  const path = hashPath.startsWith('#') ? hashPath.slice(1) : hashPath;
+  return `#${appendEConsentQueryToPath(path, eConsentStatus)}`;
+}
+
 export function isEConsentSignatureRow(row: any): boolean {
   try {
     return row?.getValue?.('bind::oc:external') === ECONSENT_SIGNATURE_EXTERNAL_VALUE;

@@ -8,6 +8,7 @@ import type {AssetResponse, AssetDownloads} from 'js/dataInterface';
 import {ASSET_TYPES} from 'js/constants';
 import assetUtils from 'js/assetUtils';
 import type {AssetsTableContextName} from './assetsTableConstants';
+import {buildHashHrefWithEConsent} from 'js/components/formBuilder/econsentSignature';
 import AssetCollectionActions from './assetCollectionActions';
 import './assetActionButtons.scss';
 import './assetTableRow.scss';
@@ -94,10 +95,10 @@ class AssetsTableRow extends React.Component<AssetsTableRowProps> {
     return (
       <bem.AssetsTableRow m={['asset', `type-${this.props.asset.asset_type}`]}>
         {this.props.asset.asset_type === ASSET_TYPES.collection.id &&
-          <bem.AssetsTableRow__link href={`#/library/asset/${this.props.asset.uid}`}/>
+          <bem.AssetsTableRow__link href={buildHashHrefWithEConsent(`/library/asset/${this.props.asset.uid}`)}/>
         }
         {this.props.asset.asset_type !== ASSET_TYPES.collection.id &&
-          <bem.AssetsTableRow__link href={`#/library/asset/${this.props.asset.uid}/edit`}/>
+          <bem.AssetsTableRow__link href={buildHashHrefWithEConsent(`/library/asset/${this.props.asset.uid}/edit`)}/>
         }
 
         <bem.AssetsTableRow__column m='name'>
@@ -141,7 +142,7 @@ class AssetsTableRow extends React.Component<AssetsTableRowProps> {
 
             {userCanEdit && this.props.asset.asset_type !== ASSET_TYPES.collection.id && (
               <bem.AssetActionButtons__iconButton
-                href={`#/library/asset/${this.props.asset.uid}/edit`}
+                href={buildHashHrefWithEConsent(`/library/asset/${this.props.asset.uid}/edit`)}
                 data-tip={t('Edit')}
                 className='right-tooltip'
               >

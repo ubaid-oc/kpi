@@ -48,6 +48,7 @@ import type {
 import {getRouteAssetUid} from 'js/router/routerUtils';
 import {routerGetAssetId, routerIsActive} from 'js/router/legacy';
 import {history} from 'js/router/historyRouter';
+import {appendEConsentQueryToPath} from 'js/components/formBuilder/econsentSignature';
 import {userCan} from 'js/components/permissions/utils';
 
 const IMPORT_CHECK_INTERVAL = 1000;
@@ -685,7 +686,7 @@ mixins.clickAssets = {
       },
       edit: function (uid: string) {
         if (routerIsActive('library')) {
-          history.push(`/library/asset/${uid}/edit`);
+          history.push(appendEConsentQueryToPath(`/library/asset/${uid}/edit`));
         } else {
           history.push(`/forms/${uid}/edit`);
         }
