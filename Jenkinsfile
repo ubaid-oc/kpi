@@ -24,6 +24,36 @@ pipeline {
             }
         }
         
+        stage('Run Frontend Tests') {
+            when {
+                expression { env.ENV == "build" || env.ENV == "build & deploy" }
+            }
+            agent {
+                docker {
+                    image 'node:16.15.0-bullseye'
+                    args '--user root:root --shm-size=2g'
+                    reuseNode true
+                }
+            }
+            environment {
+                HUSKY = '0'
+                DEBIAN_FRONTEND = 'noninteractive'
+                CHROME_PATH = '/usr/bin/chromium'
+            }
+            steps {
+                sh '''
+                    set -e
+                    apt-get update -qq
+                    apt-get install -y --no-install-recommends chromium python3
+                    ln -sf /usr/bin/python3 /usr/bin/python
+                    npm install --legacy-peer-deps --cache /tmp/.npm-cache
+                    node_modules/.bin/webpack --config webpack/test.config.js
+                    node_modules/.bin/mocha-chrome test/tests.html \
+                        --chrome-flags='["--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--headless"]'
+                '''
+            }
+        }
+
         stage('Fetch ECR Credentials') {
             steps {
                 script {
