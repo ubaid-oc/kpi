@@ -25,6 +25,63 @@ export function isEConsentSignatureItemTypeAllowed(): boolean {
   return isEConsentEnabledStatus(getStudyEConsentModuleStatus());
 }
 
+/**
+ * Append ?econsent=… to a hash-router path (e.g. /library/asset/new).
+ * Pass eConsentStatus from React Router searchParams when navigating; otherwise
+ * reads from the current URL hash.
+ */
+export function appendEConsentQueryToPath(
+  path: string,
+  eConsentStatus?: string | null,
+): string {
+  const status = eConsentStatus ?? getStudyEConsentModuleStatus();
+  const hashIndex = path.indexOf('#');
+  const fragment = hashIndex === -1 ? '' : path.slice(hashIndex);
+  const pathWithoutFragment = hashIndex === -1 ? path : path.slice(0, hashIndex);
+
+  const queryIndex = pathWithoutFragment.indexOf('?');
+  const pathname =
+    queryIndex === -1 ? pathWithoutFragment : pathWithoutFragment.slice(0, queryIndex);
+  const queryString =
+    queryIndex === -1 ? '' : pathWithoutFragment.slice(queryIndex + 1);
+
+  const params = new URLSearchParams(queryString);
+  if (isEConsentEnabledStatus(status)) {
+    params.set('econsent', status as string);
+  } else {
+    params.delete('econsent');
+  }
+
+  const query = params.toString();
+  const base = query ? `${pathname}?${query}` : pathname;
+  return `${base}${fragment}`;
+}
+
+/** Minimal router shape used by legacy withRouter() components. */
+export type EConsentRouter = {
+  searchParams: URLSearchParams;
+  navigate: (path: string) => void;
+};
+
+export function getEConsentStatusFromRouter(router: EConsentRouter): string | null {
+  return router.searchParams.get('econsent');
+}
+
+export function navigatePreservingEConsent(router: EConsentRouter, targetPath: string): void {
+  router.navigate(appendEConsentQueryToPath(targetPath, getEConsentStatusFromRouter(router)));
+}
+
+/**
+ * Build a #/… href with econsent preserved (for plain hash links in library tables).
+ */
+export function buildHashHrefWithEConsent(
+  hashPath: string,
+  eConsentStatus?: string | null,
+): string {
+  const path = hashPath.startsWith('#') ? hashPath.slice(1) : hashPath;
+  return `#${appendEConsentQueryToPath(path, eConsentStatus)}`;
+}
+
 export function isEConsentSignatureRow(row: any): boolean {
   try {
     return row?.getValue?.('bind::oc:external') === ECONSENT_SIGNATURE_EXTERNAL_VALUE;

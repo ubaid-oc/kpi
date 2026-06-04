@@ -20,6 +20,7 @@ import {ROUTES} from 'js/router/routerConstants';
 import {NavLink} from 'react-router-dom';
 import Dropzone from 'react-dropzone';
 import {validFileTypes} from 'utils';
+import {navigatePreservingEConsent} from 'js/components/formBuilder/econsentSignature';
 import './librarySidebar.scss';
 
 const assetActions = mixins.clickAssets.click.asset;
@@ -63,7 +64,7 @@ class LibrarySidebar extends Reflux.Component {
       }
     }
 
-    this.props.router.navigate(targetPath);
+    navigatePreservingEConsent(this.props.router, targetPath);
   }
 
   goToTemplateCreator() {
@@ -77,15 +78,7 @@ class LibrarySidebar extends Reflux.Component {
         targetPath = ROUTES.NEW_LIBRARY_TEMPLATE_ITEM_CHILD.replace(':uid', found.uid);
       }
     }
-    // Preserve the econsent status in the URL so that isEConsentSignatureItemTypeAllowed()
-    // returns the correct value when the row-selector picker is opened.
-    const eConsentStatus = this.props.router.searchParams.get('econsent');
-    if (eConsentStatus) {
-      const targetUrl = new URL(targetPath, window.location.origin);
-      targetUrl.searchParams.set('econsent', eConsentStatus);
-      targetPath = `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`;
-    }
-    this.props.router.navigate(targetPath);
+    navigatePreservingEConsent(this.props.router, targetPath);
   }
 
   onFileDrop(files) {
