@@ -71,7 +71,7 @@ module.exports = do ->
           </button>
           <ul class="js-card-settings-row-options card__settings__fields card__settings__fields--active"></ul>
           <ul class="js-card-settings-skip-logic card__settings__fields"></ul>
-          <ul class="js-card-settings-repeat-count card__settings__fields"></ul>
+          <ul class="js-card-settings-repeat-count card__settings__fields card__settings__fields--repeat-count"></ul>
           <ul class="js-card-settings-locked-features card__settings__fields locking__ui-hidden"></ul>
         </div>
       </section>
