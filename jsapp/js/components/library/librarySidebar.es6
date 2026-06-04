@@ -20,7 +20,7 @@ import {ROUTES} from 'js/router/routerConstants';
 import {NavLink} from 'react-router-dom';
 import Dropzone from 'react-dropzone';
 import {validFileTypes} from 'utils';
-import {appendEConsentQueryToPath} from 'js/components/formBuilder/econsentSignature';
+import {navigatePreservingEConsent} from 'js/components/formBuilder/econsentSignature';
 import './librarySidebar.scss';
 
 const assetActions = mixins.clickAssets.click.asset;
@@ -52,13 +52,6 @@ class LibrarySidebar extends Reflux.Component {
     });
   }
 
-  navigateWithEConsent(targetPath) {
-    const eConsentStatus = this.props.router.searchParams.get('econsent');
-    this.props.router.navigate(
-      appendEConsentQueryToPath(targetPath, eConsentStatus)
-    );
-  }
-
   goToBlockCreator() {
     let targetPath = ROUTES.NEW_LIBRARY_ITEM;
     const currentCollectionUid = myLibraryStore.getCollectionUid();
@@ -71,7 +64,7 @@ class LibrarySidebar extends Reflux.Component {
       }
     }
 
-    this.navigateWithEConsent(targetPath);
+    navigatePreservingEConsent(this.props.router, targetPath);
   }
 
   goToTemplateCreator() {
@@ -85,7 +78,7 @@ class LibrarySidebar extends Reflux.Component {
         targetPath = ROUTES.NEW_LIBRARY_TEMPLATE_ITEM_CHILD.replace(':uid', found.uid);
       }
     }
-    this.navigateWithEConsent(targetPath);
+    navigatePreservingEConsent(this.props.router, targetPath);
   }
 
   onFileDrop(files) {

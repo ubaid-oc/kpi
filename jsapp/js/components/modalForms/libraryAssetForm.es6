@@ -21,7 +21,7 @@ import mixins from 'js/mixins';
 import ownedCollectionsStore from 'js/components/library/ownedCollectionsStore';
 import envStore from 'js/envStore';
 import {withRouter} from 'js/router/legacy';
-import {appendEConsentQueryToPath} from 'js/components/formBuilder/econsentSignature';
+import {navigatePreservingEConsent} from 'js/components/formBuilder/econsentSignature';
 import { MODAL_TYPES } from '../../constants';
 import './libraryAssetForm.scss';
 
@@ -99,9 +99,9 @@ export class LibraryAssetFormComponent extends React.Component {
     notify(t('##type## ##name## created').replace('##type##', this.getFormAssetType()).replace('##name##', response.name));
     stores.pageState.hideModal();
     if (this.getFormAssetType() === ASSET_TYPES.template.id) {
-      const eConsentStatus = this.props.router.searchParams.get('econsent');
-      this.props.router.navigate(
-        appendEConsentQueryToPath(`/library/asset/${response.uid}/edit`, eConsentStatus)
+      navigatePreservingEConsent(
+        this.props.router,
+        `/library/asset/${response.uid}/edit`
       );
     }
   }

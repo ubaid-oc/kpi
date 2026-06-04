@@ -15,7 +15,7 @@ import {ROUTES} from 'js/router/routerConstants';
 import mixins from 'js/mixins';
 import ownedCollectionsStore from 'js/components/library/ownedCollectionsStore';
 import {withRouter} from 'js/router/legacy';
-import {appendEConsentQueryToPath} from 'js/components/formBuilder/econsentSignature';
+import {navigatePreservingEConsent} from 'js/components/formBuilder/econsentSignature';
 import {when} from 'mobx';
 
 class LibraryNewItemForm extends React.Component {
@@ -47,8 +47,7 @@ class LibraryNewItemForm extends React.Component {
       }
     }
 
-    const eConsentStatus = this.props.router.searchParams.get('econsent');
-    this.props.router.navigate(appendEConsentQueryToPath(targetPath, eConsentStatus));
+    navigatePreservingEConsent(this.props.router, targetPath);
   }
 
   goToCollection() {

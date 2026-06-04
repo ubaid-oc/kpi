@@ -35,14 +35,40 @@ export function appendEConsentQueryToPath(
   eConsentStatus?: string | null,
 ): string {
   const status = eConsentStatus ?? getStudyEConsentModuleStatus();
-  if (!isEConsentEnabledStatus(status)) {
-    return path;
+  const hashIndex = path.indexOf('#');
+  const fragment = hashIndex === -1 ? '' : path.slice(hashIndex);
+  const pathWithoutFragment = hashIndex === -1 ? path : path.slice(0, hashIndex);
+
+  const queryIndex = pathWithoutFragment.indexOf('?');
+  const pathname =
+    queryIndex === -1 ? pathWithoutFragment : pathWithoutFragment.slice(0, queryIndex);
+  const queryString =
+    queryIndex === -1 ? '' : pathWithoutFragment.slice(queryIndex + 1);
+
+  const params = new URLSearchParams(queryString);
+  if (isEConsentEnabledStatus(status)) {
+    params.set('econsent', status as string);
+  } else {
+    params.delete('econsent');
   }
-  const [pathname, queryString] = path.split('?');
-  const params = new URLSearchParams(queryString || '');
-  params.set('econsent', status as string);
+
   const query = params.toString();
-  return query ? `${pathname}?${query}` : path;
+  const base = query ? `${pathname}?${query}` : pathname;
+  return `${base}${fragment}`;
+}
+
+/** Minimal router shape used by legacy withRouter() components. */
+export type EConsentRouter = {
+  searchParams: URLSearchParams;
+  navigate: (path: string) => void;
+};
+
+export function getEConsentStatusFromRouter(router: EConsentRouter): string | null {
+  return router.searchParams.get('econsent');
+}
+
+export function navigatePreservingEConsent(router: EConsentRouter, targetPath: string): void {
+  router.navigate(appendEConsentQueryToPath(targetPath, getEConsentStatusFromRouter(router)));
 }
 
 /**
