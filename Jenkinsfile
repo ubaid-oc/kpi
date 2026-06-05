@@ -24,6 +24,42 @@ pipeline {
             }
         }
         
+        stage('Run Frontend Tests') {
+            when {
+                // List-based check is easier to extend than repeated string comparisons
+                expression { ["build", "build & deploy"].contains(env.ENV) }
+            }
+            agent {
+                docker {
+                    image 'node:16.15.0-bullseye'
+                    args '--user root:root --shm-size=2g'
+                    reuseNode true
+                }
+            }
+            environment {
+                HUSKY = '0'
+                DEBIAN_FRONTEND = 'noninteractive'
+                CHROME_PATH = '/usr/bin/chromium'
+            }
+            steps {
+                sh '''
+                    set -e
+                    apt-get update -qq
+                    apt-get install -y --no-install-recommends chromium python3
+                    ln -sf /usr/bin/python3 /usr/bin/python
+                    # Clean apt lists to reduce disk usage
+                    rm -rf /var/lib/apt/lists/*
+                    # npm ci ensures deterministic installs via lockfile.
+                    # --legacy-peer-deps is required due to unresolved peer conflicts in this project's dependency tree.
+                    npm ci --legacy-peer-deps --cache /tmp/.npm-cache
+                    node_modules/.bin/webpack --config webpack/test.config.js
+                    # --no-sandbox is required because Chrome cannot use its sandbox when running as root inside Docker.
+                    node_modules/.bin/mocha-chrome test/tests.html \
+                        --chrome-flags='["--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--headless"]'
+                '''
+            }
+        }
+
         stage('Fetch ECR Credentials') {
             steps {
                 script {
