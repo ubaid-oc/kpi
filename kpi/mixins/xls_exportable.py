@@ -10,7 +10,6 @@ import xlsxwriter
 
 from formpack.utils.kobo_locking import (
     revert_kobo_lock_structure,
-    strip_kobo_locking_profile,
 )
 
 CUSTOM_COL_APPEND_STRING = 'custom_col_append_string'
@@ -46,13 +45,11 @@ class XlsExportableMixin:
     choicesCols = [
         u'list_name',
         u'label',
-        u'name', 
+        u'name',
         u'image'
     ]
 
-    def ordered_xlsform_content(self,
-                                kobo_specific_types=False,
-                                append=None):
+    def ordered_xlsform_content(self, kobo_specific_types=False, append=None):
         # currently, this method depends on "FormpackXLSFormUtilsMixin"
         content = copy.deepcopy(self.content)
         if append:

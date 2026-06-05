@@ -1,5 +1,5 @@
 module.exports = do ->
-  replaceSupportEmail = require('utils').replaceSupportEmail
+  replaceSupportEmail = require('#/textUtils').replaceSupportEmail
 
   expandingSpacerHtml = """
       <div class="survey__row__spacer  row clearfix expanding-spacer-between-rows expanding-spacer-between-rows--depr">
@@ -21,9 +21,11 @@ module.exports = do ->
     if features isnt null
       features.cants.forEach((cant) ->
         cantsString += "<li><i class='k-icon k-icon-close'></i>#{cant.label}</li>"
+        return
       )
       features.cans.forEach((can) ->
         cansString += "<li><i class='k-icon k-icon-check'></i>#{can.label}</li>"
+        return
       )
 
     cansHtml = ''
@@ -47,7 +49,7 @@ module.exports = do ->
     """
 
   groupSettingsView = ->
-    """
+    template = """
       <section class="card__settings  row-extras row-extras--depr">
         <i class="card__settings-close k-icon k-icon-close js-toggle-card-settings"></i>
         <ul class="card__settings__tabs">
@@ -76,8 +78,9 @@ module.exports = do ->
         </div>
       </section>
     """
+    return template
   rowSettingsView = ()->
-    """
+    template = """
       <section class="card__settings  row-extras row-extras--depr">
         <i class="card__settings-close k-icon k-icon-close js-toggle-card-settings"></i>
         <ul class="card__settings__tabs">
@@ -130,6 +133,7 @@ module.exports = do ->
         </div>
       </section>
     """
+    return template
 
   xlfRowView = (surveyView) ->
       template = """
@@ -141,8 +145,8 @@ module.exports = do ->
           </div>
           <div class="card__text">
             <div class="card__header-name js-cancel-select-row js-cancel-sort"></div>
-            <textarea rows="1" placeholder="#{t("Enter question label (required for item to be visible)")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort"></textarea>
-            <input type="text" placeholder="#{t("Enter question hint (optional)")}" class="card__header-hint js-card-hint js-cancel-select-row js-cancel-sort">
+            <textarea rows="1" placeholder="#{t("Enter question label (required for item to be visible)")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort" dir="auto"></textarea>
+            <input type="text" placeholder="#{t("Enter question hint (optional)")}" class="card__header-hint js-card-hint js-cancel-select-row js-cancel-sort" dir="auto">
           </div>
           <div class="card__buttons">
             <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings" data-button-name="settings"><i class="k-icon k-icon-edit"></i></span>
@@ -160,6 +164,13 @@ module.exports = do ->
       #{expandingSpacerHtml}
       """
 
+  # This will be used by row types that are valid XLSForm types but are not yet supported by UI
+  unsupportedRowView = () ->
+    template = """
+    <div style="display: none;">This type of row is not supported by UI yet.</div>
+    """
+    return template
+
   # Empty js-group-icon is only sometimes used, but we need to reserve space for it
   groupView = (surveyView)->
     addToLibraryButton = ''
@@ -169,14 +180,14 @@ module.exports = do ->
             <i class="k-icon k-icon-folder-plus"></i>
           </span>
       """
-    """
+    template = """
     <div class="survey__row__item survey__row__item--group group card js-select-row">
       <header class="group__header">
         <div class="group__header__icon js-group-icon">
           <i class="k-icon"></i>
         </div>
         <i class="group__caret js-toggle-group-expansion k-icon k-icon-caret-down"></i>
-        <input type="text" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort">
+        <input type="text" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort" dir="auto">
         <div class="card__buttons">
           <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings">
             <i class="k-icon k-icon-edit"></i>
@@ -197,6 +208,7 @@ module.exports = do ->
     </div>
     #{expandingSpacerHtml}
     """
+    return template
 
   koboMatrixView = () ->
       template = """
@@ -207,7 +219,7 @@ module.exports = do ->
             <div class="noop card__indicator__icon"><i class="card__header-icon k-icon k-icon-matrix"></i></div>
           </div>
           <div class="card__text">
-            <input type="text" placeholder="#{t("Item label is required")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort">
+            <input type="text" placeholder="#{t("Item label is required")}" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort" dir="auto">
           </div>
           <div class="card__buttons">
             <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings" data-button-name="settings"><i class="k-icon k-icon-edit"></i></span>
@@ -284,11 +296,12 @@ module.exports = do ->
       </tfoot>
     </table>
     """
-    """
+    template = """
     <div class="score_preview">
       #{table_html}
     </div>
     """
+    return template
   rankView = (s, template_args={})->
     rank_levels_lis = for item in template_args.rank_levels
       autoclass = ""
@@ -330,7 +343,7 @@ module.exports = do ->
     rank_constraint_message_li = """
       #{rank_constraint_message_html}
     """
-    """
+    template = """
     <div class="rank_preview clearfix">
       <ol class="rank__rows">
         #{rank_rows_lis.join('')}
@@ -343,6 +356,7 @@ module.exports = do ->
       </ul>
     </div>
     """
+    return template
 
   # NOTE: Textbox value is empty, as we set it in some other place to avoid
   # problems with double quotes.
@@ -352,7 +366,7 @@ module.exports = do ->
     else
       modifier = 'custom'
 
-    """
+    template = """
     <div class="card__settings__fields__field">
       <label>#{t('Required')}:</label>
       <span class="settings__input">
@@ -390,6 +404,7 @@ module.exports = do ->
       </span>
     </div>
     """
+    return template
 
   requiredLogicPanel = () ->
     """
@@ -408,7 +423,7 @@ module.exports = do ->
     """
 
   paramsSettingsField = ->
-    """
+    template = """
     <div class="js-params-view card__settings__fields__field params-view__settings-wrapper">
       <label>#{t('Parameters')}:</label>
       <span class="settings__input">
@@ -416,36 +431,41 @@ module.exports = do ->
       </span>
     </div>
     """
+    return template
 
   paramsSimple = ->
-    """
+    template = """
     <div class="js-params-view params-view__simple-wrapper">
       <div class="params-view"></div>
     </div>
     """
+    return template
 
   selectQuestionExpansion = ->
-    """
+    template = """
     <div class="card--selectquestion__expansion row__multioptions js-cancel-sort">
       <div class="list-view">
         <ul></ul>
       </div>
     </div>
     """
+    return template
 
   expandChoiceList = ()->
-    """
+    template = """
     <span class="card__buttons__multioptions js-toggle-row-multioptions js-cancel-select-row"><i class='k-icon k-icon-caret-down' /></span>
     """
+    return template
 
   rowErrorView = (atts)->
-    """
+    template = """
     <div class="card card--error">
       #{t("Row could not be displayed:")} <pre>#{atts}</pre>
       <em>#{replaceSupportEmail(t("This question could not be imported. Please re-create it manually. Please contact us at help@kobotoolbox.org so we can fix this bug!"))}</em>
     </div>
     #{expandingSpacerHtml}
     """
+    return template
 
   defaultValuePanel = () ->
     """
@@ -486,21 +506,24 @@ module.exports = do ->
     </div>
     """
 
-  xlfRowView: xlfRowView
-  expandChoiceList: expandChoiceList
-  mandatorySettingSelector: mandatorySettingSelector
-  requiredLogicPanel: requiredLogicPanel
-  paramsSettingsField: paramsSettingsField
-  paramsSimple: paramsSimple
-  selectQuestionExpansion: selectQuestionExpansion
-  groupView: groupView
-  rowErrorView: rowErrorView
-  calculationPanel: calculationPanel
-  koboMatrixView: koboMatrixView
-  scoreView: scoreView
-  rankView: rankView
-  groupSettingsView: groupSettingsView
-  rowSettingsView: rowSettingsView
-  defaultValuePanel: defaultValuePanel
-  iconTooltip: iconTooltip
-  lockedFeatures: lockedFeatures
+  return {
+    xlfRowView: xlfRowView
+    unsupportedRowView: unsupportedRowView
+    expandChoiceList: expandChoiceList
+    mandatorySettingSelector: mandatorySettingSelector
+    requiredLogicPanel: requiredLogicPanel
+    paramsSettingsField: paramsSettingsField
+    paramsSimple: paramsSimple
+    selectQuestionExpansion: selectQuestionExpansion
+    groupView: groupView
+    rowErrorView: rowErrorView
+    calculationPanel: calculationPanel
+    koboMatrixView: koboMatrixView
+    scoreView: scoreView
+    rankView: rankView
+    groupSettingsView: groupSettingsView
+    rowSettingsView: rowSettingsView
+    defaultValuePanel: defaultValuePanel
+    iconTooltip: iconTooltip
+    lockedFeatures: lockedFeatures
+  }

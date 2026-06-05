@@ -21,8 +21,8 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.settings import import_from_string
 from rest_framework.authentication import get_authorization_header
 
-from django.utils.encoding import force_bytes, smart_text, smart_bytes
-from django.utils.translation import ugettext as _
+from django.utils.encoding import force_bytes, smart_str, smart_bytes
+from django.utils.translation import gettext as _
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 from mozilla_django_oidc.utils import absolutify, import_from_settings
 
@@ -530,9 +530,9 @@ class OpenIdConnectBackend(OIDCAuthenticationBackend): # pragma: no cover
         for jwk in jwks['keys']:
             # If there's only one key, then try it even if the key id doesn't
             # match or is None.
-            if jwk['kid'] != smart_text(header.kid) and num_keys > 1:
+            if jwk['kid'] != smart_str(header.kid) and num_keys > 1:
                 continue
-            if 'alg' in jwk and jwk['alg'] != smart_text(header.alg):
+            if 'alg' in jwk and jwk['alg'] != smart_str(header.alg):
                 raise SuspiciousOperation('alg values do not match.')
             key = jwk
         if key is None:

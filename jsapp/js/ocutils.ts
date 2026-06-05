@@ -84,13 +84,18 @@ export function setPeriodicCrossStorageCheck(checkFunction: TimerHandler) {
 }
 
 export function addCustomEventListener(selector: string, event: any, handler: (arg0: any) => void) {
+  // The bundle can load before <body> is parsed; bail out instead of throwing
+  // "Cannot read properties of null (reading 'addEventListener')".
+  const rootElement: any = document.body || document.querySelector('body');
+  if (!rootElement) {
+    return;
+  }
   if (selector == 'body') {
-    document.body.addEventListener(event, function(evt) {
+    rootElement.addEventListener(event, function(evt: any) {
       handler(evt);
       return;
     }, true);
   } else {
-    let rootElement: any = document.querySelector('body');
     rootElement.addEventListener(event, function (evt: { target: any; }) {
       let targetElement = evt.target;
       let targetFound = false;
