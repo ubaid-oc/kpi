@@ -22,6 +22,7 @@ import myLibraryStore from './components/library/myLibraryStore'
 import { userCan } from './components/permissions/utils'
 import { ASSET_TYPES, MODAL_TYPES } from './constants'
 import type { AssetResponse, DeploymentResponse, ProjectViewAsset } from './dataInterface'
+import { appendEConsentQueryToPath } from './components/formBuilder/econsentSignature'
 import { router, routerIsActive } from './router/legacy'
 import { ROUTES } from './router/routerConstants'
 import { stores } from './stores'
@@ -29,7 +30,9 @@ import { notify, renderCheckbox } from './utils'
 
 export function openInFormBuilder(uid: string) {
   if (routerIsActive(ROUTES.LIBRARY)) {
-    router!.navigate(ROUTES.EDIT_LIBRARY_ITEM.replace(':uid', uid))
+    // OC-27785: preserve the econsent module status (read from the current hash)
+    // when editing a library item so the row-selector gating stays correct.
+    router!.navigate(appendEConsentQueryToPath(ROUTES.EDIT_LIBRARY_ITEM.replace(':uid', uid)))
   } else {
     router!.navigate(ROUTES.FORM_EDIT.replace(':uid', uid))
   }

@@ -766,24 +766,24 @@ module.exports = do ->
         @cardSettingsWrap.find('.js-default-value-tab').removeClass('default-value-tab--hidden')
         $defaultPanel = $($viewTemplates.$$render('row.defaultValuePanel'))
         $defaultPanel.appendTo(@cardSettingsWrap.find('.js-card-settings-default-value'))
-        $textarea = $defaultPanel.find('.js-default-value-input')
+        $defaultTextarea = $defaultPanel.find('.js-default-value-input')
         currentVal = defaultModel.get('value') or ''
-        $textarea.val(currentVal)
+        $defaultTextarea.val(currentVal)
         if currentVal
           setTimeout ->
-            scrollHeight = $textarea.prop('scrollHeight')
-            $textarea.css('height', '')
-            $textarea.css('height', scrollHeight)
+            scrollHeight = $defaultTextarea.prop('scrollHeight')
+            $defaultTextarea.css('height', '')
+            $defaultTextarea.css('height', scrollHeight)
           , 1
         updateDefaultModel = ->
-          defaultModel.set('value', $textarea.val().replace(/\n/g, ''))
-        $textarea.on('blur', updateDefaultModel)
-        $textarea.on('change', updateDefaultModel)
-        $textarea.on('keyup', updateDefaultModel)
-        $textarea.on 'keypress', (evt) ->
+          defaultModel.set('value', $defaultTextarea.val().replace(/\n/g, ''))
+        $defaultTextarea.on('blur', updateDefaultModel)
+        $defaultTextarea.on('change', updateDefaultModel)
+        $defaultTextarea.on('keyup', updateDefaultModel)
+        $defaultTextarea.on 'keypress', (evt) ->
           if evt.key is 'Enter' or evt.keyCode is 13
             evt.preventDefault()
-            $textarea.blur()
+            $defaultTextarea.blur()
 
       # Calculation panel setup
       typesWithoutCalculation = ['note', 'image', 'audio', 'video', 'file']
@@ -794,50 +794,50 @@ module.exports = do ->
         $calcPanel = $($viewTemplates.$$render('row.calculationPanel'))
         $calcPanel.appendTo(@cardSettingsWrap.find('.js-card-settings-calculation'))
 
-        $textarea = $calcPanel.find('.js-calculation-input')
+        $calcTextarea = $calcPanel.find('.js-calculation-input')
         currentCalcVal = calculationModel.get('value') or ''
-        $textarea.val(currentCalcVal)
+        $calcTextarea.val(currentCalcVal)
 
         if currentCalcVal
           setTimeout ->
-            scrollHeight = $textarea.prop('scrollHeight')
-            $textarea.css('height', '')
-            $textarea.css('height', scrollHeight)
+            scrollHeight = $calcTextarea.prop('scrollHeight')
+            $calcTextarea.css('height', '')
+            $calcTextarea.css('height', scrollHeight)
           , 1
 
         updateCalculationModel = ->
-          calculationModel.set('value', $textarea.val().replace(/\n/g, ''))
-        $textarea.on('blur', updateCalculationModel)
-        $textarea.on('change', updateCalculationModel)
-        $textarea.on('keyup', updateCalculationModel)
-        $textarea.on 'keypress', (evt) ->
+          calculationModel.set('value', $calcTextarea.val().replace(/\n/g, ''))
+        $calcTextarea.on('blur', updateCalculationModel)
+        $calcTextarea.on('change', updateCalculationModel)
+        $calcTextarea.on('keyup', updateCalculationModel)
+        $calcTextarea.on 'keypress', (evt) ->
           if evt.key is 'Enter' or evt.keyCode is 13
             evt.preventDefault()
-            $textarea.blur()
+            $calcTextarea.blur()
 
         $calcTabError = @cardSettingsWrap.find('.js-calculation-tab-error')
         updateCalcTabError = ->
-          if ($textarea.val() or '').trim() is ''
+          if ($calcTextarea.val() or '').trim() is ''
             $calcTabError.removeClass('calculation-tab__error--hidden')
           else
             $calcTabError.addClass('calculation-tab__error--hidden')
-        $textarea.on('blur', updateCalcTabError)
-        $textarea.on('keyup', updateCalcTabError)
+        $calcTextarea.on('blur', updateCalcTabError)
+        $calcTextarea.on('keyup', updateCalcTabError)
         updateCalcTabError()
 
         if questionType is 'calculate'
           makeRequiredCheck = ->
-            $field = $textarea.closest('.calculation-panel__field')
-            if ($textarea.val() or '').trim() is ''
+            $field = $calcTextarea.closest('.calculation-panel__field')
+            if ($calcTextarea.val() or '').trim() is ''
               $field.addClass('input-error')
-              if $textarea.siblings('.message').length is 0
+              if $calcTextarea.siblings('.message').length is 0
                 $message = $('<div/>').addClass('message').text(t('This field is required'))
-                $textarea.after($message)
+                $calcTextarea.after($message)
             else
               $field.removeClass('input-error')
-              $textarea.siblings('.message').remove()
-          $textarea.on('blur', makeRequiredCheck)
-          $textarea.on('keyup', makeRequiredCheck)
+              $calcTextarea.siblings('.message').remove()
+          $calcTextarea.on('blur', makeRequiredCheck)
+          $calcTextarea.on('keyup', makeRequiredCheck)
 
         if triggerModel
           $select = $calcPanel.find('.js-calculation-trigger-select')

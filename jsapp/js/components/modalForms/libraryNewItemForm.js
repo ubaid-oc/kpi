@@ -12,6 +12,7 @@ import mixins from '#/mixins'
 import pageState from '#/pageState.store'
 import { withRouter } from '#/router/legacy'
 import { ROUTES } from '#/router/routerConstants'
+import { navigatePreservingEConsent } from '#/components/formBuilder/econsentSignature'
 import sessionStore from '#/stores/session'
 
 class LibraryNewItemForm extends React.Component {
@@ -46,7 +47,7 @@ class LibraryNewItemForm extends React.Component {
       }
     }
 
-    this.props.router.navigate(targetPath)
+    navigatePreservingEConsent(this.props.router, targetPath)
   }
 
   goToCollection() {

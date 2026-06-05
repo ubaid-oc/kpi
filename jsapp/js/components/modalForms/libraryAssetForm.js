@@ -21,6 +21,7 @@ import pageState from '#/pageState.store'
 import { withRouter } from '#/router/legacy'
 import sessionStore from '#/stores/session'
 import { notify } from '#/utils'
+import { navigatePreservingEConsent } from '#/components/formBuilder/econsentSignature'
 import { renderBackButton } from './modalHelpers'
 import './libraryAssetForm.scss'
 
@@ -105,7 +106,7 @@ export class LibraryAssetFormComponent extends React.Component {
     )
     pageState.hideModal()
     if (this.getFormAssetType() === ASSET_TYPES.template.id) {
-      this.props.router.navigate(`/library/asset/${response.uid}/edit`)
+      navigatePreservingEConsent(this.props.router, `/library/asset/${response.uid}/edit`)
     }
   }
 

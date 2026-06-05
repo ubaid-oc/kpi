@@ -19,6 +19,7 @@ import { validFileTypes } from '#/utils'
 import myLibraryStore from './myLibraryStore'
 // OC fork: upstream renamed `ownedCollectionsStore` to `managedCollectionsStore`.
 import managedCollectionsStore from './managedCollectionsStore'
+import { navigatePreservingEConsent } from '#/components/formBuilder/econsentSignature'
 import './librarySidebar.scss'
 
 // OC fork: these BEM elements used to live in the fork's bemComponents, but
@@ -98,7 +99,7 @@ class LibrarySidebar extends Reflux.Component<any, any> {
       }
     }
 
-    this.props.router.navigate(targetPath)
+    navigatePreservingEConsent(this.props.router, targetPath)
   }
 
   goToTemplateCreator() {
@@ -114,13 +115,7 @@ class LibrarySidebar extends Reflux.Component<any, any> {
     }
     // Preserve the econsent status in the URL so that isEConsentSignatureItemTypeAllowed()
     // returns the correct value when the row-selector picker is opened.
-    const eConsentStatus = this.props.router.searchParams.get('econsent')
-    if (eConsentStatus) {
-      const targetUrl = new URL(targetPath, window.location.origin)
-      targetUrl.searchParams.set('econsent', eConsentStatus)
-      targetPath = `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`
-    }
-    this.props.router.navigate(targetPath)
+    navigatePreservingEConsent(this.props.router, targetPath)
   }
 
   onFileDrop(files: File[]) {

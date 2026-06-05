@@ -60,13 +60,20 @@ module.exports = do ->
           <li data-card-settings-tab-id="skip-logic" class="card__settings__tabs__tab">
             #{t("Skip Logic")}
           </li>
+          <li data-card-settings-tab-id="repeat-count" class="card__settings__tabs__tab js-repeat-count-tab repeat-count-tab--hidden">
+            #{t("Repeat Count")}
+          </li>
           <li data-card-settings-tab-id="locked-features" class="card__settings__tabs__tab locking__ui-hidden">
             #{t("Locked Features")}
           </li>
         </ul>
         <div class="card__settings__content">
+          <button type="button" class="card__settings__back js-toggle-card-settings" aria-label="#{t('Back')}">
+            <i class="k-icon k-icon-arrow-left" aria-hidden="true"></i>
+          </button>
           <ul class="js-card-settings-row-options card__settings__fields card__settings__fields--active"></ul>
           <ul class="js-card-settings-skip-logic card__settings__fields"></ul>
+          <ul class="js-card-settings-repeat-count card__settings__fields card__settings__fields--repeat-count"></ul>
           <ul class="js-card-settings-locked-features card__settings__fields locking__ui-hidden"></ul>
         </div>
       </section>

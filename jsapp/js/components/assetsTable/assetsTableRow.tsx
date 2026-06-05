@@ -6,6 +6,7 @@ import AssetName from '#/components/common/assetName'
 import { ASSET_TYPES } from '#/constants'
 import type { AssetResponse } from '#/dataInterface'
 import { formatTime } from '#/utils'
+import { buildHashHrefWithEConsent } from '#/components/formBuilder/econsentSignature'
 import AssetActionButtons from './assetActionButtons'
 import type { AssetsTableContextName } from './assetsTableConstants'
 import './assetTableRow.scss'
@@ -33,10 +34,10 @@ class AssetsTableRow extends React.Component<AssetsTableRowProps> {
     return (
       <bem.AssetsTableRow m={['asset', `type-${this.props.asset.asset_type}`]}>
         {this.props.asset.asset_type === ASSET_TYPES.collection.id && (
-          <bem.AssetsTableRow__link href={`#/library/asset/${this.props.asset.uid}`} />
+          <bem.AssetsTableRow__link href={buildHashHrefWithEConsent(`#/library/asset/${this.props.asset.uid}`)} />
         )}
         {this.props.asset.asset_type !== ASSET_TYPES.collection.id && (
-          <bem.AssetsTableRow__link href={`#/library/asset/${this.props.asset.uid}/edit`} />
+          <bem.AssetsTableRow__link href={buildHashHrefWithEConsent(`#/library/asset/${this.props.asset.uid}/edit`)} />
         )}
 
         <bem.AssetsTableRow__column m='name' dir='auto'>
