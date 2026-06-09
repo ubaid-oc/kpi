@@ -335,8 +335,8 @@
   align-items: start;
 
   .xlf-dv-default       { grid-column: 1; grid-row: 1; }
-  .xlf-dv-oc_item_group { grid-column: 2; grid-row: 1; }
   .xlf-dv-readonly      { grid-column: 1; grid-row: 2; }
+  .xlf-dv-oc_item_group { grid-column: 2; grid-row: 2; }
 }
 
 .card__settings__row-options {
@@ -392,8 +392,8 @@
     grid-template-columns: 1fr;
 
     .xlf-dv-default       { grid-column: 1; grid-row: auto; }
-    .xlf-dv-oc_item_group { grid-column: 1; grid-row: auto; }
     .xlf-dv-readonly      { grid-column: 1; grid-row: auto; }
+    .xlf-dv-oc_item_group { grid-column: 1; grid-row: auto; }
   }
 }
 
