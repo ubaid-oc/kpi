@@ -233,7 +233,11 @@ export class LibraryAssetFormComponent extends React.Component {
               value={this.state.fields.name}
               onChange={this.onNameChange.bind(this)}
               label={this.getNameTitle()}
-              placeholder={t('Enter title of ##type## here').replace('##type##', this.getFormAssetType())}
+              placeholder={(() => {
+                const typeStr = this.getFormAssetType()
+                const capitalized = typeStr.charAt(0).toUpperCase() + typeStr.slice(1)
+                return t('Enter title of ##type## here').replace('##type##', capitalized)
+              })()}
             />
           </bem.FormModal__item>
 
