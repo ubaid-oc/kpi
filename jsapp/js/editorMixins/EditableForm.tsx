@@ -1082,20 +1082,21 @@ export default function EditableForm(props: EditableFormProps) {
             />
 
             {canAddToLibrary() && (
-              <Button
-                type='text'
-                size='m'
-                isDisabled={!groupable}
-                onClick={addQuestionsToLibrary}
-                tooltip={
-                  groupable
-                    ? t('Add selected questions to library')
-                    : t('Add selected questions to library disabled. Please select at least one question.')
-                }
-                tooltipPosition='left'
-                startIcon='folder-in'
-                className='add-questions-to-library'
-              />
+              <span
+                className='button-container left-tooltip'
+                data-tip={groupable ? t('Add selected questions to library') : t('Add selected questions to library disabled. Please select at least one question.')}
+              >
+                <bem.FormBuilderHeader__button
+                  m={['group', {groupable: groupable}]}
+                  onClick={addQuestionsToLibrary}
+                  disabled={!groupable}
+                  className='add-questions-to-library'
+                >
+                  <i className='k-icon-folder'>
+                    <i className='k-icon-plus' />
+                  </i>
+                </bem.FormBuilderHeader__button>
+              </span>
             )}
 
             {/* OpenClinica: cascading select not available */}
@@ -1301,7 +1302,8 @@ export default function EditableForm(props: EditableFormProps) {
       return null
     }
 
-    const assetTypeLabel = getFormBuilderAssetType(state.asset.asset_type, state.desiredAssetType)?.label || 'asset'
+    const rawLabel = getFormBuilderAssetType(state.asset.asset_type, state.desiredAssetType)?.label || 'asset'
+    const assetTypeLabel = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1)
 
     // Case 1: there is no asset yet (creting a new) or asset is not locked
     if (!state.asset?.content || !hasAssetAnyLocking(state.asset.content)) {

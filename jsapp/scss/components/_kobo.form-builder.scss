@@ -268,6 +268,45 @@ $s-form-builder-content-width: 1024px;
   }
 }
 
+// FORM BUILDER TOOLBAR BUTTON (oc/master-style icon button with nested icons)
+
+.form-builder-header__button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 10px;
+  color: colors.$kobo-gray-700;
+  overflow: visible; // allow absolutely-positioned child icons to overflow
+
+  i {
+    font-size: 24px;
+    margin: 3px;
+    vertical-align: middle;
+    position: relative; // anchor for the nested absolute icon
+  }
+
+  &.add-questions-to-library {
+    .k-icon-plus {
+      color: colors.$kobo-teal;
+      position: absolute;
+      font-size: 16px;
+      left: 13px;
+      top: 15px;
+    }
+  }
+
+  &:disabled,
+  &[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  &:hover:not(:disabled):not([disabled]) {
+    color: colors.$kobo-gray-800;
+  }
+}
+
 // FORM STYLE SETTINGS
 
 .form-builder-aside {
