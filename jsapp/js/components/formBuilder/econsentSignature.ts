@@ -2,8 +2,31 @@ export const ECONSENT_SIGNATURE_EXTERNAL_VALUE = 'signature' as const;
 
 export type EConsentModuleStatus = 'ACTIVE' | 'PENDING' | string;
 
+/**
+ * Event types for an event-form-definition context.
+ * Only NONREPEATING_VISIT events are eligible for eConsent forms.
+ */
+export type FormEventType =
+  | 'NONREPEATING_VISIT'
+  | 'REPEATING_VISIT'
+  | 'NONREPEATING_COMMON'
+  | 'REPEATING_COMMON'
+  | string;
+
 export function isEConsentEnabledStatus(status: EConsentModuleStatus | null | undefined): boolean {
   return status === 'ACTIVE' || status === 'PENDING';
+}
+
+/**
+ * Returns true only for event types that are eligible to host an eConsent form.
+ * Only non-repeating Visit events qualify; all Common events and Repeating Visit
+ * events are ineligible.
+ */
+export function isEConsentAllowedEventType(eventType: FormEventType | null | undefined): boolean {
+  if (eventType === null || eventType === undefined) {
+    return true;
+  }
+  return eventType === 'NONREPEATING_VISIT';
 }
 
 /**
@@ -18,11 +41,29 @@ export function getStudyEConsentModuleStatus(): string | null {
 }
 
 /**
- * AC2 gating: allow adding new eConsent Signature items only if study module is ACTIVE/PENDING.
- * Existing signature rows should continue to render regardless.
+ * Read the event type for the current form context from the URL query parameter
+ * `event_type`. Returns null when the parameter is absent (e.g. Library editing).
+ */
+export function getFormEventType(): string | null {
+  const hash = window.location.hash;
+  const queryIndex = hash.indexOf('?');
+  if (queryIndex === -1) return null;
+  const params = new URLSearchParams(hash.slice(queryIndex));
+  return params.get('event_type');
+}
+
+/**
+ * Gating for the eConsent Signature item type in Form Designer.
+ * Requires both:
+ *   1. The study eConsent module is ACTIVE or PENDING.
+ *   2. The form is in a Non-Repeating Visit event (or no event context is set).
+ * Existing signature rows continue to render regardless of this check.
  */
 export function isEConsentSignatureItemTypeAllowed(): boolean {
-  return isEConsentEnabledStatus(getStudyEConsentModuleStatus());
+  return (
+    isEConsentEnabledStatus(getStudyEConsentModuleStatus()) &&
+    isEConsentAllowedEventType(getFormEventType())
+  );
 }
 
 /**
