@@ -34,6 +34,9 @@ do ->
       it 'returns true when event type is undefined (no event context)', ->
         expect(econsentSignature.isEConsentAllowedEventType(undefined)).toBe(true)
 
+      it 'returns false for an unknown/unrecognised event type value', ->
+        expect(econsentSignature.isEConsentAllowedEventType('SOMETHING_ELSE')).toBe(false)
+
     describe 'getFormEventType', ->
       beforeEach ->
         # Reset hash before each test
@@ -54,6 +57,10 @@ do ->
       it 'returns null when there are no query params', ->
         window.location.hash = '#/forms/uid/edit'
         expect(econsentSignature.getFormEventType()).toBe(null)
+
+      it 'returns empty string when event_type param is present but empty', ->
+        window.location.hash = '#/forms/uid/edit?event_type='
+        expect(econsentSignature.getFormEventType()).toBe('')
 
     describe 'isEConsentSignatureItemTypeAllowed (combined gating)', ->
       beforeEach ->

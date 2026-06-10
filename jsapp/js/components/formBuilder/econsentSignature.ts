@@ -30,26 +30,29 @@ export function isEConsentAllowedEventType(eventType: FormEventType | null | und
 }
 
 /**
+ * Reads a named query parameter from the current URL hash fragment.
+ * Returns null when there are no query params or the name is absent.
+ */
+function getHashQueryParam(name: string): string | null {
+  const hash = window.location.hash;
+  const queryIndex = hash.indexOf('?');
+  if (queryIndex === -1) return null;
+  return new URLSearchParams(hash.slice(queryIndex)).get(name);
+}
+
+/**
  * Read study eConsent module status from the URL query parameter `econsent`.
  */
 export function getStudyEConsentModuleStatus(): string | null {
-  const hash = window.location.hash; // e.g. "#/forms/uid/edit?econsent=ACTIVE"
-  const queryIndex = hash.indexOf('?');
-  if (queryIndex === -1) return null;
-  const params = new URLSearchParams(hash.slice(queryIndex));
-  return params.get('econsent');
+  return getHashQueryParam('econsent');
 }
 
 /**
  * Read the event type for the current form context from the URL query parameter
  * `event_type`. Returns null when the parameter is absent (e.g. Library editing).
  */
-export function getFormEventType(): string | null {
-  const hash = window.location.hash;
-  const queryIndex = hash.indexOf('?');
-  if (queryIndex === -1) return null;
-  const params = new URLSearchParams(hash.slice(queryIndex));
-  return params.get('event_type');
+export function getFormEventType(): FormEventType | null {
+  return getHashQueryParam('event_type');
 }
 
 /**
