@@ -145,10 +145,3 @@ input.row__questiontypes__new-question-name {
     color: variables.$cardInSortBorderColor;
   }
 }
-
-// Force hover through jQuery for arrow key navigation
-.questiontypelist__item-force-hover {
-  @include mdl.form-builder-focus;
-
-  color: variables.$cardInSortBorderColor;
-}
