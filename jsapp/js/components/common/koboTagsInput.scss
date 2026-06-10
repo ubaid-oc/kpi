@@ -13,8 +13,10 @@ placese. As soon as these are removed, we can simplify this file.
 
   // Instead of indicating focus by default way (i.e. the input element being
   // highlighted), we highlight the wrapper.
+  // Use border-color instead of outline — outline draws outside the element and
+  // gets clipped by the modal__body overflow container when the input is at the top.
   &:focus-within {
-    outline: 1px solid colors.$kobo-blue;
+    border-color: colors.$kobo-blue;
   }
 
   &.react-tagsinput-invalid {
