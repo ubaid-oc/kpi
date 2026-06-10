@@ -32,6 +32,8 @@ import Button from '#/components/common/button'
 import type { ButtonType } from '#/components/common/button'
 import managedCollectionsStore from '#/components/library/managedCollectionsStore'
 import type { ManagedCollectionsStoreData } from '#/components/library/managedCollectionsStore'
+import ownedCollectionsStore from '#/components/library/ownedCollectionsStore'
+import type { OwnedCollectionsStoreData } from '#/components/library/ownedCollectionsStore'
 import { userCan } from '#/components/permissions/utils'
 import { ACCESS_TYPES, ASSET_TYPES } from '#/constants'
 import type { AssetDownloads, AssetResponse } from '#/dataInterface'
@@ -51,6 +53,7 @@ interface AssetActionButtonsProps extends WithRouterProps {
 
 interface AssetActionButtonsState {
   managedCollections: AssetResponse[]
+  ownedCollections: AssetResponse[]
   shouldHidePopover: boolean
   isPopoverVisible: boolean
   isSubscribePending: boolean
@@ -68,6 +71,7 @@ class AssetActionButtons extends React.Component<AssetActionButtonsProps, AssetA
     super(props)
     this.state = {
       managedCollections: managedCollectionsStore.data.collections,
+      ownedCollections: ownedCollectionsStore.data.collections,
       shouldHidePopover: false,
       isPopoverVisible: false,
       isSubscribePending: false,
@@ -77,6 +81,7 @@ class AssetActionButtons extends React.Component<AssetActionButtonsProps, AssetA
 
   componentDidMount() {
     managedCollectionsStore.listen(this.onManagedCollectionsStoreChanged.bind(this), this)
+    ownedCollectionsStore.listen(this.onOwnedCollectionsStoreChanged.bind(this), this)
     this.unlisteners.push(
       actions.library.subscribeToCollection.completed.listen(this.onSubscribingCompleted.bind(this)),
       actions.library.unsubscribeFromCollection.completed.listen(this.onSubscribingCompleted.bind(this)),
@@ -95,6 +100,10 @@ class AssetActionButtons extends React.Component<AssetActionButtonsProps, AssetA
 
   onManagedCollectionsStoreChanged(storeData: ManagedCollectionsStoreData) {
     this.setState({ managedCollections: storeData.collections })
+  }
+
+  onOwnedCollectionsStoreChanged(storeData: OwnedCollectionsStoreData) {
+    this.setState({ ownedCollections: storeData.collections })
   }
 
   // methods for inner workings of component
@@ -405,22 +414,20 @@ class AssetActionButtons extends React.Component<AssetActionButtonsProps, AssetA
 
     const assetType = this.props.asset.asset_type
     // OpenClinica fork: bypass kobo per-asset edit permission.
-    // const userCanEdit = userCan('change_asset', this.props.asset)
     const userCanEdit = true
     const hasDetailsEditable = assetType === ASSET_TYPES.template.id || assetType === ASSET_TYPES.collection.id
     const isCollection = assetType === ASSET_TYPES.collection.id
-
-    const routeAssetUid = getRouteAssetUid()
+    const downloads = !isCollection
+      ? this.props.asset.downloads.filter((dl) => dl.format !== 'xml')
+      : []
 
     return (
-      <menu className='asset-action-buttons' onMouseLeave={this.onMouseLeave} onMouseEnter={this.onMouseEnter}>
-        {/* {this.renderSubButton()} */}
-
-        {/* {userCanEdit && assetType !== ASSET_TYPES.collection.id && (
+      <menu className='asset-action-buttons'>
+        {userCanEdit && !isCollection && (
           <Link to={this.getFormBuilderLink()}>
-            <Button type='text' size='m' tooltip={t('Edit in Form Builder')} tooltipPosition='right' startIcon='edit' />
+            <Button type='text' size='m' tooltip={t('Edit')} tooltipPosition='right' startIcon='edit' />
           </Link>
-        )} */}
+        )}
 
         {userCanEdit && hasDetailsEditable && isCollection && (
           <Button
@@ -433,29 +440,18 @@ class AssetActionButtons extends React.Component<AssetActionButtonsProps, AssetA
           />
         )}
 
-        {/* {userCanEdit && (
+        {userCanEdit && !isCollection && (
           <Button
             type='text'
             size='m'
             onClick={this.showTagsModal.bind(this)}
-            tooltip={t('Edit Tags')}
+            tooltip={t('Labels')}
             tooltipPosition='right'
             startIcon='tag'
           />
-        )} */}
+        )}
 
-        {/* {userCanEdit && !isCollection && (
-          <Button
-            type='text'
-            size='m'
-            onClick={this.share.bind(this)}
-            tooltip={t('Share')}
-            tooltipPosition='right'
-            startIcon='user-share'
-          />
-        )} */}
-
-        {/* {assetType !== ASSET_TYPES.collection.id && (
+        {!isCollection && (
           <Button
             type='text'
             size='m'
@@ -464,31 +460,73 @@ class AssetActionButtons extends React.Component<AssetActionButtonsProps, AssetA
             tooltipPosition='right'
             startIcon='duplicate'
           />
-        )} */}
+        )}
 
-        {/* {assetType === ASSET_TYPES.template.id && (
+        {downloads.map((dl) => (
+          <a href={dl.url} key={`dl-${dl.format}`}>
+            <Button
+              type='text'
+              size='m'
+              tooltip={`${t('Download')} ${dl.format.toString().toUpperCase()}`}
+              tooltipPosition='right'
+              startIcon={`file-${dl.format}` as IconName}
+            />
+          </a>
+        ))}
+
+        {!isCollection && (
+          <PopoverMenu
+            triggerLabel={
+              <div className='right-tooltip' data-tip={t('Manage collection')}>
+                <i className='k-icon k-icon-folder' />
+              </div>
+            }
+          >
+            {assetType !== ASSET_TYPES.survey.id && this.props.asset.parent !== null && (
+              <bem.PopoverMenu__link onClick={this.moveToCollection.bind(this, null)}>
+                <i className='k-icon k-icon-folder-out' />
+                {t('Remove from collection')}
+              </bem.PopoverMenu__link>
+            )}
+
+            {assetType !== ASSET_TYPES.survey.id && this.state.ownedCollections.length > 0 && [
+              <bem.PopoverMenu__heading key='heading'>{t('Move to')}</bem.PopoverMenu__heading>,
+              <bem.PopoverMenu__moveTo key='list'>
+                {this.state.ownedCollections.map((collection) => {
+                  const modifiers = ['move-coll-item']
+                  const isAssetParent = collection.url === this.props.asset.parent
+                  if (isAssetParent) {
+                    modifiers.push('move-coll-item-parent')
+                  }
+                  const displayName = assetUtils.getAssetDisplayName(collection).final
+                  return (
+                    <bem.PopoverMenu__item
+                      onClick={this.moveToCollection.bind(this, collection.url)}
+                      key={collection.uid}
+                      title={displayName}
+                      m={modifiers}
+                    >
+                      {isAssetParent && <i className='k-icon k-icon-check' />}
+                      {!isAssetParent && <i className='k-icon k-icon-folder-in' />}
+                      {displayName}
+                    </bem.PopoverMenu__item>
+                  )
+                })}
+              </bem.PopoverMenu__moveTo>,
+            ]}
+          </PopoverMenu>
+        )}
+
+        {userCanEdit && !isCollection && (
           <Button
             type='text'
             size='m'
-            onClick={this.cloneAsSurvey.bind(this)}
-            tooltip={t('Create project')}
+            onClick={this.delete.bind(this)}
+            tooltip={t('Delete')}
             tooltipPosition='right'
-            startIcon='projects'
+            startIcon='trash'
           />
-        )} */}
-
-        {/* {routeAssetUid && this.props.asset.parent !== null && !this.props.asset.parent.includes(routeAssetUid) && (
-          <Button
-            type='text'
-            size='m'
-            onClick={this.viewContainingCollection.bind(this)}
-            tooltip={t('View containing Collection')}
-            tooltipPosition='right'
-            startIcon='folder'
-          />
-        )} */}
-
-        {!isCollection && this.renderMoreActions()}
+        )}
       </menu>
     )
   }
