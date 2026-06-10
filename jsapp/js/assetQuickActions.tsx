@@ -252,15 +252,11 @@ export function cloneAsset(assetOrUid: AssetResponse | ProjectViewAsset | string
             okBtn.removeAttribute('disabled')
             dialog.destroy()
 
-            // TODO when on collection landing page and user clones this
-            // collection's child asset, instead of navigating to cloned asset
-            // landing page, it would be better to stay here and refresh data
-            // (if the clone will keep the parent asset)
             let goToUrl
             if (newAsset.asset_type === ASSET_TYPES.survey.id) {
               goToUrl = `/forms/${newAsset.uid}/landing`
             } else {
-              goToUrl = `/library/asset/${newAsset.uid}`
+              goToUrl = ROUTES.LIBRARY
             }
 
             router!.navigate(goToUrl)

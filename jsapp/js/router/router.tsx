@@ -76,12 +76,7 @@ export const router = createHashRouter(
         />
         <Route
           path={ROUTES.LIBRARY_ITEM}
-          element={
-            <PermProtectedRoute
-              requiredPermissions={[PERMISSIONS_CODENAMES.view_asset]}
-              protectedComponent={AssetRoute}
-            />
-          }
+          element={<Navigate to={ROUTES.LIBRARY} replace />}
         />
         <Route
           path={ROUTES.EDIT_LIBRARY_ITEM}
