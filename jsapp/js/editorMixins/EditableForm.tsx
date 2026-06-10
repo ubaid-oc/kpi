@@ -679,9 +679,11 @@ export default function EditableForm(props: EditableFormProps) {
       // eslint-disable-next-line no-lonely-if
       if (isNewLibraryAsset) {
         saveButtonText = t('create')
-        backButtonText = t('back to library')
       } else {
         saveButtonText = t('save changes')
+      }
+      if (state.backRoute === ROUTES.LIBRARY) {
+        backButtonText = t('back to library')
       }
     }
 
@@ -979,6 +981,19 @@ export default function EditableForm(props: EditableFormProps) {
           </bem.FormBuilderHeader__cell>
 
           <bem.FormBuilderHeader__cell m={'buttonsTopRight'}>
+            {/* OC fork: replaced upstream's close (X) button with an outlined "back"
+                button, gated by canNavigateToList(). Shown before Save. */}
+            {canNavigateToList() && (
+              <Button
+                type='secondary'
+                size='l'
+                isUpperCase
+                isDisabled={!state.surveyAppRendered || !!state.surveyLoadError}
+                onClick={safeNavigateToList}
+                label={backButtonText}
+              />
+            )}
+
             <Button
               type='primary'
               size='l'
@@ -993,18 +1008,6 @@ export default function EditableForm(props: EditableFormProps) {
                 </>
               }
             />
-
-            {/* OC fork: replaced upstream's close (X) button with a text "back"
-                button, gated by canNavigateToList(). */}
-            {canNavigateToList() && (
-              <Button
-                type='text'
-                size='l'
-                isDisabled={!state.surveyAppRendered || !!state.surveyLoadError}
-                onClick={safeNavigateToList}
-                label={backButtonText}
-              />
-            )}
           </bem.FormBuilderHeader__cell>
         </bem.FormBuilderHeader__row>
 
@@ -1090,23 +1093,12 @@ export default function EditableForm(props: EditableFormProps) {
                     : t('Add selected questions to library disabled. Please select at least one question.')
                 }
                 tooltipPosition='left'
-                startIcon='folder-plus'
+                startIcon='folder-in'
                 className='add-questions-to-library'
               />
             )}
 
-            <Button
-              type='text'
-              size='m'
-              isDisabled={toggleCascade === undefined}
-              onClick={toggleCascade}
-              tooltip={t('Insert cascading select')}
-              tooltipPosition='left'
-              startIcon='cascading'
-              className={cx({
-                [LOCKING_UI_CLASSNAMES.DISABLED]: isAddingGroupsRestricted(),
-              })}
-            />
+            {/* OpenClinica: cascading select not available */}
           </bem.FormBuilderHeader__cell>
 
           <bem.FormBuilderHeader__cell m='verticalRule' />
