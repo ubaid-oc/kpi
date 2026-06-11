@@ -23,8 +23,17 @@ def update_email(*args, **kwargs):
     emails, primary = cleanup_email_addresses(request, all_email_addresses)
 
     # cleanup_email_addresses doesn't actually call set_as_primary on the primary
-    # email so do that now
-    primary.set_as_primary()
+    # email so do that now.
+    # sociallogin email_addresses are unsaved objects (no pk); set_as_primary() calls
+    # save() which fails with IntegrityError if that email already exists in the DB.
+    # Look it up first so we always call set_as_primary() on a saved instance.
+    if not primary.pk:
+        try:
+            primary = EmailAddress.objects.get(user=primary.user, email=primary.email)
+        except EmailAddress.DoesNotExist:
+            primary = None
+    if primary and primary.pk:
+        primary.set_as_primary()
 
     # update existing emails to reflect that they are no longer primary
     # and add any new emails from the SocialLogin

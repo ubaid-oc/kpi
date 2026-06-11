@@ -52,6 +52,7 @@ class TenantAwareSocialAccountAdapter(DefaultSocialAccountAdapter):
             kc_user = KeycloakTenantUser.objects.get(UID=uid, subdomain=subdomain)
             sociallogin.connect(request, kc_user.user)
             self._ensure_user_profile(kc_user.user)
+            self._clear_existing_email_addresses(kc_user.user, sociallogin)
             return
         except KeycloakTenantUser.DoesNotExist:
             pass
@@ -75,6 +76,7 @@ class TenantAwareSocialAccountAdapter(DefaultSocialAccountAdapter):
                 )
                 sociallogin.connect(request, existing_user)
                 self._ensure_user_profile(existing_user)
+                self._clear_existing_email_addresses(existing_user, sociallogin)
                 return
             except get_user_model().DoesNotExist:
                 pass
@@ -127,6 +129,17 @@ class TenantAwareSocialAccountAdapter(DefaultSocialAccountAdapter):
             user_id=user.pk,
             defaults={'validated_password': True},
         )
+
+    def _clear_existing_email_addresses(self, user, sociallogin):
+        """Remove email addresses that already exist so allauth doesn't re-insert them."""
+        from allauth.account.models import EmailAddress
+        existing = set(
+            EmailAddress.objects.filter(user=user).values_list('email', flat=True)
+        )
+        sociallogin.email_addresses = [
+            ea for ea in sociallogin.email_addresses
+            if ea.email not in existing
+        ]
 
     def _store_user_info(self, request, access_token):
         """Store oc_user_uuid in session from the access token userContext claim."""
