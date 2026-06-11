@@ -14,11 +14,11 @@ from .router_api_v1 import urls_patterns as router_api_v1_urls
 from .router_api_v2 import URL_NAMESPACE
 from .router_api_v2 import urls_patterns as router_api_v2_urls
 
-from oc.views import (
+from kobo.apps.oc_tenant_auth.views import (
     OCAuthenticationCallbackView,
     OCAuthenticationRequestView,
     OCLogoutView,
-    OCAppInfoView
+    OCAppInfoView,
 )
 
 
@@ -43,7 +43,6 @@ urlpatterns = [
     path('openid/callback/', OCAuthenticationCallbackView.as_view(), name="oidc_authentication_callback"),
     path('openid/authenticate/', OCAuthenticationRequestView.as_view(), name="oidc_authentication_init"),
     path('openid/logout/', OCLogoutView.as_view(), name="oidc_logout"),
-    re_path(r'^openid/', include('mozilla_django_oidc.urls')),
     # DEPRECATED, remove with v1
     path(
         'authorized_application/authenticate_user/',

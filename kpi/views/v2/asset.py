@@ -19,7 +19,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_extensions.mixins import NestedViewSetMixin
-from bossoidc2.models import Keycloak as KeycloakModel
+from kobo.apps.oc_tenant_auth.models import KeycloakTenantUser as KeycloakModel
 
 from kobo.apps.audit_log.base_views import AuditLoggedModelViewSet
 from kobo.apps.audit_log.models import AuditType

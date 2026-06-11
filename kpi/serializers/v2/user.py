@@ -7,7 +7,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.relations import HyperlinkedIdentityField
 
-from bossoidc2.models import Keycloak as KeycloakModel
+from kobo.apps.oc_tenant_auth.models import KeycloakTenantUser as KeycloakModel
 from kobo.apps.kobo_auth.shortcuts import User
 from kpi.constants import ASSET_TYPE_COLLECTION, PERM_DISCOVER_ASSET
 from kpi.models.asset import Asset, UserAssetSubscription

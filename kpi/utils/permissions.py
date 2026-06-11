@@ -13,7 +13,7 @@ def get_subdomain_user_ids(user) -> QuerySet:
     Use for queryset filters (owner__in=...). For a single membership check,
     prefer `is_owner_in_subdomain()` to avoid loading all IDs into memory.
     """
-    from bossoidc2.models import Keycloak as KeycloakModel
+    from kobo.apps.oc_tenant_auth.models import KeycloakTenantUser as KeycloakModel
 
     kc_user = KeycloakModel.objects.get(user=user)
     return KeycloakModel.objects.filter(
@@ -27,7 +27,7 @@ def is_owner_in_subdomain(user, owner_id: int) -> bool:
     `user`, via a DB-level EXISTS check. Raises KeycloakModel.DoesNotExist
     if `user` has no Keycloak record.
     """
-    from bossoidc2.models import Keycloak as KeycloakModel
+    from kobo.apps.oc_tenant_auth.models import KeycloakTenantUser as KeycloakModel
 
     kc_user = KeycloakModel.objects.get(user=user)
     return KeycloakModel.objects.filter(

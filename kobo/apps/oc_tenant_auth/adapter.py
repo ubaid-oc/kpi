@@ -1,0 +1,139 @@
+import base64
+import json
+import logging
+
+import requests
+from django.conf import settings
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+
+
+def _decode_jwt_payload(token):
+    part = token.split('.')[1]
+    part += '=' * (-len(part) % 4)
+    return json.loads(base64.urlsafe_b64decode(part))
+
+from .backend import get_realm_name, get_client_secret
+from .models import KeycloakTenantUser
+from .utils import get_subdomain
+
+LOGGER = logging.getLogger(__name__)
+
+
+class TenantAwareSocialAccountAdapter(DefaultSocialAccountAdapter):
+    """
+    allauth SocialAccountAdapter for OpenClinica multi-tenant Keycloak OIDC.
+
+    Replaces oc.backend.OpenIdConnectBackend for allauth-based OIDC flows.
+    Preserves all tenant isolation and OC session population behaviour.
+    """
+
+    def get_app(self, request, provider, client_id=None):
+        """Inject per-subdomain Keycloak realm URL and client secret."""
+        app = super().get_app(request, provider, client_id=client_id)
+        if provider == 'keycloak' and request is not None:
+            realm_name = get_realm_name(request)
+            client_secret = get_client_secret(realm_name)
+            realm_url = f'{settings.KEYCLOAK_AUTH_URI}/auth/realms/{realm_name}'
+            app.settings = {**app.settings, 'server_url': realm_url}
+            if client_secret:
+                app.secret = client_secret
+        return app
+
+    def pre_social_login(self, request, sociallogin):
+        """
+        Called after token validation, before login/user-creation.
+        Sets subdomain in session and enforces tenant-isolated user lookup.
+        """
+        subdomain = get_subdomain(request)
+        request.session['subdomain'] = subdomain
+
+        uid = sociallogin.account.uid
+        try:
+            kc_user = KeycloakTenantUser.objects.get(UID=uid, subdomain=subdomain)
+            sociallogin.connect(request, kc_user.user)
+            return
+        except KeycloakTenantUser.DoesNotExist:
+            pass
+
+
+    def save_user(self, request, sociallogin, form=None):
+        """
+        After user save: sync roles, populate OC session values, upsert KeycloakTenantUser.
+        """
+        user = super().save_user(request, sociallogin, form)
+        subdomain = get_subdomain(request)
+
+        # allauth sets username from preferred_username; append +subdomain
+        if not user.username.endswith(f'+{subdomain}'):
+            user.username = f'{user.username}+{subdomain}'
+            user.save(update_fields=['username'])
+        extra_data = sociallogin.account.extra_data
+        uid = sociallogin.account.uid
+        access_token = (
+            sociallogin.token.token if sociallogin.token else None
+        )
+
+        # Sync Keycloak roles → Django is_staff / is_superuser
+        from .backend import get_roles
+        roles = get_roles(extra_data)
+        user.is_staff = 'admin' in roles or 'superuser' in roles
+        user.is_superuser = 'superuser' in roles
+        user.save(update_fields=['is_staff', 'is_superuser'])
+
+        # Populate OC session values from access token
+        if access_token and request:
+            self._store_user_info(request, access_token)
+            self._store_customer_info(request, access_token)
+
+        user_type = extra_data.get(
+            'https://www.openclinica.com/userContext', {}
+        ).get('userType', '')
+
+        KeycloakTenantUser.objects.update_or_create(
+            UID=uid,
+            subdomain=subdomain,
+            defaults={'user': user, 'user_type': user_type},
+        )
+        return user
+
+    def _store_user_info(self, request, access_token):
+        """Store oc_user_uuid in session from the access token userContext claim."""
+        try:
+            payload = _decode_jwt_payload(access_token)
+            user_uuid = payload.get(
+                'https://www.openclinica.com/userContext', {}
+            ).get('userUuid')
+        except Exception as exc:
+            LOGGER.error('Failed to extract userUuid from access_token: %s', exc)
+            return
+        if not user_uuid:
+            LOGGER.error('Empty userUuid received from access_token')
+            return
+        request.session['oc_user_uuid'] = user_uuid
+
+    def _store_customer_info(self, request, access_token):
+        """Store oc_customer_name and oc_customer_shared_infra from Customer Service API."""
+        try:
+            payload = _decode_jwt_payload(access_token)
+            customer_uuid = payload.get(
+                'https://www.openclinica.com/userContext', {}
+            ).get('customerUuid')
+        except Exception as exc:
+            LOGGER.error('Failed to extract customerUuid from access_token: %s', exc)
+            return
+        if not customer_uuid:
+            LOGGER.error('Empty customerUuid received from access_token')
+            return
+        customer_url = f'{settings.OC_BUILD_URL}/customer-service/api/customers/{customer_uuid}'
+        headers = {'Authorization': f'Bearer {access_token}'}
+        try:
+            response = requests.get(customer_url, headers=headers, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            request.session['oc_customer_name'] = data.get('name')
+            request.session['oc_customer_shared_infra'] = data.get('sharedInfra', False)
+        except Exception as exc:
+            LOGGER.error(
+                'Failed to retrieve customer info for customerUuid %s: %s',
+                customer_uuid, exc,
+            )

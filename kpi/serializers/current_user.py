@@ -14,7 +14,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from bossoidc2.models import Keycloak as KeycloakModel
+from kobo.apps.oc_tenant_auth.models import KeycloakTenantUser as KeycloakModel
 
 from hub.models import ExtraUserDetail
 from kobo.apps.accounts.serializers import SocialAccountSerializer

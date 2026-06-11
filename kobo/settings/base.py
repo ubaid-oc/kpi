@@ -201,9 +201,7 @@ INSTALLED_APPS = (
     'kobo.apps.user_reports.apps.UserReportsConfig',
     'drf_spectacular',
     # OpenClinica apps
-    'oc',
-    'bossoidc2',
-    'mozilla_django_oidc',
+    'kobo.apps.oc_tenant_auth',
 )
 
 MIDDLEWARE = [
@@ -884,7 +882,6 @@ TEST_RUNNER = __name__ + '.DoNotUseRunner'
 AUTHENTICATION_BACKENDS = (
     'kpi.backends.ModelBackend',
     'kpi.backends.ObjectPermissionBackend',
-    'oc.backend.OpenIdConnectBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
@@ -1033,10 +1030,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # SessionAuthentication and BasicAuthentication would be included by
         # default
-        # OpenClinica: OIDC (Keycloak) authentication classes added for SSO.
-        'mozilla_django_oidc.contrib.drf.OIDCAuthentication',
         'kpi.authentication.SessionAuthentication',
-        'oidc_auth.authentication.BearerTokenAuthentication',
         'kpi.authentication.BasicAuthentication',
         'kpi.authentication.TokenAuthentication',
         'kpi.authentication.OAuth2Authentication',
@@ -1714,7 +1708,8 @@ ACCOUNT_UNIQUE_EMAIL = False
 ACCOUNT_RATE_LIMITS = False
 ACCOUNT_SESSION_REMEMBER = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = env.str('SOCIALACCOUNT_EMAIL_VERIFICATION', 'none')
-SOCIALACCOUNT_AUTO_SIGNUP = False
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_FORMS = {
     'signup': 'kobo.apps.accounts.forms.SocialSignupForm',
 }
@@ -2322,8 +2317,7 @@ OC_BUILD_URL = os.environ.get('OC_BUILD_URL', '')
 OIDC_RP_CLIENT_ID = os.environ.get('KEYCLOAK_CLIENT_ID', 'formdesigner')
 OIDC_RP_SCOPES = 'openid profile email'
 OIDC_RP_SIGN_ALGO = "RS256"
-OIDC_CALLBACK_CLASS = "oc.views.OCAuthenticationCallbackView"
-OIDC_AUTHENTICATE_CLASS = "oc.views.OCAuthenticationRequestView"
+OIDC_CALLBACK_CLASS = "kobo.apps.oc_tenant_auth.views.OCAuthenticationCallbackView"
 ALLOW_LOGOUT_GET_METHOD = True
 
 PUBLIC_URI_FOR_KEYCLOAK = os.environ.get('PUBLIC_URI', 'http://cust2.kobo.local')
@@ -2335,12 +2329,20 @@ KEYCLOAK_CLIENT_SECRET = os.environ.get('KEYCLOAK_CLIENT_SECRET', 'client-secret
 KEYCLOAK_ADMIN_CLIENT_ID = os.environ.get('KEYCLOAK_ADMIN_CLIENT_ID', 'admin-cli')
 KEYCLOAK_ADMIN_CLIENT_SECRET = os.environ.get('KEYCLOAK_ADMIN_CLIENT_SECRET', 'admin-client-secret')
 
-if KEYCLOAK_AUTH_URI != '' and KEYCLOAK_CLIENT_ID != '' and KEYCLOAK_CLIENT_SECRET != '' and PUBLIC_URI_FOR_KEYCLOAK != '':
-    from oc.settings import configure_oidc
+SOCIALACCOUNT_ADAPTER = 'kobo.apps.oc_tenant_auth.adapter.TenantAwareSocialAccountAdapter'
+SOCIALACCOUNT_PROVIDERS = {
+    'openid_connect': {
+        'APPS': [
+            {
+                'provider_id': 'keycloak',
+                'name': 'Keycloak',
+                'client_id': KEYCLOAK_CLIENT_ID,
+                'secret': KEYCLOAK_CLIENT_SECRET,
+                'settings': {
+                    'server_url': f'{KEYCLOAK_AUTH_URI}/auth/realms/{KEYCLOAK_DEFAULT_REALM}',
+                },
+            }
+        ],
+    }
+}
 
-    configure_oidc(
-        auth_uri='{}/auth/realms/{}'.format(KEYCLOAK_AUTH_URI, KEYCLOAK_DEFAULT_REALM),
-        client_id=KEYCLOAK_CLIENT_ID,
-        public_uri=PUBLIC_URI_FOR_KEYCLOAK,
-        client_secret=KEYCLOAK_CLIENT_SECRET
-    )

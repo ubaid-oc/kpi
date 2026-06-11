@@ -2,7 +2,7 @@
 from rest_framework import exceptions, serializers
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework.reverse import reverse
-from bossoidc2.models import Keycloak as KeycloakModel
+from kobo.apps.oc_tenant_auth.models import KeycloakTenantUser as KeycloakModel
 
 from kpi.constants import PERM_VIEW_ASSET
 from kpi.fields import RelativePrefixHyperlinkedRelatedField, WritableJSONField

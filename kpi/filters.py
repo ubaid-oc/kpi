@@ -25,7 +25,7 @@ from kpi.exceptions import (
 from kpi.models.asset import AssetDeploymentStatus, UserAssetSubscription
 from kpi.utils.django_orm_helper import OrderCustomCharField
 from kpi.utils.domain import get_subdomain
-from bossoidc2.models import Keycloak as KeycloakModel
+from kobo.apps.oc_tenant_auth.models import KeycloakTenantUser as KeycloakModel
 from kpi.utils.object_permission import (
     get_anonymous_user,
     get_database_user,
