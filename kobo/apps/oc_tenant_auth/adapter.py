@@ -56,6 +56,29 @@ class TenantAwareSocialAccountAdapter(DefaultSocialAccountAdapter):
         except KeycloakTenantUser.DoesNotExist:
             pass
 
+        # UID not found — Keycloak may have re-created the user with a new UUID.
+        # Fall back to username lookup and re-key the stored UID if matched.
+        preferred_username = (
+            sociallogin.account.extra_data.get('userinfo', {}).get('preferred_username')
+        )
+        if preferred_username:
+            expected_username = f'{preferred_username}+{subdomain}'
+            try:
+                from django.contrib.auth import get_user_model
+                existing_user = get_user_model().objects.get(username=expected_username)
+                KeycloakTenantUser.objects.filter(
+                    user=existing_user, subdomain=subdomain
+                ).update(UID=uid)
+                LOGGER.warning(
+                    'Keycloak UID rotated for %s on subdomain %s — updated to %s',
+                    expected_username, subdomain, uid,
+                )
+                sociallogin.connect(request, existing_user)
+                self._ensure_user_profile(existing_user)
+                return
+            except get_user_model().DoesNotExist:
+                pass
+
 
     def save_user(self, request, sociallogin, form=None):
         """
