@@ -1,6 +1,11 @@
 module.exports = do ->
   replaceSupportEmail = require('utils').replaceSupportEmail
 
+  XPATH_DOCS_URL = 'https://docs.openclinica.com/oc4/building-forms-and-studies/oc4-design-study/#content-17316'
+
+  xpathDocLinkHtml = ->
+    """<p class="panel__doc-link">#{t('See the')} <a href="#{XPATH_DOCS_URL}" target="_blank" rel="noopener noreferrer">#{t('documentation')}</a> #{t("for more information about xpath expressions.")}</p>"""
+
   expandingSpacerHtml = """
       <div class="survey__row__spacer  row clearfix expanding-spacer-between-rows expanding-spacer-between-rows--depr">
         <div tabIndex="0" class="js-expand-row-selector js-add-row-button btn btn--addrow btn--block  btn-xs  btn-default"
@@ -404,8 +409,7 @@ module.exports = do ->
         >
       </label>
       <p class="required-logic-panel__hint">#{t('This question has a')} <strong>#{t('Conditional')}</strong> #{t("required setting. It will be treated as required when the expression above is 'true'.")}</p>
-      <br>
-      <p class="required-logic-panel__doc-link">#{t('See the')} <a href="https://docs.openclinica.com/oc4/building-forms-and-studies/oc4-design-study/#content-17316" target="_blank" rel="noopener noreferrer">#{t('documentation')}</a> #{t("for more information about xpath expressions.")}</p>
+      #{xpathDocLinkHtml()}
     </div>
     """
 
@@ -485,8 +489,7 @@ module.exports = do ->
         </select>
         <p class="calculation-panel__hint">#{t('Calculation items recalculate their value every time any data in the form changes, by default. To restrict this item to recalculate only when a specific item is changed, select that item above. This could improve performance with very complex forms.')}</p>
       </div>
-      <br>
-      <p class="calculation-panel__doc-link">#{t('See the')} <a href="https://docs.openclinica.com/oc4/building-forms-and-studies/oc4-design-study/#content-17316" target="_blank" rel="noopener noreferrer">#{t('documentation')}</a> #{t("for more information about xpath expressions.")}</p>
+      #{xpathDocLinkHtml()}
     </div>
     """
 
