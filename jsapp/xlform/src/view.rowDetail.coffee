@@ -948,7 +948,7 @@ module.exports = do ->
           $container_checkbox_samescreen = $('<div/>')
           $container_checkbox_samescreen.append(@$checkbox_samescreen)
           $container_checkbox_samescreen.append(@$label_checkbox_samescreen)
-          @$('.settings__input').append($container_checkbox_samescreen)
+          @$('.settings__input').last().append($container_checkbox_samescreen)
           @is_checkbox_samescreen = true
 
         if modelValue? and modelValue != '' # Parse existing value
