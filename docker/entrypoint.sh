@@ -58,7 +58,7 @@ echo 'Running migrations…'
 gosu "${UWSGI_USER}" scripts/migrate.sh
 
 echo 'Creating superuser…'
-gosu "${UWSGI_USER}" python manage.py create_kobo_superuser
+gosu "${UWSGI_USER}" python manage.py create_kobo_superuser || true
 
 if [[ ! -d "${KPI_SRC_DIR}/staticfiles" ]] || ! python "${KPI_SRC_DIR}/docker/check_kpi_prefix_outdated.py"; then
     if [[ "${FRONTEND_DEV_MODE}" == "host" ]]; then
