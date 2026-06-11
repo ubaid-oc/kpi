@@ -18,6 +18,12 @@
     margin-bottom: 12px;
   }
 
+  &__doc-link{
+    font-size: 12px;
+    font-weight: normal;
+    color: colors.$kobo-gray-40;
+  }
+
   .text-box {
     display: block;
     margin-bottom: 8px;

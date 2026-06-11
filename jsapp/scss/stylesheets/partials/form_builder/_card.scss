@@ -20,6 +20,12 @@
         background-color: rgba(colors.$kobo-red, 0.5);
     }
 
+    .calculation-panel__doc-link{
+        font-size: 12px;
+        font-weight: normal;
+        color: colors.$kobo-gray-40;
+    }
+
     .card__header {
         border: $cardBorderStyle;
         // right padding needs to make space for absolute positioned icons
