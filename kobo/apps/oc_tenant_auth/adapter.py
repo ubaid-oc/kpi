@@ -51,6 +51,7 @@ class TenantAwareSocialAccountAdapter(DefaultSocialAccountAdapter):
         try:
             kc_user = KeycloakTenantUser.objects.get(UID=uid, subdomain=subdomain)
             sociallogin.connect(request, kc_user.user)
+            self._ensure_user_profile(kc_user.user)
             return
         except KeycloakTenantUser.DoesNotExist:
             pass
@@ -94,7 +95,15 @@ class TenantAwareSocialAccountAdapter(DefaultSocialAccountAdapter):
             subdomain=subdomain,
             defaults={'user': user, 'user_type': user_type},
         )
+        self._ensure_user_profile(user)
         return user
+
+    def _ensure_user_profile(self, user):
+        from kobo.apps.openrosa.apps.main.models import UserProfile
+        UserProfile.objects.get_or_create(
+            user_id=user.pk,
+            defaults={'validated_password': True},
+        )
 
     def _store_user_info(self, request, access_token):
         """Store oc_user_uuid in session from the access token userContext claim."""
