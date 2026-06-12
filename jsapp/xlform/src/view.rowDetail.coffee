@@ -674,12 +674,21 @@ module.exports = do ->
       @$el.addClass('card__settings__fields--active')
       $header = $('<h4/>', { class: 'repeat-count-panel__header' }).text(t('Repeat Count - how many times should this group repeat?'))
       $hint = $('<p/>', { class: 'repeat-count-panel__hint' }).text(t('This group has repeating enabled. Enter an expression to set the number of repeats automatically, or leave blank to allow users to add and remove repeats manually.'))
+      $docLinkAnchor = $('<a/>', {
+        href: 'https://docs.openclinica.com/oc4/building-forms-and-studies/oc4-design-study/#content-17316'
+        target: '_blank'
+        rel: 'noopener noreferrer'
+      }).text(t('documentation'))
+      $docLink = $('<p/>', { class: 'panel__doc-link' })
+        .append(document.createTextNode(t('See the') + ' '))
+        .append($docLinkAnchor)
+        .append(document.createTextNode(' ' + t('for more information about xpath expressions.')))
       @$input = $('<input/>', {
         type: 'text'
         class: 'repeat-count-panel__input'
         placeholder: t('e.g. ${NUM_VISITS}')
       })
-      @$el.append($header).append($hint).append(@$input)
+      @$el.append($header).append($hint).append($docLink).append(@$input)
 
       fireChange = =>
         val = @$input.val()

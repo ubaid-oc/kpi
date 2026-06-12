@@ -8,6 +8,13 @@
   position: relative;
 }
 
+.panel__doc-link {
+  font-size: 12px;
+  font-weight: normal;
+  color: colors.$kobo-gray-40;
+  margin-top: 8px;
+}
+
 %card-expansion {
     border: $cardBorderStyle;
     border-top-width: 1px;
