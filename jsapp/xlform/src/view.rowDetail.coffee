@@ -772,8 +772,8 @@ module.exports = do ->
 
       types[@model_type()]
     html: ->
-      @$checkbox_samescreen = $('<input/>', { type: "checkbox", id: "checkbox-samescreen", style: 'margin-top: 10px;' })
-      @$label_checkbox_samescreen = $('<span/>', { style: 'margin-left: 4px;' }).text(t('Show all questions in this group on the same screen'))
+      @$checkbox_samescreen = $('<input/>', { type: "checkbox", id: "checkbox-samescreen" })
+      @$label_checkbox_samescreen = $('<label/>', { for: 'checkbox-samescreen', style: 'margin-left: 4px;' }).text(t('Show all questions in this group on the same screen'))
       @fieldListStr = 'field-list'
       @$select_width = $('<select/>', { id: "select-width" })
       @$label_select_width = $('<label/>', { for: 'select-width' }).text(t('Width') + ":")
@@ -948,7 +948,10 @@ module.exports = do ->
           $container_checkbox_samescreen = $('<div/>')
           $container_checkbox_samescreen.append(@$checkbox_samescreen)
           $container_checkbox_samescreen.append(@$label_checkbox_samescreen)
-          @$('.settings__input').append($container_checkbox_samescreen)
+          $target = @$('.xlf-dv-width-row .settings__input')
+          if $target.length is 0
+            $target = @$('.settings__input').first()
+          $target.append($container_checkbox_samescreen)
           @is_checkbox_samescreen = true
 
         if modelValue? and modelValue != '' # Parse existing value
