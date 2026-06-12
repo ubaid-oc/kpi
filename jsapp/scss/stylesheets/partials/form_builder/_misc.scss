@@ -46,6 +46,13 @@
   height: auto !important;
 }
 
+.card__text textarea {
+  resize: vertical;
+  overflow-y: auto;
+  border-bottom: 1px solid colors.$kobo-gray-400;
+}
+
+
 code input[type='text'] {
   border: none;
   padding: 0;

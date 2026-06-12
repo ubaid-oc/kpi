@@ -22,7 +22,7 @@ $s-form-builder-content-width: 1024px;
   overflow-y: scroll;
   margin-right: 0;
   transition: margin $t-form-builder-aside-open;
-  padding: 10px;
+  padding: 20px 40px;
   width: auto;
 
   .form-builder-message-box {
@@ -32,17 +32,17 @@ $s-form-builder-content-width: 1024px;
   }
 }
 
-@media screen and (width >= breakpoints.$b1100) {
-  .form-builder-aside--visible + .form-builder {
-    .form-builder__contents {
-      margin-right: $s-form-builder-aside;
-    }
+.form-builder-aside--visible + .form-builder {
+  .form-builder__contents {
+    margin-right: $s-form-builder-aside;
   }
 }
 
+
 .form-wrap {
   width: 100%;
-  padding: 45px 75px; // Similar to the previous form builder
+  max-width: $s-form-builder-content-width;
+  margin: 0 auto;
 
   input,
   textarea {
@@ -71,12 +71,6 @@ $s-form-builder-content-width: 1024px;
       border: 1px solid black;
       padding-right: 12px;
     }
-  }
-}
-
-@media screen and (max-width: breakpoints.$b1280) {
-  .form-wrap {
-    padding: 20px;
   }
 }
 
