@@ -61,7 +61,7 @@ module.exports = do ->
             #{t("All group settings")}
           </li>
           <li data-card-settings-tab-id="skip-logic" class="card__settings__tabs__tab">
-            #{t("Skip Logic")}
+            #{t("Relevant Logic")}
           </li>
           <li data-card-settings-tab-id="repeat-count" class="card__settings__tabs__tab js-repeat-count-tab repeat-count-tab--hidden">
             #{t("Repeat Count")}
@@ -91,7 +91,7 @@ module.exports = do ->
             #{t("Question Options")}
           </li>
           <li data-card-settings-tab-id="skip-logic" class="card__settings__tabs__tab">
-            #{t("Skip Logic")}
+            #{t("Relevant Logic")}
           </li>
           <li data-card-settings-tab-id="validation-criteria" class="card__settings__tabs__tab">
             #{t("Validation Criteria")}
