@@ -511,3 +511,4 @@ module.exports = do ->
   defaultValuePanel: defaultValuePanel
   iconTooltip: iconTooltip
   lockedFeatures: lockedFeatures
+  XPATH_DOCS_URL: XPATH_DOCS_URL
