@@ -675,7 +675,7 @@ module.exports = do ->
       $header = $('<h4/>', { class: 'repeat-count-panel__header' }).text(t('Repeat Count - how many times should this group repeat?'))
       $hint = $('<p/>', { class: 'repeat-count-panel__hint' }).text(t('This group has repeating enabled. Enter an expression to set the number of repeats automatically, or leave blank to allow users to add and remove repeats manually.'))
       $docLinkAnchor = $('<a/>', {
-        href: 'https://docs.openclinica.com/oc4/building-forms-and-studies/oc4-design-study/#content-17316'
+        href: 'https://servicedesk.openclinica.com/support/solutions/articles/158000436443-form-logic'
         target: '_blank'
         rel: 'noopener noreferrer'
       }).text(t('documentation'))
@@ -688,7 +688,7 @@ module.exports = do ->
         class: 'repeat-count-panel__input'
         placeholder: t('e.g. ${NUM_VISITS}')
       })
-      @$el.append($header).append($hint).append($docLink).append(@$input)
+      @$el.append($header).append($hint).append(@$input).append($docLink)
 
       fireChange = =>
         val = @$input.val()

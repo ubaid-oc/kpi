@@ -1,7 +1,7 @@
 module.exports = do ->
   replaceSupportEmail = require('utils').replaceSupportEmail
 
-  XPATH_DOCS_URL = 'https://docs.openclinica.com/oc4/building-forms-and-studies/oc4-design-study/#content-17316'
+  XPATH_DOCS_URL = 'https://servicedesk.openclinica.com/support/solutions/articles/158000436443-form-logic'
 
   xpathDocLinkHtml = ->
     """<p class="panel__doc-link">#{t('See the')} <a href="#{XPATH_DOCS_URL}" target="_blank" rel="noopener noreferrer">#{t('documentation')}</a> #{t("for more information about xpath expressions.")}</p>"""
