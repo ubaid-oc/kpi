@@ -273,6 +273,7 @@ do ->
       expect(opts[1].text).toBe('No Trigger')
       expect(opts[2].value).toBe('${prev_q}')
       window.xlfHideWarnings = false
+      return
 
   ###############################################################
   # Per-type: note — required is prevented
@@ -349,6 +350,9 @@ do ->
             do (fieldKey) ->
               it "has '#{fieldKey}' RowDetail", ->
                 expect(@row.get(fieldKey)).toBeDefined()
+          return
+
+    return
 
   ###############################################################
   # Per-type: use_external_value (oc_external) — type-gating
