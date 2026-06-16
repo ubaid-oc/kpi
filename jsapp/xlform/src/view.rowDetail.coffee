@@ -438,7 +438,7 @@ module.exports = do ->
       @model.facade.render @target_element
 
     insertInDOM: (rowView) ->
-      @_insertInDOM rowView.cardSettingsWrap.find('.js-card-settings-skip-logic').eq(0)
+      @_insertInDOM rowView.cardSettingsWrap.find('.js-card-settings-relevant-logic').eq(0)
 
   viewRowDetail.DetailViewMixins.constraint =
     html: ->

@@ -588,9 +588,9 @@ module.exports = do ->
       if (isLockable and @hasRestriction(LOCKING_RESTRICTIONS.group_settings_edit.name))
         @$settings.find('.js-card-settings-row-options').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
-      # disable all UI from "Skip Logic" tab of group settings
+      # disable all UI from "Relevant Logic" tab of group settings
       if (isLockable and @hasRestriction(LOCKING_RESTRICTIONS.group_skip_logic_edit.name))
-        @$settings.find('.js-card-settings-skip-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
+        @$settings.find('.js-card-settings-relevant-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
       return
 
@@ -1002,9 +1002,9 @@ module.exports = do ->
           @$settings.find('.js-card-settings-row-options').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
           @$settings.find('.js-params-view').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
-        # disable all UI from "Skip Logic" tab of question settings
+        # disable all UI from "Relevant Logic" tab of question settings
         if (isLockable and @hasRestriction(LOCKING_RESTRICTIONS.question_skip_logic_edit.name))
-          @$settings.find('.js-card-settings-skip-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
+          @$settings.find('.js-card-settings-relevant-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
         # disable all UI from "Validation Criteria" tab of question settings
         if (isLockable and @hasRestriction(LOCKING_RESTRICTIONS.question_validation_edit.name))
