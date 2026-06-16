@@ -1042,7 +1042,7 @@ module.exports = do ->
       super()
       @$('.xlf-dv-required').hide()
       @$("li[data-card-settings-tab-id='validation-criteria']").hide()
-      @$("li[data-card-settings-tab-id='skip-logic']").hide()
+      @$("li[data-card-settings-tab-id='relevant-logic']").hide()
 
     _renderRow: ->
       @$el.html $viewTemplates.row.koboMatrixView()
