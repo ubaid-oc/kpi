@@ -17,7 +17,6 @@ from rest_framework import exceptions, renderers, status
 from rest_framework.decorators import action
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from kobo.apps.oc_tenant_auth.models import KeycloakTenantUser as KeycloakModel
 
@@ -47,6 +46,7 @@ from kpi.models import Asset, AssetUserPartialPermission, UserAssetSubscription
 from kpi.models.object_permission import ObjectPermission
 from kpi.paginators import AssetPagination
 from kpi.permissions import (
+    AssetObjectPermission,
     AssetPermission,
     PostMappedToChangePermission,
     ReportPermission,
@@ -383,7 +383,7 @@ class AssetViewSet(
     lookup_field = 'uid'
     lookup_url_kwarg = 'uid_asset'
     pagination_class = AssetPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AssetObjectPermission,)
     ordering_fields = AssetOrderingFilter.DEFAULT_ORDERING_FIELDS + [
         'subscribers_count',
     ]

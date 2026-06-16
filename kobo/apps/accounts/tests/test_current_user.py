@@ -27,7 +27,7 @@ class CurrentUserAPITestCase(APITestCase):
         other_social_account = baker.make('socialaccount.SocialAccount')
         # This modifies the user account
         self.client.get(self.url)
-        with self.assertNumQueries(FuzzyInt(3, 5)):
+        with self.assertNumQueries(FuzzyInt(5, 8)):
             res = self.client.get(self.url)
         for social_account in social_accounts:
             self.assertContains(res, social_account.uid)

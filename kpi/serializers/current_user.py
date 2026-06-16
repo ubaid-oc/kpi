@@ -172,19 +172,24 @@ class CurrentUserSerializer(serializers.ModelSerializer):
     def get_extra_details__uid(self, obj):
         return obj.extra_details.uid
 
+    def _get_keycloak(self, request):
+        if not hasattr(self, '_keycloak_cache'):
+            self._keycloak_cache = (
+                KeycloakModel.objects.filter(user=request.user).first()
+                if request and request.user
+                else None
+            )
+        return self._keycloak_cache
+
     def get_user_type(self, obj):
         request = self.context.get('request', False)
-        if request and request.user:
-            keycloak = KeycloakModel.objects.filter(user=request.user).first()
-            return keycloak.user_type if keycloak else None
-        return None
+        keycloak = self._get_keycloak(request)
+        return keycloak.user_type if keycloak else None
 
     def get_subdomain(self, obj):
         request = self.context.get('request', False)
-        if request and request.user:
-            keycloak = KeycloakModel.objects.filter(user=request.user).first()
-            return keycloak.subdomain if keycloak else None
-        return None
+        keycloak = self._get_keycloak(request)
+        return keycloak.subdomain if keycloak else None
 
     def get_user_uuid(self, obj):
         request = self.context.get('request', False)

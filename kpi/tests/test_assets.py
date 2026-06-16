@@ -458,31 +458,36 @@ class AssetContentTests(AssetsTestCase):
         workbook = openpyxl.load_workbook(xlsx_io)
 
         survey_sheet = workbook['survey']
+        survey_headers = [cell.value for cell in survey_sheet[1]]
         # `versioned=True` should add a calculate question to the last row.
         # The calculation (version uid) changes on each run, so don't look past
         # the first two columns (type and name)
         xls_version_row = [
             cell.value for cell in survey_sheet[survey_sheet.max_row]]
         self.assertEqual(xls_version_row[:2], ['calculate', '__version__'])
-        # The next-to-last row should have the note question from `append`
+        # The next-to-last row should be the note question from `append`
         xls_note_row = [
             cell.value for cell in survey_sheet[survey_sheet.max_row - 1]]
-        expected_note_row = list(append['survey'][0].values())
-        # Slice the result to discard any extraneous empty cells
-        self.assertEqual(
-            xls_note_row[:len(expected_note_row)], expected_note_row)
+        self.assertEqual(xls_note_row[0], 'note')
+        # Find the label column by header name (OC adds extra survey columns)
+        label_col_idx = survey_headers.index('label')
+        self.assertEqual(xls_note_row[label_col_idx], 'wee')
 
         settings_sheet = workbook['settings']
-        # Next-to-last column should have `asdf` setting
-        xls_asdf_col = [row[1].value for row in settings_sheet.iter_rows(max_row=2)]
-        self.assertEqual(xls_asdf_col, ['asdf', 'jkl'])
-
-        # Last column should have `version` setting from `append`
-        xls_version_col = [row[2].value for row in settings_sheet.iter_rows(max_row=2)]
-        self.assertEqual(xls_version_col[0], 'version')
-        # first column should have `form_title` as asset name
-        xls_form_title_col = [row[0].value for row in settings_sheet.iter_rows(max_row=2)]
-        assert xls_form_title_col == ['form_title', self.asset.name or None]
+        settings_headers = [cell.value for cell in settings_sheet[1]]
+        settings_values = [
+            cell.value for cell in
+            list(settings_sheet.iter_rows(min_row=2, max_row=2))[0]
+        ]
+        # `asdf` setting should be present with the correct value
+        assert 'asdf' in settings_headers
+        self.assertEqual(settings_values[settings_headers.index('asdf')], 'jkl')
+        # `version` setting should be the last column (added after key ordering)
+        assert 'version' in settings_headers
+        assert settings_headers[-1] == 'version'
+        # `form_title` should be the first column with the asset name
+        assert settings_headers[0] == 'form_title'
+        assert settings_values[0] == (self.asset.name or None)
 
     def test_to_xlsx_io_includes_version_number_and_date(self):
         date_string = '2021-03-17 11:12:13'
@@ -490,49 +495,55 @@ class AssetContentTests(AssetsTestCase):
         xlsx_io = self.asset.to_xlsx_io(versioned=True)
         workbook = openpyxl.load_workbook(xlsx_io)
         settings_sheet = workbook['settings']
-        version_col = [cell.value for cell in settings_sheet[1]].index(
-            'version'
-        ) + 1
-        version_string = settings_sheet[version_col][1].value
+        # Find the 'version' column by header name (OC adds extra settings
+        # columns, so a fixed column index is not reliable)
+        settings_headers = [cell.value for cell in settings_sheet[1]]
+        assert 'version' in settings_headers, \
+            "settings sheet should have a 'version' column"
+        version_col_idx = settings_headers.index('version')
+        values_row = list(settings_sheet.iter_rows(min_row=2, max_row=2))[0]
+        version_string = list(values_row)[version_col_idx].value
         assert version_string == f'1 ({date_string})'
 
     def test_unique__version__field_on_import_with_version(self):
-            xlsx_io = self.asset.to_xlsx_io(versioned=True)
-            workbook = openpyxl.load_workbook(xlsx_io)
-            survey_sheet = workbook['survey']
-            xls_version_row = [
-                cell.value for cell in survey_sheet[survey_sheet.max_row]]
-            expected_row = [
-                'calculate',
-                '__version__',
-                None,
-                f"'{self.asset.latest_version.uid}'"
-            ]
-            current_version_id = self.asset.latest_version.uid
-            assert xls_version_row == expected_row
+        xlsx_io = self.asset.to_xlsx_io(versioned=True)
+        workbook = openpyxl.load_workbook(xlsx_io)
+        survey_sheet = workbook['survey']
+        # Get headers from row 1 to find the calculation column by name
+        # (OC adds extra survey columns, so a fixed index is not reliable)
+        survey_headers = [cell.value for cell in survey_sheet[1]]
+        calc_col_idx = survey_headers.index('calculation')
 
-            xlsx_io.seek(0)
-            # Replace XLSForm with new one which contains a row with the '__version__'
-            import_task = self._create_import_task(xlsx_io)
-            self.asset.refresh_from_db()
+        xls_version_row = [
+            cell.value for cell in survey_sheet[survey_sheet.max_row]]
+        current_version_id = self.asset.latest_version.uid
+        # Last survey row should be the __version__ calculate row
+        assert xls_version_row[0] == 'calculate'
+        assert xls_version_row[1] == '__version__'
+        assert xls_version_row[calc_col_idx] == f"'{current_version_id}'"
 
-            xlsx_io = self.asset.to_xlsx_io(versioned=True)
-            workbook = openpyxl.load_workbook(xlsx_io)
-            survey_sheet = workbook['survey']
-            xls_new_version_row = [
-                cell.value for cell in survey_sheet[survey_sheet.max_row]]
-            new_version_expected_row = [
-                'calculate',
-                '__version__',
-                None,
-                f"'{self.asset.latest_version.uid}'"
-            ]
-            # Ensure last row is '__version__' (not '_version_' or '_version_001_')
-            # and it equals the asset's latest version
-            assert current_version_id != self.asset.latest_version.uid
-            assert xls_new_version_row == new_version_expected_row
-            # clean-up
-            import_task.delete()
+        xlsx_io.seek(0)
+        # Replace XLSForm with new one which contains a row with the '__version__'
+        import_task = self._create_import_task(xlsx_io)
+        self.asset.refresh_from_db()
+
+        xlsx_io = self.asset.to_xlsx_io(versioned=True)
+        workbook = openpyxl.load_workbook(xlsx_io)
+        survey_sheet = workbook['survey']
+        survey_headers = [cell.value for cell in survey_sheet[1]]
+        calc_col_idx = survey_headers.index('calculation')
+
+        xls_new_version_row = [
+            cell.value for cell in survey_sheet[survey_sheet.max_row]]
+        # Ensure last row is '__version__' (not '_version_' or '_version_001_')
+        # and it equals the asset's latest version
+        assert current_version_id != self.asset.latest_version.uid
+        assert xls_new_version_row[0] == 'calculate'
+        assert xls_new_version_row[1] == '__version__'
+        assert xls_new_version_row[calc_col_idx] == \
+            f"'{self.asset.latest_version.uid}'"
+        # clean-up
+        import_task.delete()
 
     def _create_import_task(self, xlsx_file: bytes) -> ImportTask:
         encoded_xls = base64.b64encode(xlsx_file.read()).decode('utf-8')

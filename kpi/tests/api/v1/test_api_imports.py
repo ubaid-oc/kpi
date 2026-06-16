@@ -27,6 +27,10 @@ class AssetImportTaskTest(BaseTestCase):
     def _assert_assets_contents_equal(self, a1, a2, sheet='survey'):
         def _prep_row_for_comparison(row):
             row = {k: v for k, v in row.items() if not k.startswith('$')}
+            # pyxform 1.x injects readonly='false' for questions without an
+            # explicit readonly value; strip it so fixture comparisons pass.
+            row = {k: v for k, v in row.items()
+                   if not (k == 'readonly' and v == 'false')}
             if isinstance(row['label'], list) and len(row['label']) == 1:
                 row['label'] = row['label'][0]
             return row

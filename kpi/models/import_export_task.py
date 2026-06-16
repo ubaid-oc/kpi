@@ -467,6 +467,13 @@ class ImportTask(ImportExportTask):
                     asset_type=asset_type,
                     summary={'filename': filename},
                 )
+                # OC XLS export always injects form_title into settings, which
+                # overrides the name set from summary['filename'] during save.
+                # Use a direct DB update to bypass Asset.save() hooks (which
+                # would raise AssetAdjustContentError on name-only saves).
+                if filename:
+                    Asset.objects.filter(pk=asset.pk).update(name=filename)
+                    asset.name = filename
                 msg_key = 'created'
             else:
                 asset = destination

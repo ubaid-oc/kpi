@@ -5,7 +5,7 @@ from kpi.utils.query_parser.query_parser import QueryParseActions
 
 class TestQueryParseActionsProcessValue(TestCase):
     def setUp(self):
-        self.query_parse_actions = QueryParseActions([], 3)
+        self.query_parse_actions = QueryParseActions([])
 
     def test_boolean_values(self):
         # Test various boolean inputs

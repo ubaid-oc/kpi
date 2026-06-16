@@ -423,17 +423,6 @@ def get_abbreviated_xpath(element: SurveyElement) -> str:
 
     If the element itself is the root element, just return the element name.
     """
-    def is_flat(elem):
-        # can't use elem.get('flat', False) here because SurveyElement overrides
-        # __getitem__ and it doesn't work with defaults
-        return hasattr(elem, 'flat') and elem.get('flat')
-
-    lineage = [
-        parent[0] for parent in element.iter_ancestors() if not is_flat(parent[0])
-    ]
-    lineage.reverse()
-    lineage.append(element)
-    if len(lineage) > 1:
-        return '/'.join([n.name for n in lineage[1:]])
-    else:
-        return lineage[0].name
+    # pyxform 1.1.5+oc lacks iter_ancestors(); delegate to the equivalent
+    # method on SurveyElement which returns the same abbreviated xpath.
+    return element.get_abbreviated_xpath()

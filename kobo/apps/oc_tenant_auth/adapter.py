@@ -202,7 +202,8 @@ class TenantAwareSocialAccountAdapter(DefaultSocialAccountAdapter):
         data = cache.get(key)
         if data is None:
             customer_url = (
-                f'{settings.OC_BUILD_URL}/customer-service/api/customers/{customer_uuid}'
+                f'{settings.OC_BUILD_URL}/customer-service'
+                f'/api/customers/{customer_uuid}'
             )
             headers = {'Authorization': f'Bearer {access_token}'}
             try:

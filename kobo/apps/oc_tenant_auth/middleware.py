@@ -9,7 +9,8 @@ class SDUserSwitchMiddleware:
     """
     Detects when the SD (wekan-oc) user differs from the active FD Django session
     and forces OIDC re-authentication. SD passes ?oc_sd_user=<username> in the
-    iframe URL (set in formDesignerUrl() in wekan-oc/client/components/boards/boardBody.js).
+    iframe URL (set in formDesignerUrl() in
+    wekan-oc/client/components/boards/boardBody.js).
     """
 
     def __init__(self, get_response):

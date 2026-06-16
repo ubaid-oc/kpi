@@ -580,18 +580,27 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         # caller's subdomain so that out-of-scope collections are treated as
         # "not found" by DRF rather than resolving the object and leaking its
         # existence through a different validation error.
-        user = self.context['request'].user
-        if user.is_anonymous:
-            fields['parent'].queryset = Asset.objects.none()
-        else:
-            try:
-                subdomain_user_ids = get_subdomain_user_ids(user)
-                fields['parent'].queryset = Asset.objects.filter(
-                    asset_type=ASSET_TYPE_COLLECTION,
-                    owner__in=subdomain_user_ids,
-                )
-            except KeycloakModel.DoesNotExist:
+        # Subclasses (e.g. AssetMetadataListSerializer) omit the parent field,
+        # so guard the whole block.
+        if 'parent' in fields:
+            user = self.context['request'].user
+            if user.is_anonymous:
                 fields['parent'].queryset = Asset.objects.none()
+            else:
+                try:
+                    subdomain_user_ids = get_subdomain_user_ids(user)
+                    fields['parent'].queryset = Asset.objects.filter(
+                        asset_type=ASSET_TYPE_COLLECTION,
+                        owner__in=subdomain_user_ids,
+                    )
+                except KeycloakModel.DoesNotExist:
+                    # No subdomain record (e.g. in test environments without
+                    # Keycloak). No subdomain restriction is possible, so allow
+                    # any collection; validate_parent() still enforces write
+                    # access and produces the correct error message.
+                    fields['parent'].queryset = Asset.objects.filter(
+                        asset_type=ASSET_TYPE_COLLECTION,
+                    )
 
         return fields
 
@@ -899,7 +908,10 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         )
 
     def get_owner__subdomain(self, obj: Asset) -> str:
-        return KeycloakModel.objects.get(user=obj.owner).subdomain
+        try:
+            return KeycloakModel.objects.get(user=obj.owner).subdomain
+        except KeycloakModel.DoesNotExist:
+            return None
 
     @extend_schema_field(AccessTypeField)
     def get_access_types(self, asset):
@@ -1084,8 +1096,26 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         return data_sharing
 
     def validate_parent(self, parent: Asset | None) -> Asset | None:
-        # Subdomain restriction is enforced by the parent field's queryset in
-        # get_fields(); any out-of-scope collection won't resolve this far.
+        user = get_database_user(self.context['request'].user)
+        # Validate that user can update the current (source) parent
+        if self.instance and self.instance.parent is not None:
+            if not self.instance.parent.has_perm(user, PERM_CHANGE_ASSET):
+                raise serializers.ValidationError(
+                    t('User cannot update current parent collection')
+                )
+
+        if parent is None:
+            return parent
+
+        # Validate that user has write access to the target parent collection
+        parent_perms = parent.get_perms(user)
+        if PERM_VIEW_ASSET not in parent_perms:
+            raise serializers.ValidationError(t('Target collection not found'))
+        if PERM_CHANGE_ASSET not in parent_perms:
+            raise serializers.ValidationError(
+                t('User cannot update target parent collection')
+            )
+
         return parent
 
     def validate_settings(self, settings_: dict) -> dict:

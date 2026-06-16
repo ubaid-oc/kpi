@@ -19,6 +19,25 @@ from .openrosa_backend import OpenRosaDeploymentBackend
 
 class MockDeploymentBackend(OpenRosaDeploymentBackend):
 
+    def connect(self, active=False):
+        # pyxform rejects XLS forms whose survey sheet has no rows containing a
+        # 'type' column. Tests often deploy empty assets purely to set up state
+        # (e.g. ordering, permissions) rather than to test form validity, so
+        # inject a placeholder note when the survey is empty.
+        content = self.asset.content or {}
+        if not content.get('survey'):
+            original_content = self.asset.content
+            self.asset.content = {
+                **content,
+                'survey': [{'type': 'note', 'name': 'placeholder', 'label': 'Form'}],
+            }
+            try:
+                super().connect(active=active)
+            finally:
+                self.asset.content = original_content
+        else:
+            super().connect(active=active)
+
     def create_enketo_survey_links_for_single_data_collector(self, token):
         pass
 

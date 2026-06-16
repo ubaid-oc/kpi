@@ -21,6 +21,7 @@ from kpi.constants import (
 from kpi.exceptions import (
     QueryParserBadSyntax,
     QueryParserNotSupportedFieldLookup,
+    SearchQueryTooShortException,
 )
 from kpi.models.asset import AssetDeploymentStatus, UserAssetSubscription
 from kpi.utils.django_orm_helper import OrderCustomCharField
@@ -182,6 +183,8 @@ class KpiObjectPermissionsFilter(filters.BaseFilterBackend):
         model_name = queryset.model._meta.model_name
         if model_name == 'asset' or model_name == 'collection':
             try:
+                if user.is_anonymous:
+                    raise KeycloakModel.DoesNotExist
                 subdomain_user_ids = get_subdomain_user_ids(user)
                 if model_name == 'asset':
                     subdomain_assetIds = Asset.objects.filter(owner__in=subdomain_user_ids).values_list('id', flat=True)
@@ -485,6 +488,10 @@ class SearchFilter(filters.BaseFilterBackend):
                 return queryset
         except KeyError:
             return queryset
+
+        min_search_chars = getattr(view, 'min_search_chars', 0)
+        if min_search_chars and len(q) < min_search_chars:
+            raise SearchQueryTooShortException()
 
         try:
             q_obj = parse(

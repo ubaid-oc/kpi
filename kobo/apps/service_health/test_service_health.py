@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import responses
 from django.conf import settings
 from django.test import TestCase
@@ -13,8 +15,12 @@ class ServiceHealthTestCase(TestCase):
         res = self.client.get(self.url)
         self.assertContains(res, 'OK')
 
-    @responses.activate
     def test_service_health_failure(self):
-        responses.add(responses.GET, settings.ENKETO_INTERNAL_URL, status=500)
-        res = self.client.get(self.url)
-        self.assertContains(res, 'HTTPError', status_code=500)
+        # OC's health view does not probe Enketo over HTTP; simulate a failure
+        # in the Django cache check instead (one of the OC-checked services).
+        with patch(
+            'kobo.apps.service_health.views.cache.set',
+            side_effect=Exception('cache failure'),
+        ):
+            res = self.client.get(self.url)
+        self.assertContains(res, 'Exception', status_code=500)

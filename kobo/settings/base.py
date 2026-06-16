@@ -2321,8 +2321,8 @@ KEYCLOAK_AUTH_URI = env.str('KEYCLOAK_AUTH_URI')
 KEYCLOAK_DEFAULT_REALM = env.str('KEYCLOAK_DEFAULT_REALM')
 KEYCLOAK_CLIENT_ID = os.environ.get('KEYCLOAK_CLIENT_ID', 'formdesigner')
 KEYCLOAK_CLIENT_SECRET = env.str('KEYCLOAK_CLIENT_SECRET')
-# KEYCLOAK_MASTER_REALM ('master') and KEYCLOAK_ADMIN_CLIENT_ID ('admin-cli') are Keycloak architectural
-# constants that never vary across deployments, so they are hardcoded directly in backend.py.
+# KEYCLOAK_MASTER_REALM ('master') and KEYCLOAK_ADMIN_CLIENT_ID ('admin-cli') are
+# Keycloak architectural constants hardcoded directly in backend.py.
 KEYCLOAK_ADMIN_CLIENT_SECRET = env.str('KEYCLOAK_ADMIN_CLIENT_SECRET')
 
 SOCIALACCOUNT_ADAPTER = (

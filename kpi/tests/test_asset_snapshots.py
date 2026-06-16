@@ -77,7 +77,8 @@ class CreateAssetSnapshots(AssetSnapshotsTestCase):
             'settings': {},
         }
         snap = AssetSnapshot.objects.create(source=content)
-        assert snap.xml.count('<name>ABC</name>') == 2
+        # pyxform 1.x uses <value> instead of <name> for choice elements
+        assert snap.xml.count('<value>ABC</value>') == 2
 
     def test_asset_snapshot_regenerate(self):
         content = {

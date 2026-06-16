@@ -64,9 +64,12 @@ urlpatterns = [
     re_path(r'^api-auth/',
             include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^accounts/logout/', logout),
-    # Override allauth's OIDC views with caching versions (must come before allauth include)
+    # Caching overrides for allauth's OIDC views; must come before allauth.urls
     path('accounts/oidc/<provider_id>/login/', oidc_login, name='openid_connect_login'),
-    path('accounts/oidc/<provider_id>/login/callback/', oidc_callback, name='openid_connect_callback'),
+    path(
+        'accounts/oidc/<provider_id>/login/callback/',
+        oidc_callback, name='openid_connect_callback',
+    ),
     path('accounts/', include('allauth.urls')),  # Must be after kpi.url, login
     re_path(
         r'^accounts/register/?',
