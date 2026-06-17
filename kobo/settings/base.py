@@ -2320,13 +2320,13 @@ OC_BUILD_URL = os.environ.get('OC_BUILD_URL', '')
 
 ALLOW_LOGOUT_GET_METHOD = True
 
-KEYCLOAK_AUTH_URI = env.str('KEYCLOAK_AUTH_URI')
-KEYCLOAK_DEFAULT_REALM = env.str('KEYCLOAK_DEFAULT_REALM')
+KEYCLOAK_AUTH_URI = env.str('KEYCLOAK_AUTH_URI', default='')
+KEYCLOAK_DEFAULT_REALM = env.str('KEYCLOAK_DEFAULT_REALM', default='')
 KEYCLOAK_CLIENT_ID = os.environ.get('KEYCLOAK_CLIENT_ID', 'formdesigner')
-KEYCLOAK_CLIENT_SECRET = env.str('KEYCLOAK_CLIENT_SECRET')
+KEYCLOAK_CLIENT_SECRET = env.str('KEYCLOAK_CLIENT_SECRET', default='')
 # KEYCLOAK_MASTER_REALM ('master') and KEYCLOAK_ADMIN_CLIENT_ID ('admin-cli') are
 # Keycloak architectural constants hardcoded directly in backend.py.
-KEYCLOAK_ADMIN_CLIENT_SECRET = env.str('KEYCLOAK_ADMIN_CLIENT_SECRET')
+KEYCLOAK_ADMIN_CLIENT_SECRET = env.str('KEYCLOAK_ADMIN_CLIENT_SECRET', default='')
 
 SOCIALACCOUNT_ADAPTER = (
     'kobo.apps.oc_tenant_auth.adapter.TenantAwareSocialAccountAdapter'
