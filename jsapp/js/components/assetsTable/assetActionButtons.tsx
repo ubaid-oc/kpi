@@ -32,8 +32,8 @@ import Button from '#/components/common/button'
 import type { ButtonType } from '#/components/common/button'
 import managedCollectionsStore from '#/components/library/managedCollectionsStore'
 import type { ManagedCollectionsStoreData } from '#/components/library/managedCollectionsStore'
-import ownedCollectionsStore from '#/components/library/ownedCollectionsStore'
-import type { OwnedCollectionsStoreData } from '#/components/library/ownedCollectionsStore'
+import subdomainCollectionsStore from '#/components/library/subdomainCollectionsStore'
+import type { SubdomainCollectionsStoreData } from '#/components/library/subdomainCollectionsStore'
 import { userCan } from '#/components/permissions/utils'
 import { ACCESS_TYPES, ASSET_TYPES } from '#/constants'
 import type { AssetDownloads, AssetResponse } from '#/dataInterface'
@@ -71,7 +71,7 @@ class AssetActionButtons extends React.Component<AssetActionButtonsProps, AssetA
     super(props)
     this.state = {
       managedCollections: managedCollectionsStore.data.collections,
-      ownedCollections: ownedCollectionsStore.data.collections,
+      ownedCollections: subdomainCollectionsStore.data.collections,
       shouldHidePopover: false,
       isPopoverVisible: false,
       isSubscribePending: false,
@@ -81,7 +81,7 @@ class AssetActionButtons extends React.Component<AssetActionButtonsProps, AssetA
 
   componentDidMount() {
     managedCollectionsStore.listen(this.onManagedCollectionsStoreChanged.bind(this), this)
-    ownedCollectionsStore.listen(this.onOwnedCollectionsStoreChanged.bind(this), this)
+    subdomainCollectionsStore.listen(this.onOwnedCollectionsStoreChanged.bind(this), this)
     this.unlisteners.push(
       actions.library.subscribeToCollection.completed.listen(this.onSubscribingCompleted.bind(this)),
       actions.library.unsubscribeFromCollection.completed.listen(this.onSubscribingCompleted.bind(this)),
@@ -102,7 +102,7 @@ class AssetActionButtons extends React.Component<AssetActionButtonsProps, AssetA
     this.setState({ managedCollections: storeData.collections })
   }
 
-  onOwnedCollectionsStoreChanged(storeData: OwnedCollectionsStoreData) {
+  onOwnedCollectionsStoreChanged(storeData: SubdomainCollectionsStoreData) {
     this.setState({ ownedCollections: storeData.collections })
   }
 

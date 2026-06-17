@@ -6,9 +6,9 @@ import { getAssetDisplayName, isSelfOwned } from '#/assetUtils'
 import bem from '#/bem'
 import { ACCESS_TYPES, ASSET_TYPES } from '#/constants'
 import type { AssetResponse } from '#/dataInterface'
+import subdomainLibraryStore from '#/oc/subdomainLibraryStore'
 import { isAnyLibraryRoute } from '#/router/routerUtils'
 import { ROOT_BREADCRUMBS } from './libraryConstants'
-import myLibraryStore from './myLibraryStore'
 import publicCollectionsStore from './publicCollectionsStore'
 
 interface AssetBreadcrumbsProps {
@@ -57,7 +57,7 @@ class AssetBreadcrumbs extends React.Component<AssetBreadcrumbsProps> {
     let foundParent = null
     const parentUid = this.getParentUid()
     if (parentUid) {
-      foundParent = myLibraryStore.findAsset(parentUid)
+      foundParent = subdomainLibraryStore.findAsset(parentUid)
     }
     if (parentUid && !foundParent) {
       foundParent = publicCollectionsStore.findAsset(parentUid)

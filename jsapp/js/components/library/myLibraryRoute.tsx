@@ -12,13 +12,13 @@ import { AssetsTableContextName } from '#/components/assetsTable/assetsTableCons
 import { ROOT_BREADCRUMBS } from '#/components/library/libraryConstants'
 import { AssetTypeName, MODAL_TYPES } from '#/constants'
 import mixins from '#/mixins'
+import subdomainLibraryStore from '#/oc/subdomainLibraryStore'
+import type { SubdomainLibraryStoreData } from '#/oc/subdomainLibraryStore'
 import pageState from '#/pageState.store'
 import type { OrderDirection } from '#/projects/projectViews/constants'
 import { validFileTypes } from '#/utils'
 import libraryTypeFilterStore from './libraryTypeFilterStore'
-import myLibraryStore from './myLibraryStore'
-import type { MyLibraryStoreData } from './myLibraryStore'
-import ownedCollectionsStore from './ownedCollectionsStore'
+import subdomainCollectionsStore from './subdomainCollectionsStore'
 import './assetBreadcrumbs.scss'
 import './myLibrary.scss'
 
@@ -29,8 +29,8 @@ bem.LibraryTypeFilter = makeBem(null, 'library-type-filter')
 
 const LIBRARY_MANAGEMENT_SUPPORT_URL = 'https://docs.openclinica.com/oc4/help-index/form-designer/library-management/'
 
-// OpenClinica: fork state added on top of the upstream MyLibraryStoreData.
-type MyLibraryRouteState = MyLibraryStoreData & {
+// OpenClinica: fork state added on top of SubdomainLibraryStoreData.
+type MyLibraryRouteState = SubdomainLibraryStoreData & {
   showAllTags: boolean
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   typeFilterVal: any
@@ -43,27 +43,27 @@ export default class MyLibraryRoute extends React.Component<{}, MyLibraryRouteSt
 
   getFreshState(): MyLibraryRouteState {
     return {
-      isFetchingData: myLibraryStore.data.isFetchingData,
-      assets: myLibraryStore.data.assets,
-      metadata: myLibraryStore.data.metadata,
-      totalUserAssets: myLibraryStore.data.totalUserAssets,
-      totalSearchAssets: myLibraryStore.data.totalSearchAssets,
-      orderColumnId: myLibraryStore.data.orderColumnId,
-      orderValue: myLibraryStore.data.orderValue,
-      filterColumnId: myLibraryStore.data.filterColumnId,
-      filterValue: myLibraryStore.data.filterValue,
-      currentPage: myLibraryStore.data.currentPage,
-      totalPages: myLibraryStore.data.totalPages,
-      collectionUid: myLibraryStore.data.collectionUid,
-      totalUserRootAssets: myLibraryStore.data.totalUserRootAssets,
+      isFetchingData: subdomainLibraryStore.data.isFetchingData,
+      assets: subdomainLibraryStore.data.assets,
+      metadata: subdomainLibraryStore.data.metadata,
+      totalUserAssets: subdomainLibraryStore.data.totalUserAssets,
+      totalSearchAssets: subdomainLibraryStore.data.totalSearchAssets,
+      orderColumnId: subdomainLibraryStore.data.orderColumnId,
+      orderValue: subdomainLibraryStore.data.orderValue,
+      filterColumnId: subdomainLibraryStore.data.filterColumnId,
+      filterValue: subdomainLibraryStore.data.filterValue,
+      currentPage: subdomainLibraryStore.data.currentPage,
+      totalPages: subdomainLibraryStore.data.totalPages,
+      collectionUid: subdomainLibraryStore.data.collectionUid,
+      totalUserRootAssets: subdomainLibraryStore.data.totalUserRootAssets,
       showAllTags: false,
       typeFilterVal: libraryTypeFilterStore.getFilterType(),
     }
   }
 
   componentDidMount() {
-    this.unlisteners.push(myLibraryStore.listen(this.myLibraryStoreChanged.bind(this), this))
-    this.unlisteners.push(ownedCollectionsStore.listen(this.myLibraryStoreChanged.bind(this), this))
+    this.unlisteners.push(subdomainLibraryStore.listen(this.myLibraryStoreChanged.bind(this), this))
+    this.unlisteners.push(subdomainCollectionsStore.listen(this.myLibraryStoreChanged.bind(this), this))
   }
 
   componentWillUnmount() {
@@ -77,15 +77,15 @@ export default class MyLibraryRoute extends React.Component<{}, MyLibraryRouteSt
   }
 
   onAssetsTableOrderChange(columnId: string, value: OrderDirection) {
-    myLibraryStore.setOrder(columnId, value)
+    subdomainLibraryStore.setOrder(columnId, value)
   }
 
   onAssetsTableFilterChange(columnId: string | null, value: string | null) {
-    myLibraryStore.setFilter(columnId, value)
+    subdomainLibraryStore.setFilter(columnId, value)
   }
 
   onAssetsTableSwitchPage(pageNumber: number) {
-    myLibraryStore.setCurrentPage(pageNumber)
+    subdomainLibraryStore.setCurrentPage(pageNumber)
   }
 
   clickShowAllTagsToggle() {
@@ -119,7 +119,7 @@ export default class MyLibraryRoute extends React.Component<{}, MyLibraryRouteSt
   render() {
     let contextualEmptyMessage: React.ReactNode = t('Your search returned no results.')
 
-    if (myLibraryStore.data.totalUserAssets === 0) {
+    if (subdomainLibraryStore.data.totalUserAssets === 0) {
       contextualEmptyMessage = (
         <div>
           {t(
@@ -192,11 +192,11 @@ export default class MyLibraryRoute extends React.Component<{}, MyLibraryRouteSt
             <bem.Breadcrumbs__crumb href={ROOT_BREADCRUMBS.MY_LIBRARY.href}>
               {ROOT_BREADCRUMBS.MY_LIBRARY.label}
             </bem.Breadcrumbs__crumb>
-            {myLibraryStore.getCollectionUid() && (
+            {subdomainLibraryStore.getCollectionUid() && (
               <React.Fragment>
                 <i className='k-icon k-icon-angle-right' />
                 <bem.Breadcrumbs__crumb>
-                  {myLibraryStore.getCollectionData()?.name || t('Collection')}
+                  {subdomainLibraryStore.getCollectionData()?.name || t('Collection')}
                 </bem.Breadcrumbs__crumb>
               </React.Fragment>
             )}

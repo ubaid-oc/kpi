@@ -13,13 +13,13 @@ import alertify from 'alertifyjs'
 import escape from 'lodash.escape'
 import toast from 'react-hot-toast'
 import { PERMISSIONS_CODENAMES } from '#/components/permissions/permConstants'
+import subdomainLibraryStore from '#/oc/subdomainLibraryStore'
 import pageState from '#/pageState.store'
 import sessionStore from '#/stores/session'
 import { actions } from './actions'
 import { renderJSXMessage } from './alertify'
 import assetUtils from './assetUtils'
 import { appendEConsentQueryToPath } from './components/formBuilder/econsentSignature'
-import myLibraryStore from './components/library/myLibraryStore'
 import { userCan } from './components/permissions/utils'
 import { ASSET_TYPES, MODAL_TYPES } from './constants'
 import type { AssetResponse, DeploymentResponse, ProjectViewAsset } from './dataInterface'
@@ -233,7 +233,7 @@ export function cloneAsset(assetOrUid: AssetResponse | ProjectViewAsset | string
 
       let parent
       if ('parent' in asset && asset.parent) {
-        const foundParentAsset = myLibraryStore.findAssetByUrl(asset.parent)
+        const foundParentAsset = subdomainLibraryStore.findAssetByUrl(asset.parent)
         const canAddToParent =
           typeof foundParentAsset !== 'undefined' && userCan(PERMISSIONS_CODENAMES.change_asset, foundParentAsset)
         if (canAddToParent) {

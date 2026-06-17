@@ -1,8 +1,8 @@
 import { actions } from 'js/actions'
 import assetUtils from 'js/assetUtils'
 import bem, { makeBem } from 'js/bem'
-import ownedCollectionsStore from 'js/components/library/ownedCollectionsStore'
-import type { OwnedCollectionsStoreData } from 'js/components/library/ownedCollectionsStore'
+import subdomainCollectionsStore from 'js/components/library/subdomainCollectionsStore'
+import type { SubdomainCollectionsStoreData } from 'js/components/library/subdomainCollectionsStore'
 import { ASSET_TYPES } from 'js/constants'
 import type { AssetResponse } from 'js/dataInterface'
 import PopoverMenu from 'js/popoverMenu'
@@ -24,16 +24,16 @@ class AssetCollectionActions extends React.Component<AssetCollectionActionsProps
   constructor(props: AssetCollectionActionsProps) {
     super(props)
     this.state = {
-      ownedCollections: ownedCollectionsStore.data.collections,
+      ownedCollections: subdomainCollectionsStore.data.collections,
     }
     autoBind(this)
   }
 
   componentDidMount() {
-    ownedCollectionsStore.listen(this.onOwnedCollectionsStoreChanged.bind(this), this)
+    subdomainCollectionsStore.listen(this.onOwnedCollectionsStoreChanged.bind(this), this)
   }
 
-  onOwnedCollectionsStoreChanged(storeData: OwnedCollectionsStoreData) {
+  onOwnedCollectionsStoreChanged(storeData: SubdomainCollectionsStoreData) {
     this.setState({ ownedCollections: storeData.collections })
   }
 

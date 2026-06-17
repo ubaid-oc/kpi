@@ -11,6 +11,7 @@ import bem, { makeBem } from '#/bem'
 import { navigatePreservingEConsent } from '#/components/formBuilder/econsentSignature'
 import { ASSET_TYPES, MODAL_TYPES } from '#/constants'
 import mixins from '#/mixins'
+import subdomainLibraryStore from '#/oc/subdomainLibraryStore'
 import pageState from '#/pageState.store'
 import PopoverMenu from '#/popoverMenu'
 import { routerIsActive, withRouter } from '#/router/legacy'
@@ -19,7 +20,6 @@ import sessionStore from '#/stores/session'
 import { validFileTypes } from '#/utils'
 // OC fork: upstream renamed `ownedCollectionsStore` to `managedCollectionsStore`.
 import managedCollectionsStore from './managedCollectionsStore'
-import myLibraryStore from './myLibraryStore'
 import './librarySidebar.scss'
 
 // OC fork: these BEM elements used to live in the fork's bemComponents, but
@@ -78,18 +78,18 @@ class LibrarySidebar extends Reflux.Component<any, any> {
   }
 
   componentDidMount() {
-    this.listenTo(myLibraryStore, this.myLibraryStoreChanged)
+    this.listenTo(subdomainLibraryStore, this.myLibraryStoreChanged)
     this.listenTo(managedCollectionsStore, this.ownedCollectionsStoreChanged)
     this.setState({
       isLoading: false,
-      libraryTotalCount: myLibraryStore.getCurrentUserRootAssets(),
+      libraryTotalCount: subdomainLibraryStore.getCurrentUserRootAssets(),
       sidebarCollections: managedCollectionsStore.data.collections,
     })
   }
 
   goToBlockCreator() {
     let targetPath: string = ROUTES.NEW_LIBRARY_ITEM
-    const currentCollectionUid = myLibraryStore.getCollectionUid()
+    const currentCollectionUid = subdomainLibraryStore.getCollectionUid()
     if (currentCollectionUid) {
       const found = managedCollectionsStore.find(currentCollectionUid)
       if (found && found.asset_type === ASSET_TYPES.collection.id) {
@@ -104,7 +104,7 @@ class LibrarySidebar extends Reflux.Component<any, any> {
 
   goToTemplateCreator() {
     let targetPath: string = ROUTES.NEW_LIBRARY_TEMPLATE_ITEM
-    const currentCollectionUid = myLibraryStore.getCollectionUid()
+    const currentCollectionUid = subdomainLibraryStore.getCollectionUid()
     if (currentCollectionUid) {
       const found = managedCollectionsStore.find(currentCollectionUid)
       if (found && found.asset_type === ASSET_TYPES.collection.id) {
@@ -135,7 +135,7 @@ class LibrarySidebar extends Reflux.Component<any, any> {
   myLibraryStoreChanged() {
     this.setState({
       isLoading: false,
-      libraryTotalCount: myLibraryStore.getCurrentUserRootAssets(),
+      libraryTotalCount: subdomainLibraryStore.getCurrentUserRootAssets(),
     })
   }
 
@@ -181,13 +181,13 @@ class LibrarySidebar extends Reflux.Component<any, any> {
     evt.preventDefault()
     const collectionUid = (evt.currentTarget as HTMLElement).getAttribute('data-collection-uid')
     if (collectionUid) {
-      myLibraryStore.setCollectionUid(collectionUid)
+      subdomainLibraryStore.setCollectionUid(collectionUid)
     }
   }
 
   clickWithoutCollectionFilter(evt: React.SyntheticEvent) {
     evt.preventDefault()
-    myLibraryStore.clearCollectionUid()
+    subdomainLibraryStore.clearCollectionUid()
   }
 
   render() {
@@ -252,7 +252,7 @@ class LibrarySidebar extends Reflux.Component<any, any> {
                   key={collection.uid}
                   m={{
                     collection: true,
-                    selected: myLibraryStore.getCollectionUid() === collection.uid,
+                    selected: subdomainLibraryStore.getCollectionUid() === collection.uid,
                   }}
                 >
                   <bem.FormSidebar__itemlink
@@ -263,7 +263,7 @@ class LibrarySidebar extends Reflux.Component<any, any> {
                     <i className='k-icon-folder' />
                     {collection.name}
                   </bem.FormSidebar__itemlink>
-                  {myLibraryStore.getCollectionUid() === collection.uid && (
+                  {subdomainLibraryStore.getCollectionUid() === collection.uid && (
                     <PopoverMenu type='collectionSidebarPublic-menu' triggerLabel={<i className='k-icon-more' />}>
                       <bem.PopoverMenu__link
                         m={'rename'}
