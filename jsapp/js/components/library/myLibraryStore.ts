@@ -9,7 +9,7 @@ import searchBoxStore from '#/components/header/searchBoxStore'
 import type { AssetTypeName } from '#/constants'
 import { DEFAULT_PAGE_SIZE } from '#/dataInterface'
 import type { AssetResponse, AssetsResponse, MetadataResponse, SearchAssetsPredefinedParams } from '#/dataInterface'
-import { getCollectionUidCacheName } from '#/ocutils'
+import { getCollectionUidCacheName } from '#/oc/utils'
 import type { OrderDirection } from '#/projects/projectViews/constants'
 import { router } from '#/router/legacy'
 import { ROUTES } from '#/router/routerConstants'
@@ -37,6 +37,10 @@ export interface MyLibraryStoreData {
 /**
  * @deprecated migrate to react-query whenever you need to adjust things beyond simple rename
  */
+// OC: Substantially extended for collection browsing and type-based filtering.
+// Added: collectionUid/totalUserRootAssets fields, previousFilterType, libraryTypeFilterStore +
+// ownedCollectionsStore integrations, sessionStore login guard, and collection management methods
+// (getCollectionUid, setCollectionUid, clearCollectionUid, getCollectionData, getCurrentUserRootAssets).
 class MyLibraryStore extends Reflux.Store {
   /**
    * A method for aborting current XHR fetch request.

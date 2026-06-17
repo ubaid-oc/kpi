@@ -1,3 +1,4 @@
+// OC: Entirely OC-added store (no upstream equivalent). Tracks collections owned by the current user; used by myLibraryStore for the "Move to collection" menu.
 import findIndex from 'lodash.findindex'
 import { when } from 'mobx'
 import Reflux from 'reflux'

@@ -29,7 +29,7 @@ multiConfirm = require('#/alertify').multiConfirm
 alertify = require('alertifyjs')
 constants = require('#/constants')
 notify = require('#/utils').notify
-arrayMiddleOut = require('#/ocutils').processArrayMiddleOut
+arrayMiddleOut = require('#/oc/utils').processArrayMiddleOut
 
 module.exports = do ->
   class BaseRowView extends Backbone.View

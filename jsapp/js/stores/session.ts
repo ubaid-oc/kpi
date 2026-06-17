@@ -5,7 +5,7 @@ import type { Json } from '#/components/common/common.interfaces'
 import { ANON_USER_SUBDOMAIN, ANON_USER_TYPE } from '#/constants'
 import { dataInterface } from '#/dataInterface'
 import type { AccountResponse, FailResponse } from '#/dataInterface'
-import { checkCrossStorageTimeOut, checkCrossStorageUser, updateCrossStorageTimeOut } from '#/ocutils'
+import { checkCrossStorageTimeOut, checkCrossStorageUser, updateCrossStorageTimeOut } from '#/oc/utils'
 import type { ProjectViewsSettings } from '#/projects/customViewStore'
 import userpilot from '#/userpilot'
 import { ANON_USERNAME } from '#/users/utils'
@@ -46,6 +46,7 @@ class SessionStore {
         this.isInitialLoadComplete = true
         if ('email' in account) {
           this.currentAccount = account
+          // OC: cross-tab SSO session enforcement — blocks login if cross-storage user changed or idle timeout expired
           const currentUserName = this.currentAccount.username
           if (currentUserName !== '') {
             const crossStorageUserName = currentUserName.slice(0, currentUserName.lastIndexOf('+'))
@@ -73,8 +74,8 @@ class SessionStore {
             log('Warning: Valid account has empty username, skipping cross-storage checks')
           }
           this.isLoggedIn = true
-          userpilot.identify(account)
-          window.parent.postMessage('fd_loggedin', '*')
+          userpilot.identify(account) // OC: usage analytics
+          window.parent.postMessage('fd_loggedin', '*') // OC: notify parent SD (study-designer) iframe of successful login
           // Save UI language to Back-end for language usage statistics.
           // Logging in causes the whole page to be reloaded, so we don't need
           // to do it more than once.

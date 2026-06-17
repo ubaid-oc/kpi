@@ -1,6 +1,7 @@
+// OC: Entirely OC-added store (no upstream equivalent). Persists the library asset-type filter (All / Block / Question / Template / Collection) in sessionStorage.
 import Reflux from 'reflux'
 
-import { getLibraryFilterCacheName } from 'js/ocutils'
+import { getLibraryFilterCacheName } from '#/oc/utils'
 
 const DEFAULT_FILTER = { value: 'all', label: t('Show All') }
 
