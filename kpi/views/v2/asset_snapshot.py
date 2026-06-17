@@ -25,7 +25,8 @@ from kpi.filters import RelatedAssetPermissionsFilter
 from kpi.highlighters import highlight_xform
 from kpi.models import AssetFile, AssetSnapshot, PairedData
 from kpi.parsers import RawFilenameMultiPartParser
-from kpi.permissions import AssetSnapshotPermission, EditSubmissionPermission
+from kobo.apps.oc_tenant_auth.permissions import SubdomainAwareAssetSnapshotPermission
+from kpi.permissions import EditSubmissionPermission
 from kpi.renderers import (
     OpenRosaFormListRenderer,
     OpenRosaManifestRenderer,
@@ -318,7 +319,7 @@ class AssetSnapshotViewSet(OpenRosaViewSetMixin, AuditLoggedNoUpdateModelViewSet
     serializer_class = AssetSnapshotSerializer
     lookup_field = 'uid_asset_snapshot'
     queryset = AssetSnapshot.objects.all()
-    permission_classes = [AssetSnapshotPermission]
+    permission_classes = [SubdomainAwareAssetSnapshotPermission]
 
     log_type = AuditType.PROJECT_HISTORY
 

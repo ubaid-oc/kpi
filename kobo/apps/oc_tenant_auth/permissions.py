@@ -1,7 +1,8 @@
 # coding: utf-8
 from rest_framework import permissions
 
-from kpi.permissions import AssetPermission
+from kpi.permissions import AssetPermission, AssetSnapshotPermission
+from kobo.apps.oc_tenant_auth.utils import get_subdomain_user_ids
 
 
 class AssetObjectPermission(AssetPermission):
@@ -17,7 +18,13 @@ class AssetObjectPermission(AssetPermission):
     Anonymous users pass the model-level check for safe methods so that filter
     backends can restrict their view to publicly-shared assets at the
     object level.
+
+    OC customization: subdomain users can read and edit each other's library
+    items (question/block/template/collection). Surveys remain governed by the
+    standard object-level permission check.
     """
+
+    _LIBRARY_ASSET_TYPES = ('question', 'block', 'template', 'collection')
 
     def has_permission(self, request, view):
         self.validate_password(request)
@@ -26,3 +33,41 @@ class AssetObjectPermission(AssetPermission):
         # Anonymous users may read public assets; object-level and filter
         # backends enforce per-asset visibility.
         return request.method in permissions.SAFE_METHODS
+
+    def has_object_permission(self, request, view, obj):
+        # OC: all subdomain users may read and write each other's library items.
+        if (
+            request.user
+            and request.user.is_authenticated
+            and getattr(obj, 'asset_type', None) in self._LIBRARY_ASSET_TYPES
+            and self._same_subdomain(request.user, obj)
+        ):
+            return True
+        return super().has_object_permission(request, view, obj)
+
+    @staticmethod
+    def _same_subdomain(user, asset):
+        try:
+            return asset.owner_id in get_subdomain_user_ids(user)
+        except Exception:
+            return False
+
+
+class SubdomainAwareAssetSnapshotPermission(AssetSnapshotPermission):
+    """
+    OC customization: extends AssetSnapshotPermission to grant preview/detail
+    access to snapshots of library items (question/block/template/collection)
+    owned by users in the caller's Keycloak subdomain.
+    """
+
+    _LIBRARY_ASSET_TYPES = ('question', 'block', 'template', 'collection')
+
+    def has_object_permission(self, request, view, obj):
+        if (
+            request.user
+            and request.user.is_authenticated
+            and getattr(obj.asset, 'asset_type', None) in self._LIBRARY_ASSET_TYPES
+            and AssetObjectPermission._same_subdomain(request.user, obj.asset)
+        ):
+            return True
+        return super().has_object_permission(request, view, obj)

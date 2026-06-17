@@ -33,11 +33,13 @@ from kpi.constants import (
     CLONE_FROM_VERSION_ID_ARG_NAME,
 )
 from kpi.exceptions import BadAssetTypeException
-from kobo.apps.oc_tenant_auth.filters import SubdomainFilter
+from kobo.apps.oc_tenant_auth.filters import (
+    SubdomainAwareObjectPermissionsFilter,
+    SubdomainFilter,
+)
 from kpi.filters import (
     AssetOrderingFilter,
     ExcludeOrgAssetFilter,
-    KpiObjectPermissionsFilter,
     SearchFilter,
 )
 from kpi.highlighters import highlight_xform
@@ -379,7 +381,7 @@ class AssetViewSet(
     - docs/api/v2/assets/metadata.md
     """
 
-    # Filtering handled by KpiObjectPermissionsFilter.filter_queryset()
+    # Filtering handled by SubdomainAwareObjectPermissionsFilter.filter_queryset()
     queryset = Asset.objects.all()
     lookup_field = 'uid'
     lookup_url_kwarg = 'uid_asset'
@@ -391,7 +393,7 @@ class AssetViewSet(
     filter_backends = [
         ExcludeOrgAssetFilter,
         SubdomainFilter,
-        KpiObjectPermissionsFilter,
+        SubdomainAwareObjectPermissionsFilter,
         SearchFilter,
         AssetOrderingFilter,
     ]
