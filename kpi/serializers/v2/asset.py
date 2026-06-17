@@ -17,7 +17,6 @@ from rest_framework.fields import empty
 from rest_framework.reverse import reverse
 
 from kobo.apps.oc_tenant_auth.models import KeycloakTenantUser as KeycloakModel
-
 from kobo.apps.organizations.constants import ORG_ADMIN_ROLE
 from kobo.apps.organizations.utils import get_real_owner
 from kobo.apps.reports.constants import FUZZY_VERSION_PATTERN
@@ -54,7 +53,10 @@ from kpi.utils.project_views import (
     user_has_project_view_asset_perm,
     view_has_perm,
 )
-from kpi.utils.permissions import get_subdomain_user_ids
+from kobo.apps.oc_tenant_auth.utils import (
+    get_parent_collection_queryset,
+    get_subdomain_user_ids,
+)
 from kpi.utils.schema_extensions.fields import (
     HyperlinkedIdentityFieldWithSchemaField,
     PaginatedApiFieldWithSchemaField,
@@ -248,10 +250,7 @@ class AssetBulkActionsSerializer(serializers.Serializer):
             ).count()
         else:
             try:
-                kc_user = KeycloakModel.objects.get(user=self.__user)
-                subdomain_user_ids = KeycloakModel.objects.filter(
-                    subdomain=kc_user.subdomain
-                ).values_list('user_id', flat=True)
+                subdomain_user_ids = get_subdomain_user_ids(self.__user)
                 objects_count = Asset.objects.filter(
                     owner__in=subdomain_user_ids,
                     uid__in=asset_uids,
@@ -576,31 +575,11 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
             if exclude in fields:
                 fields.pop(exclude)
 
-        # Restrict the parent field queryset to collections within the
-        # caller's subdomain so that out-of-scope collections are treated as
-        # "not found" by DRF rather than resolving the object and leaking its
-        # existence through a different validation error.
-        # Subclasses (e.g. AssetMetadataListSerializer) omit the parent field,
-        # so guard the whole block.
+        # Subclasses (e.g. AssetMetadataListSerializer) omit the parent field.
         if 'parent' in fields:
-            user = self.context['request'].user
-            if user.is_anonymous:
-                fields['parent'].queryset = Asset.objects.none()
-            else:
-                try:
-                    subdomain_user_ids = get_subdomain_user_ids(user)
-                    fields['parent'].queryset = Asset.objects.filter(
-                        asset_type=ASSET_TYPE_COLLECTION,
-                        owner__in=subdomain_user_ids,
-                    )
-                except KeycloakModel.DoesNotExist:
-                    # No subdomain record (e.g. in test environments without
-                    # Keycloak). No subdomain restriction is possible, so allow
-                    # any collection; validate_parent() still enforces write
-                    # access and produces the correct error message.
-                    fields['parent'].queryset = Asset.objects.filter(
-                        asset_type=ASSET_TYPE_COLLECTION,
-                    )
+            fields['parent'].queryset = get_parent_collection_queryset(
+                self.context['request'].user
+            )
 
         return fields
 

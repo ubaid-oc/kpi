@@ -8,7 +8,7 @@ from kpi.constants import PERM_VIEW_ASSET
 from kpi.fields import RelativePrefixHyperlinkedRelatedField, WritableJSONField
 from kpi.models import Asset, AssetSnapshot
 from kpi.utils.object_permission import get_database_user
-from kpi.utils.permissions import is_owner_in_subdomain
+from kobo.apps.oc_tenant_auth.utils import is_owner_in_subdomain
 
 
 class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
