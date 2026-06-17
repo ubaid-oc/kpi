@@ -55,8 +55,15 @@ class TenantAwareSocialAccountAdapter(DefaultSocialAccountAdapter):
     def get_app(self, request, provider, client_id=None):
         """Inject per-subdomain Keycloak realm URL and client secret."""
         app = super().get_app(request, provider, client_id=client_id)
-        if provider == 'keycloak' and request is not None:
-            realm_name = _cached_realm_name(request)
+        if request is not None and getattr(settings, 'OC_BUILD_URL', None):
+            try:
+                realm_name = _cached_realm_name(request)
+            except Exception as exc:
+                LOGGER.warning('get_app: failed to determine realm name: %s', exc)
+                return app
+            if not realm_name:
+                LOGGER.warning('get_app: empty realm name, skipping injection')
+                return app
             client_secret = _cached_client_secret(realm_name)
             realm_url = f'{settings.KEYCLOAK_AUTH_URI}/auth/realms/{realm_name}'
             app.settings = {**app.settings, 'server_url': realm_url}
@@ -84,9 +91,17 @@ class TenantAwareSocialAccountAdapter(DefaultSocialAccountAdapter):
 
         # UID not found — Keycloak may have re-created the user with a new UUID.
         # Fall back to username lookup and re-key the stored UID if matched.
-        preferred_username = (
-            sociallogin.account.extra_data.get('userinfo', {}).get('preferred_username')
+        preferred_username = sociallogin.account.extra_data.get(
+            'preferred_username'
+        ) or sociallogin.account.extra_data.get('userinfo', {}).get(
+            'preferred_username'
         )
+        if not preferred_username:
+            LOGGER.warning(
+                'pre_social_login: UID %s not found and preferred_username absent '
+                'from extra_data — cannot attempt username fallback',
+                uid,
+            )
         if preferred_username:
             expected_username = f'{preferred_username}+{subdomain}'
             try:
@@ -126,7 +141,14 @@ class TenantAwareSocialAccountAdapter(DefaultSocialAccountAdapter):
 
         # Sync Keycloak roles → Django is_staff / is_superuser
         from .backend import get_roles
-        roles = get_roles(extra_data)
+
+        roles = []
+        if access_token:
+            try:
+                token_payload = _decode_jwt_payload(access_token)
+                roles = get_roles(token_payload)
+            except Exception as exc:
+                LOGGER.warning('Failed to extract roles from access_token: %s', exc)
         user.is_staff = 'admin' in roles or 'superuser' in roles
         user.is_superuser = 'superuser' in roles
         user.save(update_fields=['is_staff', 'is_superuser'])

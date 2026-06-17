@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlencode
 
 from django.contrib.auth import logout
 
@@ -34,7 +35,7 @@ class SDUserSwitchMiddleware:
                 )
                 logout(request)
                 from django.shortcuts import redirect
-                return redirect(
-                    f'/accounts/oidc/keycloak/login/?next={request.path}'
-                )
+
+                next_qs = urlencode({'next': request.path})
+                return redirect(f'/accounts/oidc/keycloak/login/?{next_qs}')
         return self.get_response(request)

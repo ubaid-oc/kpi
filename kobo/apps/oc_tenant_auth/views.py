@@ -1,18 +1,19 @@
-import os
 import json
+import os
+from urllib.parse import urlencode
 
-from django.contrib import auth
 from django.conf import settings
+from django.contrib import auth
 from django.http import (
-    HttpResponseRedirect,
     HttpResponseNotAllowed,
-    JsonResponse,
     HttpResponseNotFound,
+    HttpResponseRedirect,
+    JsonResponse,
 )
 from django.urls import reverse
 from django.utils.module_loading import import_string
-from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import View
 
 
 class OCAuthenticationCallbackView(View):
@@ -38,7 +39,7 @@ class OCAuthenticationRequestView(View):
         login_url = reverse('openid_connect_login', kwargs={'provider_id': 'keycloak'})
         next_url = request.GET.get('next', '')
         if next_url:
-            login_url = f'{login_url}?next={next_url}'
+            login_url = f'{login_url}?{urlencode({"next": next_url})}'
         return HttpResponseRedirect(login_url)
 
 

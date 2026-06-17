@@ -33,6 +33,10 @@ class CachingOpenIDConnectAdapter(OpenIDConnectOAuth2Adapter):
             key = f'oc:oidc_discovery:{hashlib.md5(server_url.encode()).hexdigest()}'
             config = cache.get(key)
             if config is None:
+                # server_url already includes /.well-known/openid-configuration
+                # because OpenIDConnectProvider.server_url calls wk_server_url()
+                # which appends the suffix automatically (allauth >= 65.x).
+                # Do NOT append it again here — that produces a double-suffix URL.
                 with get_adapter().get_requests_session() as sess:
                     resp = sess.get(server_url)
                     resp.raise_for_status()

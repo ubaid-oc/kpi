@@ -58,13 +58,14 @@ def main():
         # straight to force-completing below.
         schema_ready = True
         if name == '0009_backfill_attachment_model':
-            with connection.cursor() as cursor:
-                cursor.execute("""
-                    SELECT 1 FROM information_schema.columns
-                    WHERE table_name = 'logger_attachment'
-                      AND column_name = 'date_created'
-                """)
-                schema_ready = cursor.fetchone() is not None
+            if connection.vendor == 'postgresql':
+                with connection.cursor() as cursor:
+                    cursor.execute("""
+                        SELECT 1 FROM information_schema.columns
+                        WHERE table_name = 'logger_attachment'
+                          AND column_name = 'date_created'
+                    """)
+                    schema_ready = cursor.fetchone() is not None
 
         if schema_ready:
             print(f'Running required long-running migration: {name} ...')

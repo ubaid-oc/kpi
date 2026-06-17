@@ -1,4 +1,6 @@
 # coding: utf-8
+import unittest
+
 from django.urls import reverse
 from rest_framework import status
 
@@ -36,11 +38,13 @@ class ApiAnonymousPermissionsTestCase(test_api_permissions.ApiAnonymousPermissio
 class ApiPermissionsPublicAssetTestCase(test_api_permissions.ApiPermissionsPublicAssetTestCase):
     URL_NAMESPACE = None
 
+    @unittest.skip(
+        'OC requires authentication; anonymous users always receive 401 so '
+        'the public-asset viewability assertions in the upstream test are not '
+        'meaningful here. The permission-revoke path is covered by the v2 '
+        'variant of this test.'
+    )
     def test_revoke_anon_from_asset_in_public_collection(self):
-        # OC requires authentication; anonymous users always receive 401 so
-        # the public-asset viewability assertions in the upstream test are not
-        # meaningful here. The permission-revoke path is covered by the v2
-        # variant of this test.
         pass
 
 
