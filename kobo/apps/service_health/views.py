@@ -3,7 +3,7 @@ import time
 from typing import Callable, Optional, Tuple
 
 from django.conf import settings
-from django.core.cache import cache, caches
+from django.core.cache import cache
 from django.http import HttpResponse
 
 from kobo.apps.openrosa.apps.main.models.user_profile import UserProfile
@@ -36,29 +36,32 @@ def service_health(request):
     Return a HTTP 200 if some very basic runtime tests of the application
     pass. Otherwise, return HTTP 500
     """
-    # OpenClinica customization: Mongo failures are non-fatal. Mongo is checked
-    # separately so that an outage does not flip the overall status to FAIL, and
-    # the Mongo line is only reported when the check succeeds.
+    # OpenClinica customization: skip MongoDB check when MONGO_DB_URL is not
+    # configured — avoids connection-timeout error spam when MongoDB is not
+    # deployed. When configured, failures are non-fatal and only reported on
+    # success.
     mongo_message = None
-    t0 = time.time()
-    try:
-        settings.MONGO_DB.instances.find_one(max_time_ms=settings.MONGO_TIMEOUT_MS)
-    except Exception:
-        logging.error('Service health Mongo check failure', exc_info=True)
-    else:
-        mongo_message = 'OK'
-    mongo_time = time.time() - t0
+    mongo_time = 0.0
+    if settings.MONGO_CONFIGURED:
+        t0 = time.time()
+        try:
+            settings.MONGO_DB.instances.find_one(max_time_ms=settings.MONGO_TIMEOUT_MS)
+        except Exception:
+            logging.error('Service health Mongo check failure', exc_info=True)
+        else:
+            mongo_message = 'OK'
+        mongo_time = time.time() - t0
 
-    # OpenClinica customization: the external Enketo HTTP probe (and the
-    # standalone KoBoCAT HTTP probe) are intentionally omitted from this
-    # deployment's health checks.
+    # OpenClinica customization: the external Enketo HTTP probe and Enketo Redis
+    # are intentionally omitted — enketo runs externally and its Redis is not
+    # reachable from KPI pods. KoBoCAT is integrated as OpenRosa (no separate
+    # web app); its DB is checked via 'Postgres kobocat' below.
     all_checks = {
         'Postgres kpi': lambda: Asset.objects.order_by().exists(),
         'Postgres kobocat': lambda: UserProfile.objects.exists(),
         'Cache': lambda: cache.set('a', True, 1),
         'Broker': lambda: celery_app.backend.client.ping(),
         'Session': lambda: request.session.save(),
-        'Enketo Redis (main)': lambda: caches['enketo_redis_main'].set('a', True, 1),
     }
 
     check_results = []

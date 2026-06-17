@@ -2027,6 +2027,9 @@ mongo_client = MongoClient(
     serverSelectionTimeoutMS=MONGO_TIMEOUT_MS
 )
 MONGO_DB = mongo_client[mongo_db_name]
+# OpenClinica: True only when MONGO_DB_URL env var is explicitly set.
+# Used to gate health-check and any other optional Mongo calls.
+MONGO_CONFIGURED = bool(os.getenv('MONGO_DB_URL'))
 
 # Maximum query duration (in milliseconds) for PostgreSQL (statement_timeout)
 # and MongoDB (maxTimeMS). Applied per environment:
