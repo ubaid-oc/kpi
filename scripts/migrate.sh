@@ -31,5 +31,12 @@ else
     echo "$MIGRATE_OUT"
 fi
 
+# Ensure user_reports MV exists — create it synchronously if SKIP_HEAVY_MIGRATIONS
+# deferred it (user_reports.0007 records without creating the MV, and 0008 then
+# resets the LRM record to 'created' expecting a Celery worker). Running this here
+# after migrate guarantees the MV is always present when the migrate job completes,
+# regardless of whether the LRM worker runs.
+DJANGO_SETTINGS_MODULE=kobo.settings.guardian python manage.py manage_user_reports_mv --create --force
+
 # Skipping kobocat DB migrations — kobocat not in use
 python manage.py runscript create_anonymous_user
