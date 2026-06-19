@@ -73,6 +73,8 @@ class ExtraUserDetail(StandardizeSearchableFieldMixin, models.Model):
         organization potentially transitions to a multi-member state.
         """
         user_organization = self.user.organization
+        if user_organization is None:
+            return
         if user_organization.is_owner(self.user) and not user_organization.is_mmo:
             fields_to_update = []
             try:
