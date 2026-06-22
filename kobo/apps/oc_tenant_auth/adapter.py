@@ -4,9 +4,11 @@ import logging
 import time
 
 import requests
+from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
 from django.core.cache import cache
+from django.http import HttpResponseForbidden
 
 from .backend import get_realm_name, get_client_secret
 from .models import KeycloakTenantUser
@@ -97,10 +99,17 @@ class TenantAwareSocialAccountAdapter(DefaultSocialAccountAdapter):
             'preferred_username'
         )
         if not preferred_username:
-            LOGGER.warning(
+            LOGGER.error(
                 'pre_social_login: UID %s not found and preferred_username absent '
-                'from extra_data — cannot attempt username fallback',
+                'from Keycloak token on subdomain %s — check token mapper config',
                 uid,
+                subdomain,
+            )
+            raise ImmediateHttpResponse(
+                HttpResponseForbidden(
+                    'Login failed: preferred_username missing from Keycloak token. '
+                    'Contact your administrator.'
+                )
             )
         if preferred_username:
             expected_username = f'{preferred_username}+{subdomain}'
