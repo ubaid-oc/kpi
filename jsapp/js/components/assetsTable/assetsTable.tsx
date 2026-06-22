@@ -350,7 +350,8 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
           <span>{t('##count## items').replace('##count##', String(this.props.totalAssets))}</span>
         )}
 
-        {this.renderPagination()}
+        {/* OpenClinica: Pagination intentionally hidden. */}
+        {/* {this.renderPagination()} */}
 
         {/* OpenClinica: Toggle fullscreen button intentionally hidden. */}
         {/* {this.props.totalAssets !== null && (
