@@ -12,7 +12,31 @@
     margin-left: 15px;
   }
 
-  .popover-menu__toggle .k-icon {
-    display: block;
+  // Override blue text-button color — action icons should be gray.
+  // Needs 3-class specificity to beat .k-button.k-button--type-text in button.scss.
+  .k-button.k-button--type-text {
+    color: colors.$kobo-gray-700;
+
+    &:hover,
+    &:focus-visible {
+      color: colors.$kobo-gray-800;
+    }
+  }
+
+  // Match folder trigger to Button size='m' icon-only dimensions (22px icon, 32px height)
+  .popover-menu__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+
+    .k-icon {
+      font-size: 22px;
+      color: colors.$kobo-gray-700;
+    }
+
+    &:hover .k-icon {
+      color: colors.$kobo-gray-800;
+    }
   }
 }

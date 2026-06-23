@@ -28,6 +28,32 @@ class DeploymentSerializer(serializers.Serializer):
         asset = self.context['asset']
         return AssetSerializer(asset, context=self.context).data
 
+    @staticmethod
+    def _validate_content_sheet_names(asset):
+        """
+        Raise DuplicateWorksheetName if the asset content has two keys that
+        are identical when compared case-insensitively (e.g. 'settings' and
+        'Settings'). xlsxwriter enforces this constraint at worksheet creation
+        time, but to_xlsx_io() only creates sheets for the standard three
+        ('survey', 'choices', 'settings'), so extra conflicting keys would
+        otherwise slip through silently.
+
+        Always reports the mixed-case (non-lowercase) key as the duplicate,
+        matching xlsxwriter's convention and making the error predictable
+        regardless of iteration order (which varies with jsonb storage).
+        """
+        seen = {}
+        for key in (asset.content or {}):
+            lower = key.lower()
+            if lower in seen:
+                # Always report the key whose casing differs from lowercase
+                # (the "unusual" one), regardless of which appeared first.
+                odd_key = key if key != lower else seen[lower]
+                raise DuplicateWorksheetName(
+                    f"Sheetname '{odd_key}', with case ignored, is already in use."
+                )
+            seen[lower] = key
+
     def create(self, validated_data):
         asset = self.context['asset']
         self._raise_unless_current_version(asset, validated_data)
@@ -37,6 +63,7 @@ class DeploymentSerializer(serializers.Serializer):
         # `asset.deploy()` deploys the latest version and updates that versions'
         # 'deployed' boolean value
         try:
+            self._validate_content_sheet_names(asset)
             asset.deploy(backend=backend_id, active=validated_data.get('active', False))
         except (
             DuplicateWorksheetName,
@@ -78,6 +105,7 @@ class DeploymentSerializer(serializers.Serializer):
         self._raise_unless_current_version(asset, validated_data)
 
         try:
+            self._validate_content_sheet_names(asset)
             asset.deploy(
                 backend=deployment.backend,
                 active=validated_data.get('active', deployment.active),

@@ -54,3 +54,4 @@ class TranscriptionServiceViewSet(BaseViewSet):
 
     serializer_class = TranscriptionServiceSerializer
     queryset = TranscriptionService.objects.all()
+    min_search_chars = 3

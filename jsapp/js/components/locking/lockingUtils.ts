@@ -113,6 +113,9 @@ export function getRowLockingProfile(assetContent: AssetContent, rowName: string
  * Returns `null` if not found.
  */
 export function getAssetLockingProfile(assetContent: AssetContent) {
+  if (!assetContent) {
+    return null
+  }
   if (
     assetContent.settings &&
     LOCKING_PROFILE_PROP_NAME in assetContent.settings &&

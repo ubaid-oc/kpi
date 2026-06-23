@@ -1,22 +1,16 @@
 import type { RouterState } from '@remix-run/router'
 import debounce from 'lodash.debounce'
-import { reaction, when } from 'mobx'
+import { reaction } from 'mobx'
 import Reflux from 'reflux'
 import { actions } from '#/actions'
 import assetUtils from '#/assetUtils'
 import { ASSETS_TABLE_COLUMNS, ORDER_DIRECTIONS } from '#/components/assetsTable/assetsTableConstants'
 import searchBoxStore from '#/components/header/searchBoxStore'
-import type { AssetTypeName } from '#/constants'
-import { DEFAULT_PAGE_SIZE } from '#/dataInterface'
 import type { AssetResponse, AssetsResponse, MetadataResponse, SearchAssetsPredefinedParams } from '#/dataInterface'
-import { getCollectionUidCacheName } from '#/ocutils'
 import type { OrderDirection } from '#/projects/projectViews/constants'
 import { router } from '#/router/legacy'
 import { ROUTES } from '#/router/routerConstants'
 import { getCurrentPath, isAnyLibraryRoute } from '#/router/routerUtils'
-import sessionStore from '#/stores/session'
-import libraryTypeFilterStore from './libraryTypeFilterStore'
-import ownedCollectionsStore from './ownedCollectionsStore'
 
 export interface MyLibraryStoreData {
   isFetchingData: boolean
@@ -30,8 +24,6 @@ export interface MyLibraryStoreData {
   orderValue: OrderDirection | null | undefined
   filterColumnId: string | null
   filterValue: string | null
-  collectionUid: string | null
-  totalUserRootAssets: number | null
 }
 
 /**
@@ -44,8 +36,7 @@ class MyLibraryStore extends Reflux.Store {
    */
   abortFetchData?: Function
   previousPath = getCurrentPath()
-  previousFilterType = libraryTypeFilterStore.getFilterType()
-  PAGE_SIZE = DEFAULT_PAGE_SIZE
+  PAGE_SIZE = 100
   DEFAULT_ORDER_COLUMN = ASSETS_TABLE_COLUMNS['date-modified']
   searchContext = 'MY_LIBRARY'
 
@@ -68,8 +59,6 @@ class MyLibraryStore extends Reflux.Store {
     orderValue: this.DEFAULT_ORDER_COLUMN.defaultValue,
     filterColumnId: null,
     filterValue: null,
-    collectionUid: null,
-    totalUserRootAssets: null,
   }
 
   fetchDataDebounced?: (needsMetadata?: boolean) => void
@@ -87,7 +76,6 @@ class MyLibraryStore extends Reflux.Store {
       this.onSearchBoxStoreChanged.bind(this),
     )
 
-    libraryTypeFilterStore.listen(this.libraryTypeFilterStoreChanged, this)
     actions.library.moveToCollection.completed.listen(this.onMoveToCollectionCompleted.bind(this))
     actions.library.subscribeToCollection.completed.listen(this.fetchData.bind(this, true))
     actions.library.unsubscribeFromCollection.completed.listen(this.fetchData.bind(this, true))
@@ -104,9 +92,6 @@ class MyLibraryStore extends Reflux.Store {
     // https://github.com/kobotoolbox/kpi/issues/476
     actions.resources.createImport.completed.listen(this.fetchDataDebounced.bind(this, true))
 
-    // Wait for login before starting store
-    when(() => sessionStore.isLoggedIn, this.startupStore.bind(this))
-
     // startup store after config is ready
     actions.permissions.getConfig.completed.listen(this.startupStore.bind(this))
   }
@@ -116,7 +101,7 @@ class MyLibraryStore extends Reflux.Store {
    * otherwise wait until route changes to a library (see `onRouteChange`)
    */
   startupStore() {
-    if (!this.isInitialised && isAnyLibraryRoute() && !this.data.isFetchingData && sessionStore.isLoggedIn) {
+    if (!this.isInitialised && isAnyLibraryRoute() && !this.data.isFetchingData) {
       // This will indirectly run `fetchData`
       searchBoxStore.setContext(this.searchContext)
     }
@@ -135,11 +120,9 @@ class MyLibraryStore extends Reflux.Store {
   getSearchParams() {
     const params: SearchAssetsPredefinedParams = {
       searchPhrase: (searchBoxStore.data.searchPhrase ?? '').trim(),
-      filterType: libraryTypeFilterStore.getFilterType(),
       pageSize: this.PAGE_SIZE,
       page: this.data.currentPage,
-      // collectionsFirst: true,
-      uid: this.getCollectionUid() || undefined,
+      collectionsFirst: true,
     }
 
     if (this.data.filterColumnId !== null) {
@@ -198,17 +181,6 @@ class MyLibraryStore extends Reflux.Store {
     this.previousPath = data.location.pathname
   }
 
-  libraryTypeFilterStoreChanged() {
-    if (libraryTypeFilterStore.getFilterType() !== this.previousFilterType) {
-      // reset to first page when search changes
-      this.data.currentPage = 0
-      this.data.totalPages = null
-      this.data.totalSearchAssets = null
-      this.previousFilterType = libraryTypeFilterStore.getFilterType()
-      this.fetchData(true)
-    }
-  }
-
   onSearchBoxStoreChanged() {
     if (searchBoxStore.data.context === this.searchContext) {
       // reset to first page when search changes
@@ -237,10 +209,6 @@ class MyLibraryStore extends Reflux.Store {
     // update total count for the first time and the ones that will get a full count
     if (this.data.totalUserAssets === null || searchBoxStore.data.searchPhrase === '') {
       this.data.totalUserAssets = this.data.totalSearchAssets
-      // track total count when no collection filter
-      if (this.data.collectionUid === null) {
-        this.data.totalUserRootAssets = this.data.totalSearchAssets
-      }
     }
     this.data.isFetchingData = false
     this.isInitialised = true
@@ -296,32 +264,24 @@ class MyLibraryStore extends Reflux.Store {
   }
 
   onAssetCreated(asset: AssetResponse) {
-    if (assetUtils.isLibraryAsset(asset.asset_type)) {
+    if (assetUtils.isLibraryAsset(asset.asset_type) && asset.parent === null) {
       if (this.data.totalUserAssets !== null) {
         this.data.totalUserAssets++
-      }
-      if (this.data.totalUserRootAssets !== null && asset.parent === null) {
-        this.data.totalUserRootAssets++
       }
       this.fetchData(true)
     }
   }
 
-  onDeleteAssetCompleted(response: { uid: string; assetType: AssetTypeName }) {
-    if (assetUtils.isLibraryAsset(response.assetType)) {
-      const found = this.findAsset(response.uid)
-      if (found) {
-        if (this.data.totalUserAssets !== null) {
-          this.data.totalUserAssets--
-        }
-        if (this.data.totalUserRootAssets !== null && found.parent === null) {
-          this.data.totalUserRootAssets--
-        }
-        this.fetchData(true)
+  onDeleteAssetCompleted(response: { uid: string }) {
+    const found = this.findAsset(response.uid)
+    if (found) {
+      if (this.data.totalUserAssets !== null) {
+        this.data.totalUserAssets--
       }
-      // if not found it is possible it is on other page of results, but it is
-      // not important enough to do a data fetch
+      this.fetchData(true)
     }
+    // if not found it is possible it is on other page of results, but it is
+    // not important enough to do a data fetch
   }
 
   // public methods
@@ -370,45 +330,12 @@ class MyLibraryStore extends Reflux.Store {
     return this.data.totalUserAssets
   }
 
-  getCurrentUserRootAssets() {
-    return this.data.totalUserRootAssets
-  }
-
   findAsset(uid: string) {
     return this.data.assets.find((asset) => asset.uid === uid)
   }
 
   findAssetByUrl(url: string) {
     return this.data.assets.find((asset) => asset.url === url)
-  }
-
-  getCollectionUid() {
-    return this.data.collectionUid
-  }
-
-  setCollectionUid(newVal: string) {
-    if (this.data.collectionUid !== newVal) {
-      this.data.collectionUid = newVal
-      sessionStorage.setItem(getCollectionUidCacheName(), JSON.stringify(this.data.collectionUid))
-      this.trigger(this.data)
-      this.fetchData(true)
-    }
-  }
-
-  clearCollectionUid() {
-    this.data.collectionUid = null
-    sessionStorage.removeItem(getCollectionUidCacheName())
-    this.trigger(this.data)
-    this.fetchData(true)
-  }
-
-  getCollectionData() {
-    let collectionData = null
-    const parentUid = this.getCollectionUid()
-    if (parentUid) {
-      collectionData = ownedCollectionsStore.find(parentUid)
-    }
-    return collectionData
   }
 }
 

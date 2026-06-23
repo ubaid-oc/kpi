@@ -1,4 +1,6 @@
 # coding: utf-8
+import unittest
+
 from django.urls import reverse
 from rest_framework import status
 
@@ -15,9 +17,35 @@ from kpi.utils.object_permission import get_anonymous_user
 class ApiAnonymousPermissionsTestCase(test_api_permissions.ApiAnonymousPermissionsTestCase):
     URL_NAMESPACE = None
 
+    def test_anon_list_assets(self):
+        # OC requires authentication for all asset access; anonymous requests
+        # return 401, not 200. Override the upstream assertion accordingly.
+        url = reverse(self._get_endpoint('asset-list'))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_anon_asset_detail(self):
+        # OC requires authentication for all asset access; anonymous requests
+        # return 401, not 200. Override the upstream assertion accordingly.
+        url = reverse(
+            self._get_endpoint('asset-detail'),
+            kwargs={'uid_asset': self.anon_accessible.uid},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class ApiPermissionsPublicAssetTestCase(test_api_permissions.ApiPermissionsPublicAssetTestCase):
     URL_NAMESPACE = None
+
+    @unittest.skip(
+        'OC requires authentication; anonymous users always receive 401 so '
+        'the public-asset viewability assertions in the upstream test are not '
+        'meaningful here. The permission-revoke path is covered by the v2 '
+        'variant of this test.'
+    )
+    def test_revoke_anon_from_asset_in_public_collection(self):
+        pass
 
 
 class ApiPermissionsTestCase(test_api_permissions.ApiPermissionsTestCase):

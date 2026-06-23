@@ -306,7 +306,8 @@ $assets-table-hover-bg: colors.$kobo-gray-100;
     }
 
     &.assets-table-row__column--actions {
-      width: 22%;
+      width: 230px;
+      flex-shrink: 0;
       text-align: right;
 
       .asset-action-buttons {
@@ -315,6 +316,7 @@ $assets-table-hover-bg: colors.$kobo-gray-100;
     }
 
     &.assets-table-row__column--actions.header {
+      font-size: 0.9rem;
       text-align: center;
     }
 

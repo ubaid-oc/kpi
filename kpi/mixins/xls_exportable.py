@@ -267,8 +267,18 @@ class XlsExportableMixin:
         """
         if versioned:
             append = kwargs.setdefault('append', {})
-            # We want to keep the order and append `version` at the end.
+            # Append the __version__ calculate row to the survey. It will be
+            # the last survey row after existing rows and any append rows.
+            append.setdefault('survey', []).append({
+                'name': '__version__',
+                'calculation': "'{}'".format(self.version_id),
+                'type': 'calculate',
+            })
+            # Preserve existing append settings; `version` is added to the
+            # settings dict AFTER ordered_xlsform_content() runs so it appears
+            # as the last column (bypassing _settings_maintain_key_order).
             append_settings = OrderedDict(append.setdefault('settings', {}))
+            append_settings['form_title'] = self.name
             kwargs['append']['settings'] = append_settings
         try:
             def _add_contents_to_sheet(sheet, contents):
@@ -289,6 +299,10 @@ class XlsExportableMixin:
             # and its return value *only*. Calling deepcopy() is required to
             # achieve this isolation.
             ss_dict = self.ordered_xlsform_content(**kwargs)
+            # Add `version` to settings after _settings_maintain_key_order
+            # runs inside ordered_xlsform_content, so it appears last.
+            if versioned and ss_dict.get('settings'):
+                ss_dict['settings'][0]['version'] = self.version_number_and_date
             ordered_ss_dict = OrderedDict()
             for t in ['settings', 'choices', 'survey']:
                 if t in ss_dict:

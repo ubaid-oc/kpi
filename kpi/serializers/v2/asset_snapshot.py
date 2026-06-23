@@ -2,13 +2,13 @@
 from rest_framework import exceptions, serializers
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework.reverse import reverse
-from bossoidc2.models import Keycloak as KeycloakModel
+from kobo.apps.oc_tenant_auth.models import KeycloakTenantUser as KeycloakModel
 
 from kpi.constants import PERM_VIEW_ASSET
 from kpi.fields import RelativePrefixHyperlinkedRelatedField, WritableJSONField
 from kpi.models import Asset, AssetSnapshot
 from kpi.utils.object_permission import get_database_user
-from kpi.utils.permissions import is_owner_in_subdomain
+from kobo.apps.oc_tenant_auth.utils import is_owner_in_subdomain
 
 
 class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
@@ -58,6 +58,10 @@ class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
         # Check if asset owner id in subdomain userIds
         user = self.context['request'].user
 
+        # Anonymous users have no Keycloak record; skip subdomain check.
+        if user.is_anonymous:
+            return
+
         if isinstance(asset, dict) and 'owner' in asset:
             asset_owner = asset['owner']
         else:
@@ -86,10 +90,8 @@ class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
         validated_data['owner'] = get_database_user(self.context['request'].user)
 
         if source:
-            self.check_subdomain_permission(validated_data)
             snapshot = AssetSnapshot.objects.create(**validated_data)
         else:
-            self.check_subdomain_permission(asset)
             # asset.snapshot pulls, by default, a snapshot for the latest
             # version.
             snapshot = asset.snapshot()

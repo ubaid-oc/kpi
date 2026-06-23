@@ -75,7 +75,7 @@
   display: block;
   padding: 6px 12px 6px 6px;
   position: relative;
-  color: colors.$kobo-dark-blue;
+  color: colors.$kobo-gray-700;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
@@ -94,7 +94,7 @@
 
   &:hover {
     background-color: colors.$kobo-gray-200;
-    color: color.adjust(colors.$kobo-dark-blue, $lightness: -5%);
+    color: colors.$kobo-gray-800;
   }
 
   &.active {
@@ -146,6 +146,33 @@
 .popover-menu--formLanding-menu {
   .popover-menu__content {
     right: 10px;
+  }
+}
+
+.popover-menu--new-menu {
+  width: 100%;
+
+  .popover-menu__content {
+    right: 0;
+    width: 100%;
+  }
+
+  .popover-menu__toggle {
+    background-color: colors.$kobo-blue;
+    color: colors.$kobo-white;
+    border-radius: 6px;
+    width: 100%;
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &:hover {
+      background-color: color.adjust(colors.$kobo-blue, $lightness: -5%);
+      color: colors.$kobo-white;
+    }
   }
 }
 

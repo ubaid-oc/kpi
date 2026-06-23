@@ -21,23 +21,20 @@ from kpi.constants import (
 from kpi.exceptions import (
     QueryParserBadSyntax,
     QueryParserNotSupportedFieldLookup,
+    SearchQueryTooShortException,
 )
 from kpi.models.asset import AssetDeploymentStatus, UserAssetSubscription
 from kpi.utils.django_orm_helper import OrderCustomCharField
-from kpi.utils.domain import get_subdomain
-from bossoidc2.models import Keycloak as KeycloakModel
 from kpi.utils.object_permission import (
     get_anonymous_user,
     get_database_user,
     get_objects_for_user,
     get_perm_ids_from_code_names,
 )
-from kpi.utils.permissions import get_subdomain_user_ids, is_user_anonymous
+from kpi.utils.permissions import is_user_anonymous
 from kpi.utils.query_parser import ParseError, get_parsed_parameters, parse
 
 from .models import Asset, ObjectPermission
-
-from kpi.utils.log import logging
 
 class DeploymentFilter:
     DEPLOYMENT_STATUS_DEFAULT_ORDER = [
@@ -177,27 +174,6 @@ class KpiObjectPermissionsFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
 
         user = request.user
-
-        # User can access assets/collections created by users with same subdomain
-        model_name = queryset.model._meta.model_name
-        if model_name == 'asset' or model_name == 'collection':
-            try:
-                subdomain_user_ids = get_subdomain_user_ids(user)
-                if model_name == 'asset':
-                    subdomain_assetIds = Asset.objects.filter(owner__in=subdomain_user_ids).values_list('id', flat=True)
-                    return queryset.filter(pk__in=subdomain_assetIds)
-                # elif model_name == 'collection':
-                #     subdomain_collectionIds = Collection.objects.filter(owner__in=subdomain_userIds).values_list('id', flat=True)
-                #     return queryset.filter(pk__in=subdomain_collectionIds)
-            except KeycloakModel.DoesNotExist:
-                # User has no Keycloak record; fall through to standard filtering
-                pass
-            except Exception:
-                logging.exception(
-                    'Unexpected error while filtering queryset by subdomain '
-                    'for user %s', user
-                )
-                raise
 
         if user.is_superuser and view.detail:
             # For a list, we won't deluge the superuser with everyone else's
@@ -485,6 +461,10 @@ class SearchFilter(filters.BaseFilterBackend):
                 return queryset
         except KeyError:
             return queryset
+
+        min_search_chars = getattr(view, 'min_search_chars', 0)
+        if min_search_chars and len(q) < min_search_chars:
+            raise SearchQueryTooShortException()
 
         try:
             q_obj = parse(

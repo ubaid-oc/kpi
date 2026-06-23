@@ -31,8 +31,12 @@ class AssetImportTaskTest(BaseTestCase):
     def _assert_assets_contents_equal(self, a1, a2, sheet='survey'):
         def _prep_row_for_comparison(row):
             row = {k: v for k, v in row.items() if not k.startswith('$')}
-            if isinstance(row['label'], list) and len(row['label']) == 1:
+            if isinstance(row.get('label'), list) and len(row['label']) == 1:
                 row['label'] = row['label'][0]
+            # pyxform 1.x injects readonly='false' as a default on all
+            # questions; strip it so round-trip comparisons don't fail.
+            if row.get('readonly') == 'false':
+                del row['readonly']
             return row
         self.assertEqual(len(a1.content[sheet]), len(a2.content[sheet]))
         for index, row in enumerate(a1.content[sheet]):
@@ -59,9 +63,11 @@ class AssetImportTaskTest(BaseTestCase):
     def _prepare_survey_content(self, survey):
         _survey = []
         for item in survey:
-            _survey.append(
-                {k: v for k, v in item.items() if not k.startswith('$')}
-            )
+            row = {k: v for k, v in item.items() if not k.startswith('$')}
+            # pyxform 1.x injects readonly='false' as a default; strip it.
+            if row.get('readonly') == 'false':
+                del row['readonly']
+            _survey.append(row)
         return _survey
 
     @staticmethod

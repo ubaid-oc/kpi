@@ -22,7 +22,7 @@ $s-form-builder-content-width: 1024px;
   overflow-y: scroll;
   margin-right: 0;
   transition: margin $t-form-builder-aside-open;
-  padding: 10px;
+  padding: 20px 40px;
   width: auto;
 
   .form-builder-message-box {
@@ -32,17 +32,17 @@ $s-form-builder-content-width: 1024px;
   }
 }
 
-@media screen and (width >= breakpoints.$b1100) {
-  .form-builder-aside--visible + .form-builder {
-    .form-builder__contents {
-      margin-right: $s-form-builder-aside;
-    }
+.form-builder-aside--visible + .form-builder {
+  .form-builder__contents {
+    margin-right: $s-form-builder-aside;
   }
 }
 
+
 .form-wrap {
   width: 100%;
-  padding: 45px 75px; // Similar to the previous form builder
+  max-width: $s-form-builder-content-width;
+  margin: 0 auto;
 
   input,
   textarea {
@@ -71,12 +71,6 @@ $s-form-builder-content-width: 1024px;
       border: 1px solid black;
       padding-right: 12px;
     }
-  }
-}
-
-@media screen and (max-width: breakpoints.$b1280) {
-  .form-wrap {
-    padding: 20px;
   }
 }
 
@@ -109,6 +103,15 @@ $s-form-builder-content-width: 1024px;
       z-index: 1;
       box-shadow: 0 0 3px 0 rgba(colors.$kobo-gray-800, 0.2), 0 0 10px 0 rgba(colors.$kobo-gray-800, 0.1);
       padding: 0 20px;
+
+      // OpenClinica: all text buttons in the secondary row should be gray, not blue
+      .k-button.k-button--type-text {
+        color: colors.$kobo-gray-700;
+
+        &:hover:not([disabled]) {
+          color: colors.$kobo-teal;
+        }
+      }
     }
   }
 
@@ -152,6 +155,8 @@ $s-form-builder-content-width: 1024px;
 
     &.form-builder-header__cell--name {
       flex: 1;
+      // OpenClinica: indent name field from logo cell
+      margin-left: 20px;
 
       label::first-letter {
         text-transform: uppercase;
@@ -161,6 +166,16 @@ $s-form-builder-content-width: 1024px;
         border-radius: 0;
         padding-left: 0;
         font-size: 16px;
+        // OpenClinica: gray underline only; blue on focus
+        border: none;
+        border-bottom: 2px solid colors.$kobo-gray-400;
+        outline: none;
+        background: transparent;
+
+        &:focus {
+          border-bottom-color: colors.$kobo-blue;
+          box-shadow: none;
+        }
       }
     }
 
@@ -187,6 +202,17 @@ $s-form-builder-content-width: 1024px;
       flex-direction: row;
       gap: 10px;
       padding-right: 10px;
+
+      // OpenClinica: outlined style for secondary (back) button
+      .k-button.k-button--type-secondary {
+        background-color: colors.$kobo-white;
+        border: 2px solid colors.$kobo-blue;
+        color: colors.$kobo-blue;
+
+        &:hover:not([disabled]) {
+          background-color: colors.$kobo-bg-blue;
+        }
+      }
     }
 
     &.form-builder-header__cell--close {
@@ -200,6 +226,27 @@ $s-form-builder-content-width: 1024px;
     &.form-builder-header__cell--toolsButtons {
       @include mixins.centerRowFlex;
       gap: 10px;
+
+      // OpenClinica: toolbar action icons should be gray, not blue
+      .k-button.k-button--type-text {
+        color: colors.$kobo-gray-700;
+
+        &:hover:not([disabled]) {
+          color: colors.$kobo-teal;
+        }
+      }
+    }
+
+    &.form-builder-header__cell--supportUrl {
+      // OpenClinica: larger gray help icon
+      a {
+        font-size: 24px;
+        color: colors.$kobo-gray-700;
+
+        &:hover {
+          color: colors.$kobo-teal;
+        }
+      }
     }
 
     &.form-builder-header__cell--spacer {
@@ -212,6 +259,45 @@ $s-form-builder-content-width: 1024px;
       background: colors.$kobo-gray-300;
       height: 100%;
     }
+  }
+}
+
+// FORM BUILDER TOOLBAR BUTTON (oc/master-style icon button with nested icons)
+
+.form-builder-header__button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 10px;
+  color: colors.$kobo-gray-700;
+  overflow: visible; // allow absolutely-positioned child icons to overflow
+
+  i {
+    font-size: 24px;
+    margin: 3px;
+    vertical-align: middle;
+    position: relative; // anchor for the nested absolute icon
+  }
+
+  &.add-questions-to-library {
+    .k-icon-plus {
+      color: colors.$kobo-teal;
+      position: absolute;
+      font-size: 16px;
+      left: 13px;
+      top: 15px;
+    }
+  }
+
+  &:disabled,
+  &[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  &:hover:not(:disabled):not([disabled]) {
+    color: colors.$kobo-gray-800;
   }
 }
 

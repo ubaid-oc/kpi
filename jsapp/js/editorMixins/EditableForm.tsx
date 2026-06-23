@@ -50,9 +50,9 @@ import {
   update_states,
 } from '#/constants'
 import envStore from '#/envStore'
-import sessionStore from '#/stores/session'
 import type { RouterProp } from '#/router/legacy'
 import { ROUTES } from '#/router/routerConstants'
+import sessionStore from '#/stores/session'
 import dkobo_xlform from '../../xlform/src/_xlform.init'
 import type { Survey } from '../../xlform/src/model.survey'
 import type { SurveyDetail } from '../../xlform/src/model.surveyDetail'
@@ -679,9 +679,11 @@ export default function EditableForm(props: EditableFormProps) {
       // eslint-disable-next-line no-lonely-if
       if (isNewLibraryAsset) {
         saveButtonText = t('create')
-        backButtonText = t('back to library')
       } else {
         saveButtonText = t('save changes')
+      }
+      if (state.backRoute === ROUTES.LIBRARY) {
+        backButtonText = t('back to library')
       }
     }
 
@@ -979,6 +981,19 @@ export default function EditableForm(props: EditableFormProps) {
           </bem.FormBuilderHeader__cell>
 
           <bem.FormBuilderHeader__cell m={'buttonsTopRight'}>
+            {/* OC fork: replaced upstream's close (X) button with an outlined "back"
+                button, gated by canNavigateToList(). Shown before Save. */}
+            {canNavigateToList() && (
+              <Button
+                type='secondary'
+                size='l'
+                isUpperCase
+                isDisabled={!state.surveyAppRendered || !!state.surveyLoadError}
+                onClick={safeNavigateToList}
+                label={backButtonText}
+              />
+            )}
+
             <Button
               type='primary'
               size='l'
@@ -993,18 +1008,6 @@ export default function EditableForm(props: EditableFormProps) {
                 </>
               }
             />
-
-            {/* OC fork: replaced upstream's close (X) button with a text "back"
-                button, gated by canNavigateToList(). */}
-            {canNavigateToList() && (
-              <Button
-                type='text'
-                size='l'
-                isDisabled={!state.surveyAppRendered || !!state.surveyLoadError}
-                onClick={safeNavigateToList}
-                label={backButtonText}
-              />
-            )}
           </bem.FormBuilderHeader__cell>
         </bem.FormBuilderHeader__row>
 
@@ -1079,34 +1082,28 @@ export default function EditableForm(props: EditableFormProps) {
             />
 
             {canAddToLibrary() && (
-              <Button
-                type='text'
-                size='m'
-                isDisabled={!groupable}
-                onClick={addQuestionsToLibrary}
-                tooltip={
+              <span
+                className='button-container left-tooltip'
+                data-tip={
                   groupable
                     ? t('Add selected questions to library')
                     : t('Add selected questions to library disabled. Please select at least one question.')
                 }
-                tooltipPosition='left'
-                startIcon='folder-plus'
-                className='add-questions-to-library'
-              />
+              >
+                <bem.FormBuilderHeader__button
+                  m={['group', { groupable: !!groupable }]}
+                  onClick={addQuestionsToLibrary}
+                  disabled={!groupable}
+                  className='add-questions-to-library'
+                >
+                  <i className='k-icon-folder'>
+                    <i className='k-icon-plus' />
+                  </i>
+                </bem.FormBuilderHeader__button>
+              </span>
             )}
 
-            <Button
-              type='text'
-              size='m'
-              isDisabled={toggleCascade === undefined}
-              onClick={toggleCascade}
-              tooltip={t('Insert cascading select')}
-              tooltipPosition='left'
-              startIcon='cascading'
-              className={cx({
-                [LOCKING_UI_CLASSNAMES.DISABLED]: isAddingGroupsRestricted(),
-              })}
-            />
+            {/* OpenClinica: cascading select not available */}
           </bem.FormBuilderHeader__cell>
 
           <bem.FormBuilderHeader__cell m='verticalRule' />
@@ -1309,7 +1306,8 @@ export default function EditableForm(props: EditableFormProps) {
       return null
     }
 
-    const assetTypeLabel = getFormBuilderAssetType(state.asset.asset_type, state.desiredAssetType)?.label || 'asset'
+    const rawLabel = getFormBuilderAssetType(state.asset.asset_type, state.desiredAssetType)?.label || 'asset'
+    const assetTypeLabel = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1)
 
     // Case 1: there is no asset yet (creting a new) or asset is not locked
     if (!state.asset?.content || !hasAssetAnyLocking(state.asset.content)) {

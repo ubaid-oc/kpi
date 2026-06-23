@@ -1,10 +1,17 @@
 # coding: utf-8
 import os
 
-from django.contrib.auth.management import DEFAULT_DB_ALIAS
-from mongomock import MongoClient as MockMongoClient
+# Dummy Keycloak values so base.py's env.str() calls don't crash during tests.
+# CI doesn't set these; setdefault() lets real env vars override if present.
+os.environ.setdefault('KEYCLOAK_AUTH_URI', 'https://auth.test.example.com')
+os.environ.setdefault('KEYCLOAK_DEFAULT_REALM', 'test-realm')
+os.environ.setdefault('KEYCLOAK_CLIENT_SECRET', 'test-client-secret')
+os.environ.setdefault('KEYCLOAK_ADMIN_CLIENT_SECRET', 'test-admin-client-secret')
 
-from .base import *
+from django.contrib.auth.management import DEFAULT_DB_ALIAS  # noqa: E402
+from mongomock import MongoClient as MockMongoClient  # noqa: E402
+
+from .base import *  # noqa: E402, F403
 
 # For tests, don't use KoboCAT's DB
 DATABASES = {
@@ -41,6 +48,10 @@ ENKETO_INTERNAL_URL = 'http://enketo.mock'
 # Do not use cache with Constance in tests to avoid overwriting production
 # cached values
 CONSTANCE_DATABASE_CACHE_BACKEND = None
+
+# Enable i18n in tests so that translation.override() works correctly;
+# base.py sets USE_I18N=False for production performance reasons.
+USE_I18N = True
 
 if 'djstripe' not in INSTALLED_APPS:  # noqa F405
     INSTALLED_APPS += ('djstripe', 'kobo.apps.stripe')  # noqa F405

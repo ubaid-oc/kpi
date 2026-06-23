@@ -110,7 +110,6 @@ CORS_ORIGIN_REGEX_WHITELIST = [
     rf'^(https?://)?([A-Za-z0-9-]+\.){{1,4}}{re.escape(domain.lstrip("."))}$'
     for domain in CORS_ALLOWED_DOMAINS
 ]
-
 CORS_ALLOW_CREDENTIALS = True
 # Limit sessions to 1 week (the default is 2 weeks)
 SESSION_COOKIE_AGE = env.int('DJANGO_SESSION_COOKIE_AGE', 604800)
@@ -201,9 +200,7 @@ INSTALLED_APPS = (
     'kobo.apps.user_reports.apps.UserReportsConfig',
     'drf_spectacular',
     # OpenClinica apps
-    'oc',
-    'bossoidc2',
-    'mozilla_django_oidc',
+    'kobo.apps.oc_tenant_auth',
 )
 
 MIDDLEWARE = [
@@ -224,6 +221,7 @@ MIDDLEWARE = [
     # 'oc.middleware.csrf.OCCsrfViewMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'kobo.apps.oc_tenant_auth.middleware.SDUserSwitchMiddleware',
     'kobo.apps.openrosa.libs.utils.middleware.RestrictedAccessMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'kobo.apps.openrosa.libs.utils.middleware.HTTPResponseNotAllowedMiddleware',
@@ -884,7 +882,6 @@ TEST_RUNNER = __name__ + '.DoNotUseRunner'
 AUTHENTICATION_BACKENDS = (
     'kpi.backends.ModelBackend',
     'kpi.backends.ObjectPermissionBackend',
-    'oc.backend.OpenIdConnectBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
@@ -1033,10 +1030,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # SessionAuthentication and BasicAuthentication would be included by
         # default
-        # OpenClinica: OIDC (Keycloak) authentication classes added for SSO.
-        'mozilla_django_oidc.contrib.drf.OIDCAuthentication',
         'kpi.authentication.SessionAuthentication',
-        'oidc_auth.authentication.BearerTokenAuthentication',
         'kpi.authentication.BasicAuthentication',
         'kpi.authentication.TokenAuthentication',
         'kpi.authentication.OAuth2Authentication',
@@ -1714,7 +1708,9 @@ ACCOUNT_UNIQUE_EMAIL = False
 ACCOUNT_RATE_LIMITS = False
 ACCOUNT_SESSION_REMEMBER = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = env.str('SOCIALACCOUNT_EMAIL_VERIFICATION', 'none')
-SOCIALACCOUNT_AUTO_SIGNUP = False
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_STORE_TOKENS = True
 SOCIALACCOUNT_FORMS = {
     'signup': 'kobo.apps.accounts.forms.SocialSignupForm',
 }
@@ -2031,6 +2027,9 @@ mongo_client = MongoClient(
     serverSelectionTimeoutMS=MONGO_TIMEOUT_MS
 )
 MONGO_DB = mongo_client[mongo_db_name]
+# OpenClinica: True only when MONGO_DB_URL env var is explicitly set.
+# Used to gate health-check and any other optional Mongo calls.
+MONGO_CONFIGURED = bool(os.getenv('MONGO_DB_URL'))
 
 # Maximum query duration (in milliseconds) for PostgreSQL (statement_timeout)
 # and MongoDB (maxTimeMS). Applied per environment:
@@ -2319,28 +2318,33 @@ SECURE_REFERRER_POLICY = env(
 X_OPENROSA_ACCEPT_CONTENT_LENGTH_DEFAULT = os.environ.get('X_OPENROSA_ACCEPT_CONTENT_LENGTH_DEFAULT', '100000000')
 OC_BUILD_URL = os.environ.get('OC_BUILD_URL', '')
 
-OIDC_RP_CLIENT_ID = os.environ.get('KEYCLOAK_CLIENT_ID', 'formdesigner')
-OIDC_RP_SCOPES = 'openid profile email'
-OIDC_RP_SIGN_ALGO = "RS256"
-OIDC_CALLBACK_CLASS = "oc.views.OCAuthenticationCallbackView"
-OIDC_AUTHENTICATE_CLASS = "oc.views.OCAuthenticationRequestView"
 ALLOW_LOGOUT_GET_METHOD = True
 
-PUBLIC_URI_FOR_KEYCLOAK = os.environ.get('PUBLIC_URI', 'http://cust2.kobo.local')
-KEYCLOAK_AUTH_URI = os.environ.get('KEYCLOAK_AUTH_URI', 'https://auth.openclinica-dev.io')
-KEYCLOAK_DEFAULT_REALM = os.environ.get('KEYCLOAK_DEFAULT_REALM', 'cust2-aws-dev')
-KEYCLOAK_MASTER_REALM = os.environ.get('KEYCLOAK_MASTER_REALM', 'master')
+KEYCLOAK_AUTH_URI = env.str('KEYCLOAK_AUTH_URI', default='')
+KEYCLOAK_DEFAULT_REALM = env.str('KEYCLOAK_DEFAULT_REALM', default='')
 KEYCLOAK_CLIENT_ID = os.environ.get('KEYCLOAK_CLIENT_ID', 'formdesigner')
-KEYCLOAK_CLIENT_SECRET = os.environ.get('KEYCLOAK_CLIENT_SECRET', 'client-secret')
-KEYCLOAK_ADMIN_CLIENT_ID = os.environ.get('KEYCLOAK_ADMIN_CLIENT_ID', 'admin-cli')
-KEYCLOAK_ADMIN_CLIENT_SECRET = os.environ.get('KEYCLOAK_ADMIN_CLIENT_SECRET', 'admin-client-secret')
+KEYCLOAK_CLIENT_SECRET = env.str('KEYCLOAK_CLIENT_SECRET', default='')
+# KEYCLOAK_MASTER_REALM ('master') and KEYCLOAK_ADMIN_CLIENT_ID ('admin-cli') are
+# Keycloak architectural constants hardcoded directly in backend.py.
+KEYCLOAK_ADMIN_CLIENT_SECRET = env.str('KEYCLOAK_ADMIN_CLIENT_SECRET', default='')
 
-if KEYCLOAK_AUTH_URI != '' and KEYCLOAK_CLIENT_ID != '' and KEYCLOAK_CLIENT_SECRET != '' and PUBLIC_URI_FOR_KEYCLOAK != '':
-    from oc.settings import configure_oidc
-
-    configure_oidc(
-        auth_uri='{}/auth/realms/{}'.format(KEYCLOAK_AUTH_URI, KEYCLOAK_DEFAULT_REALM),
-        client_id=KEYCLOAK_CLIENT_ID,
-        public_uri=PUBLIC_URI_FOR_KEYCLOAK,
-        client_secret=KEYCLOAK_CLIENT_SECRET
-    )
+SOCIALACCOUNT_ADAPTER = (
+    'kobo.apps.oc_tenant_auth.adapter.TenantAwareSocialAccountAdapter'
+)
+SOCIALACCOUNT_PROVIDERS = {
+    'openid_connect': {
+        'APPS': [
+            {
+                'provider_id': 'keycloak',
+                'name': 'Keycloak',
+                'client_id': KEYCLOAK_CLIENT_ID,
+                'secret': KEYCLOAK_CLIENT_SECRET,
+                'settings': {
+                    'server_url': (
+                        f'{KEYCLOAK_AUTH_URI}/auth/realms/{KEYCLOAK_DEFAULT_REALM}'
+                    ),
+                },
+            }
+        ],
+    }
+}

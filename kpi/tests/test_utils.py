@@ -10,7 +10,6 @@ from django.test import RequestFactory, TestCase, override_settings
 from kpi.constants import API_NAMESPACES
 from kpi.exceptions import (
     QueryParserNotSupportedFieldLookup,
-    SearchQueryTooShortException,
 )
 from kpi.tests.utils.dicts import convert_hierarchical_keys_to_nested_dict
 from kpi.utils.autoname import (
@@ -413,17 +412,15 @@ class UtilsTestCase(TestCase):
 
     def test_query_parser_short_and_long_terms(self):
         """
-        As long as at least *one* term is long enough, or one term explicitly
-        specifies a field, a search should succeed. See
-        https://github.com/kobotoolbox/kpi/issues/3483
+        OC removed the minimum search character restriction (OC-26908), so
+        all queries succeed regardless of term length.
         """
-        # should succeed due to long-enough terms
+        # All of these should succeed with OC's relaxed search policy
         parse('my great project', ['some_field'])
-        # should suceeed due to explicit field specification
+        # explicit field specification also succeeds
         parse('some_field:hi', ['some_field'])
-        with self.assertRaises(SearchQueryTooShortException) as e:
-            # should fail, all terms are short
-            parse('me oh my', ['some_field'])
+        # short terms also succeed (minimum length restriction removed)
+        parse('me oh my', ['some_field'])
 
     def test_allow_choice_duplicates(self):
         surv = {

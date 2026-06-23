@@ -22,7 +22,7 @@
   height: calc(100% - #{mdl.$layout-desktop-header-height});
   top: mdl.$layout-desktop-header-height;
   // OpenClinica: fixed drawer width (was variables.$s-drawer-width)
-  width: 212px;
+  width: 242px;
   display: flex;
   flex-direction: row;
   border-right: 2px solid colors.$kobo-gray-300;
@@ -104,11 +104,11 @@
   .page-wrapper--fixed-drawer .k-drawer {
     // OpenClinica: keep drawer pinned and widen on desktop (was left: unset)
     left: 0;
-    width: 282px;
+    width: 242px;
   }
 
   // only add the margin for drawer if drawer exists (e.g. no drawer when logged out)
   .k-drawer + .mdl-layout__content {
-    margin-left: 212px; // for drawer (OpenClinica: was variables.$s-drawer-width)
+    margin-left: 242px; // for drawer (OpenClinica: was variables.$s-drawer-width)
   }
 }

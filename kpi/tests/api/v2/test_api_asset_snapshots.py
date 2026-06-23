@@ -241,8 +241,10 @@ class TestAssetSnapshotList(AssetSnapshotBase):
         with self.assertRaises(ParseError) as context:
             self.client.get(xml_url)
 
-        # Check that the error message contains the expected substring
-        self.assertIn('_fail', str(context.exception))
+        # Check that the error message references the problematic field.
+        # pyxform 3.x names it '_fail'; 1.x quotes it as '${fail}' — both
+        # contain 'fail', which is the common denominator.
+        self.assertIn('fail', str(context.exception))
 
     def test_anonymous_can_create_snapshot_when_asset_shared_public(self):
         self.client.login(username='someuser', password='someuser')

@@ -5,7 +5,6 @@ $configs = require './model.configs'
 $viewUtils = require './view.utils'
 $icons = require './view.icons'
 $hxl = require './view.rowDetail.hxlDict'
-ResizeSensor = require 'css-element-queries/src/ResizeSensor'
 
 $viewRowDetailSkipLogic = require './view.rowDetail.SkipLogic'
 $viewTemplates = require './view.templates'
@@ -389,31 +388,13 @@ module.exports = do ->
 
       $textarea.css("min-height", 20)
 
-      resizableOpts = {
-        containment: "parent",
-        handles: "s",
-        minHeight: 27
-      }
       if @model.get("value")?
-        setTimeout =>
-          maxLine = 3
-          textareaScrollHeight = $textarea.prop('scrollHeight')
-          textAreaLineHeight = parseInt($textarea.css('line-height'))
-          textAreaSetHeight = Math.min(textareaScrollHeight, (textAreaLineHeight * maxLine)) + 7
-          $textarea.css("height", "")
-          $textarea.css("height", textAreaSetHeight)
-          $textarea.resizable(resizableOpts)
-        , 1
-      else
-        $textarea.resizable(resizableOpts)
-
-      targetNode = $textarea.closest('.card__text')[0]
-      new ResizeSensor(targetNode, =>
-        card_text_width = targetNode.clientWidth
-        $textarea.width(card_text_width)
-        $textarea.siblings('.ui-resizable-s').width(card_text_width)
-        $textarea.closest('.ui-wrapper').width(card_text_width)
-      )
+        maxLine = 3
+        textareaScrollHeight = $textarea.prop('scrollHeight')
+        textAreaLineHeight = parseInt($textarea.css('line-height'))
+        textAreaSetHeight = Math.min(textareaScrollHeight, (textAreaLineHeight * maxLine)) + 7
+        $textarea.css("height", "")
+        $textarea.css("height", textAreaSetHeight)
 
       return
 

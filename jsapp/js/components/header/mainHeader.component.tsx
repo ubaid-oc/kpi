@@ -9,10 +9,10 @@ import Icon from '#/components/common/icon'
 import HeaderTitleEditor from '#/components/header/headerTitleEditor'
 import OrganizationBadge from '#/components/header/organizationBadge.component'
 import SearchBox from '#/components/header/searchBox'
-import myLibraryStore from '#/components/library/myLibraryStore'
 import { userCan } from '#/components/permissions/utils'
 import type { AssetResponse } from '#/dataInterface'
 import type { IconName } from '#/k-icons'
+import subdomainLibraryStore from '#/oc/subdomainLibraryStore'
 import pageState from '#/pageState.store'
 import { RequireOrg } from '#/router/RequireOrg'
 import { router, withRouter } from '#/router/legacy'
@@ -25,10 +25,6 @@ import {
   isPublicCollectionsRoute,
 } from '#/router/routerUtils'
 import sessionStore from '#/stores/session'
-// OpenClinica fork customization: AccountMenu is intentionally NOT rendered
-// (host shell owns account/logout/language). Import kept for easy re-enable.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import AccountMenu from './accountMenu'
 import GitRev from './gitRev.component'
 import styles from './mainHeader.module.scss'
 import MainHeaderBase from './mainHeaderBase.component'
@@ -56,7 +52,7 @@ const MainHeader = class MainHeader extends React.Component<MainHeaderProps> {
     // whenever any linked store changes.
     this.unlisteners.push(
       assetStore.listen(() => this.forceUpdate(), this),
-      myLibraryStore.listen(() => this.forceUpdate(), this),
+      subdomainLibraryStore.listen(() => this.forceUpdate(), this),
     )
   }
 
@@ -69,7 +65,7 @@ const MainHeader = class MainHeader extends React.Component<MainHeaderProps> {
   isSearchBoxDisabled() {
     if (isMyLibraryRoute()) {
       // disable search when user has zero assets
-      return myLibraryStore.getCurrentUserTotalAssets() === null
+      return subdomainLibraryStore.getCurrentUserTotalAssets() === null
     } else {
       return false
     }

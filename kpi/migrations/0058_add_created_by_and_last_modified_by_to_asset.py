@@ -37,6 +37,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('kpi', '0057_add_index_on_kpi_asset__deployment_data__formid'),
+        ('project_ownership', '0007_alter_models_options'),
     ]
 
     operations = [

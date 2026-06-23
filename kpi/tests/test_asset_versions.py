@@ -34,6 +34,10 @@ class AssetVersionTestCase(TestCase):
         for row in _vc['survey']:
             for att in pop_atts:
                 row.pop(att, None)
+            # pyxform 1.x injects readonly='false' as default for questions
+            # without an explicit readonly value; strip it for comparison.
+            if row.get('readonly') == 'false':
+                row.pop('readonly')
         self.assertEqual(_vc, {
                 'survey': [
                     {'type': 'note',

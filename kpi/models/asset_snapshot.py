@@ -388,7 +388,11 @@ class AssetSnapshot(
 
         # Step 3: update details based on whether generation succeeded or failed
         if generation_error:
-            err_message = str(generation_error)
+            # When the pyxform fallback also fails, FormPack's error is more
+            # user-friendly (e.g. it names the offending field). Prefer it.
+            err_message = (
+                str(formpack_error) if formpack_error else str(generation_error)
+            )
             logging.error('Failed to generate xform for asset', extra={
                 'src': source,
                 'id_string': id_string,

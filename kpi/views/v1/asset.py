@@ -1,16 +1,19 @@
 # coding: utf-8
 from django.shortcuts import get_object_or_404
-from rest_framework import exceptions, status
+from rest_framework import exceptions, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from kpi.constants import CLONE_ARG_NAME, PERM_MANAGE_ASSET, PERM_VIEW_ASSET
 from kpi.models import Asset
+from kobo.apps.oc_tenant_auth.permissions import AssetObjectPermission
 from kpi.serializers.v1.asset import AssetListSerializer, AssetSerializer
 from kpi.views.v2.asset import AssetViewSet as AssetViewSetV2
 
 
 class AssetViewSet(AssetViewSetV2):
+    # v1 does not expose public assets to anonymous users
+    permission_classes = (permissions.IsAuthenticated, AssetObjectPermission,)
     """
     ## This document is for a deprecated version of kpi's API.
 

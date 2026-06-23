@@ -1,16 +1,15 @@
 import React, { lazy, Suspense } from 'react'
-import { NavLink } from 'react-router-dom'
 import bem from '#/bem'
 import Button from '#/components/common/ButtonNew'
+import Icon from '#/components/common/icon'
 import LibrarySidebar from '#/components/library/librarySidebar'
 import pageState from '#/pageState.store'
 import RequireAuth from '#/router/requireAuth'
-import { PROJECTS_ROUTES, ROUTES } from '#/router/routerConstants'
+import { ROUTES } from '#/router/routerConstants'
 import { MODAL_TYPES } from '../constants'
 import { routerIsActive } from '../router/legacy'
 import SidebarFormsList from '../sidebar/SidebarFormsList'
 import sessionStore from '../stores/session'
-import Icon from './common/icon'
 
 const AccountSidebar = lazy(() => import('#/account/accountSidebar'))
 
@@ -43,16 +42,6 @@ export default function Drawer() {
 
   return (
     <bem.KDrawer>
-      <bem.KDrawer__primaryIcons>
-        <NavLink to={PROJECTS_ROUTES.MY_PROJECTS} className='k-drawer__link' data-tip={t('Projects')}>
-          <Icon name='projects' size='inherit' />
-        </NavLink>
-
-        <NavLink to={ROUTES.LIBRARY} className='k-drawer__link' data-tip={t('Library')}>
-          <Icon name='library' size='inherit' />
-        </NavLink>
-      </bem.KDrawer__primaryIcons>
-
       <bem.KDrawer__sidebar>
         {isLibrary && (
           <bem.FormSidebarWrapper>
@@ -72,7 +61,13 @@ export default function Drawer() {
           <bem.FormSidebarWrapper>
             {/* For CSS flex's sake */}
             <div>
-              <Button size='lg' fullWidth disabled={!sessionStore.isLoggedIn} onClick={openNewFormModal}>
+              <Button
+                size='lg'
+                fullWidth
+                variant='filled'
+                disabled={!sessionStore.isLoggedIn}
+                onClick={openNewFormModal}
+              >
                 {t('new').toUpperCase()}
               </Button>
             </div>

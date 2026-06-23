@@ -136,7 +136,7 @@ class AssetContentAnalyzer:
             ):
                 lock_any = True
         
-        if "version" in self.settings:
+        if isinstance(self.settings, dict) and 'version' in self.settings:
             self.settings_version = self.settings['version']
 
         summary = {

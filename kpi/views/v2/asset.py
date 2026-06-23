@@ -17,9 +17,8 @@ from rest_framework import exceptions, renderers, status
 from rest_framework.decorators import action
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from rest_framework_extensions.mixins import NestedViewSetMixin
-from bossoidc2.models import Keycloak as KeycloakModel
+from kobo.apps.oc_tenant_auth.models import KeycloakTenantUser as KeycloakModel
 
 from kobo.apps.audit_log.base_views import AuditLoggedModelViewSet
 from kobo.apps.audit_log.models import AuditType
@@ -34,10 +33,13 @@ from kpi.constants import (
     CLONE_FROM_VERSION_ID_ARG_NAME,
 )
 from kpi.exceptions import BadAssetTypeException
+from kobo.apps.oc_tenant_auth.filters import (
+    SubdomainAwareObjectPermissionsFilter,
+    SubdomainFilter,
+)
 from kpi.filters import (
     AssetOrderingFilter,
     ExcludeOrgAssetFilter,
-    KpiObjectPermissionsFilter,
     SearchFilter,
 )
 from kpi.highlighters import highlight_xform
@@ -46,6 +48,7 @@ from kpi.mixins.object_permission import ObjectPermissionViewSetMixin
 from kpi.models import Asset, AssetUserPartialPermission, UserAssetSubscription
 from kpi.models.object_permission import ObjectPermission
 from kpi.paginators import AssetPagination
+from kobo.apps.oc_tenant_auth.permissions import AssetObjectPermission
 from kpi.permissions import (
     AssetPermission,
     PostMappedToChangePermission,
@@ -98,7 +101,7 @@ from kpi.utils.bugfix import repair_file_column_content_and_save
 from kpi.utils.hash import calculate_hash
 from kpi.utils.kobo_to_xlsform import to_xlsform_structure
 from kpi.utils.object_permission import get_database_user, get_objects_for_user
-from kpi.utils.permissions import is_owner_in_subdomain
+from kobo.apps.oc_tenant_auth.utils import is_owner_in_subdomain
 from kpi.utils.schema_extensions.examples import generate_example_from_schema
 from kpi.utils.schema_extensions.markdown import read_md
 from kpi.utils.schema_extensions.response import (
@@ -378,18 +381,19 @@ class AssetViewSet(
     - docs/api/v2/assets/metadata.md
     """
 
-    # Filtering handled by KpiObjectPermissionsFilter.filter_queryset()
+    # Filtering handled by SubdomainAwareObjectPermissionsFilter.filter_queryset()
     queryset = Asset.objects.all()
     lookup_field = 'uid'
     lookup_url_kwarg = 'uid_asset'
     pagination_class = AssetPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AssetObjectPermission,)
     ordering_fields = AssetOrderingFilter.DEFAULT_ORDERING_FIELDS + [
         'subscribers_count',
     ]
     filter_backends = [
         ExcludeOrgAssetFilter,
-        KpiObjectPermissionsFilter,
+        SubdomainFilter,
+        SubdomainAwareObjectPermissionsFilter,
         SearchFilter,
         AssetOrderingFilter,
     ]

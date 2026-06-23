@@ -36,7 +36,7 @@ import {
   checkCrossStorageUser,
   setPeriodicCrossStorageCheck,
   updateCrossStorageTimeOut,
-} from '#/ocutils'
+} from '#/oc/utils'
 import AllRoutes from '#/router/allRoutes'
 import sessionStore from '#/stores/session'
 import { csrfSafeMethod, currentLang } from '#/utils'

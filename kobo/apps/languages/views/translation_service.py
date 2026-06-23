@@ -51,3 +51,4 @@ class TranslationServiceViewSet(BaseViewSet):
 
     serializer_class = TranslationServiceSerializer
     queryset = TranslationService.objects.all()
+    min_search_chars = 3

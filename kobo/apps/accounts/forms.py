@@ -12,6 +12,7 @@ from allauth.socialaccount.forms import SignupForm as BaseSocialSignupForm
 from django import forms
 from django.contrib.auth import get_user_model
 from django.utils.safestring import mark_safe
+from django.utils.translation import get_language
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as t
 
@@ -157,7 +158,11 @@ class KoboSignupMixin(forms.Form):
 
         # It's easier to _remove_ unwanted fields here in the constructor
         # than to add a new fields *shrug*
-        desired_metadata_fields = I18nUtils.get_metadata_fields('user')
+        # Pass the current language explicitly so @cache_for_request uses
+        # a language-specific cache key rather than caching across locales.
+        desired_metadata_fields = I18nUtils.get_metadata_fields(
+            'user', lang=get_language()
+        )
         desired_metadata_fields = {
             field['name']: field for field in desired_metadata_fields
         }

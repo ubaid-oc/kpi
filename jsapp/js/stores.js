@@ -155,6 +155,7 @@ stores.allAssets = Reflux.createStore({
         this.data[index] = asset
       }
     })
+    this.trigger(this.data)
   },
   onLoadAssetCompleted(asset) {
     this.registerAsset(asset)
