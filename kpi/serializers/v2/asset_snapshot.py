@@ -71,9 +71,7 @@ class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
             if not is_owner_in_subdomain(user, asset_owner.id):
                 raise exceptions.PermissionDenied
         except KeycloakModel.DoesNotExist:
-            # No subdomain record (e.g. in test environments without
-            # Keycloak). Subdomain restriction is not possible; allow.
-            pass
+            raise exceptions.PermissionDenied
 
     def create(self, validated_data):
         """
@@ -92,10 +90,8 @@ class AssetSnapshotSerializer(serializers.HyperlinkedModelSerializer):
         validated_data['owner'] = get_database_user(self.context['request'].user)
 
         if source:
-            self.check_subdomain_permission(validated_data)
             snapshot = AssetSnapshot.objects.create(**validated_data)
         else:
-            self.check_subdomain_permission(asset)
             # asset.snapshot pulls, by default, a snapshot for the latest
             # version.
             snapshot = asset.snapshot()

@@ -36,6 +36,6 @@ class SDUserSwitchMiddleware:
                 logout(request)
                 from django.shortcuts import redirect
 
-                next_qs = urlencode({'next': request.path})
+                next_qs = urlencode({'next': request.get_full_path()})
                 return redirect(f'/accounts/oidc/keycloak/login/?{next_qs}')
         return self.get_response(request)

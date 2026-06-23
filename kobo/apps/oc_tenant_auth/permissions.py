@@ -2,7 +2,7 @@
 from rest_framework import permissions
 
 from kpi.permissions import AssetPermission, AssetSnapshotPermission
-from kobo.apps.oc_tenant_auth.utils import get_subdomain_user_ids
+from kobo.apps.oc_tenant_auth.utils import is_owner_in_subdomain
 
 
 class AssetObjectPermission(AssetPermission):
@@ -48,7 +48,7 @@ class AssetObjectPermission(AssetPermission):
     @staticmethod
     def _same_subdomain(user, asset):
         try:
-            return asset.owner_id in get_subdomain_user_ids(user)
+            return is_owner_in_subdomain(user, asset.owner_id)
         except Exception:
             return False
 

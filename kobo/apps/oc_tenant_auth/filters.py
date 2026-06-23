@@ -1,6 +1,7 @@
 # coding: utf-8
 import logging
 
+from django.db.models import Q
 from rest_framework import filters
 
 from kobo.apps.oc_tenant_auth.models import KeycloakTenantUser as KeycloakModel
@@ -50,27 +51,26 @@ class SubdomainAwareObjectPermissionsFilter(KpiObjectPermissionsFilter):
 
     _LIBRARY_ASSET_TYPES = ('question', 'block', 'template', 'collection')
 
-    def _get_subdomain_library_pks(self, user):
-        try:
-            subdomain_user_ids = get_subdomain_user_ids(user)
-            return set(
-                Asset.objects.filter(
-                    owner__in=subdomain_user_ids,
-                    asset_type__in=self._LIBRARY_ASSET_TYPES,
-                ).values_list('pk', flat=True)
-            )
-        except Exception:
-            return set()
-
     def filter_queryset(self, request, queryset, view):
         standard = super().filter_queryset(request, queryset, view)
         user = request.user
         if user.is_anonymous:
             return standard
-        subdomain_pks = self._get_subdomain_library_pks(user)
-        if not subdomain_pks:
+        try:
+            subdomain_user_ids = get_subdomain_user_ids(user)
+            subdomain_library_qs = Asset.objects.filter(
+                owner__in=subdomain_user_ids,
+                asset_type__in=self._LIBRARY_ASSET_TYPES,
+            ).values('pk')
+        except KeycloakModel.DoesNotExist:
             return standard
-        # Union of standard-permitted items + subdomain library items,
-        # still constrained to what SubdomainFilter already passed us (queryset).
-        all_pks = set(standard.values_list('pk', flat=True)) | subdomain_pks
-        return queryset.filter(pk__in=all_pks)
+        except Exception:
+            logger.exception(
+                'Unexpected error while building subdomain library filter for user %s',
+                user,
+            )
+            raise
+        # Union via DB-level subqueries — avoids materialising pk sets into Python.
+        return queryset.filter(
+            Q(pk__in=standard.values('pk')) | Q(pk__in=subdomain_library_qs)
+        )

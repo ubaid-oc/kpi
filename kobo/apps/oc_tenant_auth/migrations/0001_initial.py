@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
                                     DEFERRABLE INITIALLY DEFERRED
                         );
                     """,
-                    reverse_sql='DROP TABLE IF EXISTS "bossoidc_keycloak";',
+                    reverse_sql=migrations.RunSQL.noop,
                 ),
             ],
         ),
