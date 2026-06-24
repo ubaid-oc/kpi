@@ -21,6 +21,8 @@ export function isEConsentEnabledStatus(status: EConsentModuleStatus | null | un
  * Returns true only for event types that are eligible to host an eConsent form.
  * Only non-repeating Visit events qualify; all Common events and Repeating Visit
  * events are ineligible.
+ * Also returns true when eventType is null or undefined (no event context set,
+ * e.g. Library editing), so the item type remains available outside event forms.
  */
 export function isEConsentAllowedEventType(eventType: FormEventType | null | undefined): boolean {
   if (eventType === null || eventType === undefined) {
@@ -45,7 +47,8 @@ export function getStudyEConsentModuleStatus(): string | null {
 
 /**
  * Read the event type for the current form context from the URL query parameter
- * `event_type`. Returns null when the parameter is absent (e.g. Library editing).
+ * `event_type`. Returns null when the parameter is absent (e.g. Library editing),
+ * or an empty string when the parameter is present but has no value.
  */
 export function getFormEventType(): FormEventType | null {
   return getHashQueryParam('event_type')

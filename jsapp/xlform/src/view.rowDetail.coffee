@@ -824,7 +824,7 @@ module.exports = do ->
           appearances = @getTypes()
           if appearances?
             appearances.push 'other'
-            appearances.unshift { value: 'select', text: t('select') }
+            appearances.unshift { value: 'select', text: t('Select') }
             @is_input_select = true
             return viewRowDetail.Templates.dropdown @cid, @model.key, appearances, t("Appearance")
           else
