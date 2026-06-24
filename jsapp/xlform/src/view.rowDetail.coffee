@@ -992,6 +992,7 @@ module.exports = do ->
 
     get_width_from_model_value: ->
       modelValue = @model.get 'value'
+      return null unless modelValue?
       model_width = null
       for width_option in @width_options
         model_width = width_option if ((modelValue.indexOf width_option) > -1)
@@ -1170,7 +1171,10 @@ module.exports = do ->
           $container_checkbox_samescreen = $('<div/>')
           $container_checkbox_samescreen.append(@$checkbox_samescreen)
           $container_checkbox_samescreen.append(@$label_checkbox_samescreen)
-          @$('.settings__input').append($container_checkbox_samescreen)
+          $target = @$('.xlf-dv-width-row .settings__input')
+          if $target.length is 0
+            $target = @$('.settings__input').first()
+          $target.append($container_checkbox_samescreen)
           @is_checkbox_samescreen = true
 
         if modelValue? and modelValue != ''

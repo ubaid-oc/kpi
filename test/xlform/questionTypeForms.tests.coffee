@@ -54,7 +54,7 @@ do ->
         types = ctx.getTypes()
         expect(types).toBeUndefined()
 
-      it 'select_one getTypes() returns undefined — text does not use card grid', ->
+      it 'text does not use card grid (isCardGridType is false)', ->
         ctx = buildAppearanceMixinCtx('text')
         expect(ctx.isCardGridType()).toBe(false)
 
