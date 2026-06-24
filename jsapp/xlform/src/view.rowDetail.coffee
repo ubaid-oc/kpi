@@ -5,7 +5,6 @@ $configs = require './model.configs'
 $viewUtils = require './view.utils'
 $icons = require './view.icons'
 $hxl = require './view.rowDetail.hxlDict'
-ResizeSensor = require 'css-element-queries/src/ResizeSensor'
 
 $viewRowDetailSkipLogic = require './view.rowDetail.SkipLogic'
 $viewTemplates = require './view.templates'
@@ -224,18 +223,18 @@ module.exports = do ->
       #   placeholder_text = t(placeholder_text)
       escaped = @_escapeAttr(placeholder_text)
       if max_length is ''
-        @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{escaped}" />""", cid, key_label
+        @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" dir="auto" placeholder="#{escaped}" />""", cid, key_label
       else
-        @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{escaped}" maxlength="#{max_length}" />""", cid, key_label
+        @field """<input type="text" name="#{key}" id="#{cid}" class="#{input_class}" dir="auto" placeholder="#{escaped}" maxlength="#{max_length}" />""", cid, key_label
 
     textarea: (cid, key, key_label = key, input_class = '', placeholder_text='', max_length = '') ->
       # if placeholder_text is not ''
       #   placeholder_text = t(placeholder_text)
       escaped = @_escapeAttr(placeholder_text)
       if max_length is ''
-        @field """<textarea name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{escaped}" />""", cid, key_label
+        @field """<textarea name="#{key}" id="#{cid}" class="#{input_class}" dir="auto" placeholder="#{escaped}" />""", cid, key_label
       else
-        @field """<textarea name="#{key}" id="#{cid}" class="#{input_class}" placeholder="#{escaped}" maxlength="#{max_length}" />""", cid, key_label
+        @field """<textarea name="#{key}" id="#{cid}" class="#{input_class}" dir="auto" placeholder="#{escaped}" maxlength="#{max_length}" />""", cid, key_label
 
     checkbox: (cid, key, key_label = key, input_label = t("Yes")) ->
       input_label = input_label
@@ -253,7 +252,11 @@ module.exports = do ->
       select = """<select name="#{key}" id="#{cid}">"""
 
       for value in values
-        if typeof value == 'object'
+        if Array.isArray(value)
+          # HACK FIX: we're expecting an array of this structure [['option', 'Description'], ...] in order
+          # to display the option next to some helpful text in a dropdown
+          select += """<option value="#{value[0]}">#{value[0]} (#{value[1]})</option>"""
+        else if typeof value == 'object'
           select += """<option value="#{value.value}">#{value.text}</option>"""
         else
           select += """<option value="#{value}">#{value}</option>"""
@@ -331,6 +334,39 @@ module.exports = do ->
       return
 
 
+  viewRowDetail.DetailViewMixins.file =
+    html: ->
+      @fieldTab = "active"
+      @$el.addClass("card__settings__fields--file")
+      available_files = this.model.getSurvey().availableFiles || []
+      file = available_files[0]
+      if available_files.length is 0
+        return viewRowDetail.Templates.textbox @cid, @model.key, label, 'text'
+      else
+        options = []
+        for file in available_files
+          options.push "<option>#{file.metadata.filename}</option>"
+        uniq = "select-file-#{@cid}"
+        tfile = t("Choices File")
+        return """
+            <label for="#{uniq}">#{tfile}:</label>
+            <div class="settings__input">
+              <select id="#{uniq}">
+                #{options.join('')}
+              </select>
+            </div>
+        """
+
+    afterRender: ->
+      @$el.find('select').eq(0).val(@model.get("value"))
+      @listenForSelectChange(@$('select').eq(0))
+
+    listenForSelectChange: ($select) ->
+      $select.on 'change', (evt) =>
+        targetval = evt.target.value
+        @model.set('value', targetval)
+
+
   viewRowDetail.DetailViewMixins.label =
     html: -> false
     insertInDOM: (rowView)->
@@ -353,31 +389,13 @@ module.exports = do ->
 
       $textarea.css("min-height", 20)
 
-      resizableOpts = {
-        containment: "parent",
-        handles: "s",
-        minHeight: 27
-      }
       if @model.get("value")?
-        setTimeout =>
-          maxLine = 3
-          textareaScrollHeight = $textarea.prop('scrollHeight')
-          textAreaLineHeight = parseInt($textarea.css('line-height'))
-          textAreaSetHeight = Math.min(textareaScrollHeight, (textAreaLineHeight * maxLine)) + 7
-          $textarea.css("height", "")
-          $textarea.css("height", textAreaSetHeight)
-          $textarea.resizable(resizableOpts)
-        , 1
-      else
-        $textarea.resizable(resizableOpts)
-
-      targetNode = $textarea.closest('.card__text')[0]
-      new ResizeSensor(targetNode, =>
-        card_text_width = targetNode.clientWidth
-        $textarea.width(card_text_width)
-        $textarea.siblings('.ui-resizable-s').width(card_text_width)
-        $textarea.closest('.ui-wrapper').width(card_text_width)
-      )
+        maxLine = 3
+        textareaScrollHeight = $textarea.prop('scrollHeight')
+        textAreaLineHeight = parseInt($textarea.css('line-height'))
+        textAreaSetHeight = Math.min(textareaScrollHeight, (textAreaLineHeight * maxLine)) + 7
+        $textarea.css("height", "")
+        $textarea.css("height", textAreaSetHeight)
 
       return
 
