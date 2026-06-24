@@ -175,6 +175,7 @@ do ->
       for key in ['bind::oc:itemgroup', 'bind::oc:briefdescription',
                   'bind::oc:description', 'bind::oc:external']
         expect(getDetail(@row, key).getSurvey()).toBe(@survey)
+      return
 
   ###############################################################
   # model.base.RowDetail — change:value event propagation
@@ -325,6 +326,7 @@ do ->
             [survey, row] = buildSurveyWithRow(qtype)
             expect(getDetail(row, 'required').get('value')).toBe('false')
 
+
           it 'readonly defaults to ""', ->
             [survey, row] = buildSurveyWithRow(qtype)
             expect(getDetail(row, 'readonly').get('value')).toBe('')
@@ -352,3 +354,4 @@ do ->
           it 'has a trigger detail', ->
             [survey, row] = buildSurveyWithRow(qtype)
             expect(getDetail(row, 'trigger')).toBeDefined()
+    return
