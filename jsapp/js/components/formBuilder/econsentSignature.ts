@@ -59,10 +59,7 @@ export function getFormEventType(): FormEventType | null {
  * Existing signature rows continue to render regardless of this check.
  */
 export function isEConsentSignatureItemTypeAllowed(): boolean {
-  return (
-    isEConsentEnabledStatus(getStudyEConsentModuleStatus()) &&
-    isEConsentAllowedEventType(getFormEventType())
-  )
+  return isEConsentEnabledStatus(getStudyEConsentModuleStatus()) && isEConsentAllowedEventType(getFormEventType())
 }
 
 /**
