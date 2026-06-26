@@ -706,3 +706,69 @@ do ->
 
     it 'file-custom with no text → "Custom"', ->
       expect(buildPillText('file-custom', null, null)).toBe('Custom')
+
+  # appearance picker: parseAppearanceValue — text type
+  ##############################################################################
+
+  describe 'parseAppearanceValue (text)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → single-line', ->
+      expect(parseAppearanceValue('', 'text')).toEqual { card: 'single-line', columnCount: null, customText: null }
+
+    it 'null → single-line', ->
+      expect(parseAppearanceValue(null, 'text')).toEqual { card: 'single-line', columnCount: null, customText: null }
+
+    it '"default" → single-line', ->
+      expect(parseAppearanceValue('default', 'text')).toEqual { card: 'single-line', columnCount: null, customText: null }
+
+    it '"multiline" → paragraph', ->
+      expect(parseAppearanceValue('multiline', 'text')).toEqual { card: 'paragraph', columnCount: null, customText: null }
+
+    it '"other" → custom with empty text', ->
+      expect(parseAppearanceValue('other', 'text')).toEqual { card: 'custom', columnCount: null, customText: '' }
+
+    it 'unknown value → custom with raw text', ->
+      expect(parseAppearanceValue('compact', 'text')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
+
+    it 'w-prefix stripped and maps to single-line', ->
+      expect(parseAppearanceValue('w3', 'text')).toEqual { card: 'single-line', columnCount: null, customText: null }
+
+  # appearance picker: buildModelValue — text cards
+  ##############################################################################
+
+  describe 'buildModelValue (text cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'single-line → empty string', ->
+      expect(buildModelValue('single-line', null, null)).toBe('')
+
+    it 'paragraph → "multiline"', ->
+      expect(buildModelValue('paragraph', null, null)).toBe('multiline')
+
+    it 'custom (text) with text → raw text', ->
+      expect(buildModelValue('custom', null, 'compact')).toBe('compact')
+
+    it 'custom (text) with empty text → "other"', ->
+      expect(buildModelValue('custom', null, '')).toBe('other')
+
+    it 'custom (text) with null text → "other"', ->
+      expect(buildModelValue('custom', null, null)).toBe('other')
+
+  # appearance picker: buildPillText — text cards
+  ##############################################################################
+
+  describe 'buildPillText (text cards)', ->
+    {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'single-line → "Single line"', ->
+      expect(buildPillText('single-line', null, null)).toBe('Single line')
+
+    it 'paragraph → "Paragraph"', ->
+      expect(buildPillText('paragraph', null, null)).toBe('Paragraph')
+
+    it 'custom (text) with text → "Custom: compact"', ->
+      expect(buildPillText('custom', null, 'compact')).toBe('Custom: compact')
+
+    it 'custom (text) with no text → "Custom"', ->
+      expect(buildPillText('custom', null, null)).toBe('Custom')
