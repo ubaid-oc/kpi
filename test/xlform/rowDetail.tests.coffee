@@ -604,6 +604,7 @@ do ->
     it 'date-custom with null text → "other"', ->
       expect(buildModelValue('date-custom', null, null)).toBe('other')
 
+
   ###############################################################
   # appearance picker: parseAppearanceValue — note type
   ###############################################################
