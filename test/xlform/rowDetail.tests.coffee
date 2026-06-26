@@ -541,6 +541,12 @@ do ->
     it 'year → "Year only"', ->
       expect(buildPillText('year', null, null)).toBe('Year only')
 
+    it 'date-custom with text → "Custom: compact"', ->
+      expect(buildPillText('date-custom', null, 'compact')).toBe('Custom: compact')
+
+    it 'date-custom with no text → "Custom"', ->
+      expect(buildPillText('date-custom', null, null)).toBe('Custom')
+
   ###############################################################
   # appearance picker: parseAppearanceValue — date type
   ###############################################################
@@ -559,11 +565,14 @@ do ->
     it 'year → year card for date', ->
       expect(parseAppearanceValue('year', 'date')).toEqual { card: 'year', columnCount: null, customText: null }
 
-    it 'unknown value → custom for date', ->
-      expect(parseAppearanceValue('compact', 'date')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
+    it 'unknown value → date-custom for date', ->
+      expect(parseAppearanceValue('compact', 'date')).toEqual { card: 'date-custom', columnCount: null, customText: 'compact' }
 
-    it '"other" → custom with empty text for date', ->
-      expect(parseAppearanceValue('other', 'date')).toEqual { card: 'custom', columnCount: null, customText: '' }
+    it '"other" → date-custom with empty text for date', ->
+      expect(parseAppearanceValue('other', 'date')).toEqual { card: 'date-custom', columnCount: null, customText: '' }
+
+    it '"default" → full-date for date (legacy value treated as default)', ->
+      expect(parseAppearanceValue('default', 'date')).toEqual { card: 'full-date', columnCount: null, customText: null }
 
     it 'width token stripped before date parse', ->
       expect(parseAppearanceValue('month-year w3', 'date')).toEqual { card: 'month-year', columnCount: null, customText: null }
@@ -585,3 +594,12 @@ do ->
 
     it 'year → "year"', ->
       expect(buildModelValue('year', null, null)).toBe('year')
+
+    it 'date-custom with text → raw text', ->
+      expect(buildModelValue('date-custom', null, 'compact')).toBe('compact')
+
+    it 'date-custom with empty text → "other"', ->
+      expect(buildModelValue('date-custom', null, '')).toBe('other')
+
+    it 'date-custom with null text → "other"', ->
+      expect(buildModelValue('date-custom', null, null)).toBe('other')

@@ -22,11 +22,11 @@ module.exports = do ->
         return { card: 'month-year', columnCount: null, customText: null }
       if cleaned is 'year'
         return { card: 'year', columnCount: null, customText: null }
-      if cleaned is ''
+      if cleaned is '' or cleaned is 'default'
         return { card: 'full-date', columnCount: null, customText: null }
       if cleaned is 'other'
-        return { card: 'custom', columnCount: null, customText: '' }
-      return { card: 'custom', columnCount: null, customText: cleaned }
+        return { card: 'date-custom', columnCount: null, customText: '' }
+      return { card: 'date-custom', columnCount: null, customText: cleaned }
 
     if cleaned is 'likert'
       if questionType is 'select_one'
@@ -74,6 +74,9 @@ module.exports = do ->
       when 'full-date'   then ''
       when 'month-year'  then 'month-year'
       when 'year'        then 'year'
+      when 'date-custom'
+        text = ((customText or '').trim())
+        if text then text else 'other'
       when 'dropdown'      then 'minimal'
       when 'columns-buttons'
         if columnCount? then "columns-#{columnCount}" else 'columns'
@@ -96,6 +99,8 @@ module.exports = do ->
       when 'full-date'              then t('Full date')
       when 'month-year'             then t('Month & year')
       when 'year'                   then t('Year only')
+      when 'date-custom'
+        if customText then "#{t('Custom')}: #{customText}" else t('Custom')
       when 'dropdown'               then t('Dropdown')
       when 'image-grid'             then t('Image grid')
       when 'image-grid-labels-only' then t('Image grid (labels only)')
@@ -898,6 +903,7 @@ module.exports = do ->
     'search': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><rect x="3" y="10" width="46" height="14" rx="3" stroke="#444" stroke-width="1.2"/><rect x="7" y="14" width="26" height="5" rx="1.5" fill="#444" opacity="0.15"/><circle cx="40" cy="17" r="3.5" stroke="#444" stroke-width="1.2"/><line x1="43" y1="20" x2="46" y2="23" stroke="#444" stroke-width="1.3"/></svg>'
     'hotspot-image': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><rect x="2" y="2" width="48" height="30" rx="3" stroke="#444" stroke-width="1.2"/><rect x="7" y="6" width="16" height="11" rx="2" stroke="#444" stroke-width="1.1"/><rect x="28" y="6" width="16" height="11" rx="2" stroke="#444" stroke-width="1.1"/><rect x="7" y="20" width="12" height="8" rx="2" stroke="#444" stroke-width="1.1"/><rect x="22" y="20" width="12" height="8" rx="2" stroke="#444" stroke-width="1.1"/></svg>'
     'custom': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><path d="M12 8 Q6 8 6 14 L6 20 Q6 26 12 26" stroke="#444" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M40 8 Q46 8 46 14 L46 20 Q46 26 40 26" stroke="#444" stroke-width="1.5" fill="none" stroke-linecap="round"/><text x="17" y="22" font-size="12" fill="#378ADD" font-family="Menlo, Consolas, monospace" font-weight="700">&lt;/&gt;</text></svg>'
+    'date-custom': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><rect x="8" y="9" width="56" height="10" rx="2" stroke="#888" stroke-width="1.1" stroke-dasharray="3 2"/><rect x="8" y="25" width="56" height="10" rx="2" stroke="#888" stroke-width="1.1" stroke-dasharray="3 2"/><text x="36" y="16" font-size="6" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">appearance=</text><text x="36" y="31" font-size="5.5" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">w3 my-class</text></svg>'
     'full-date': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><rect x="2" y="14" width="18" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="11" y="23" font-size="7" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">DD</text><rect x="27" y="14" width="18" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="36" y="23" font-size="7" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">MM</text><rect x="52" y="14" width="18" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="61" y="23" font-size="6" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">YYYY</text></svg>'
     'month-year': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><rect x="10" y="14" width="20" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="20" y="23" font-size="7" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">MM</text><rect x="42" y="14" width="20" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="52" y="23" font-size="6" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">YYYY</text></svg>'
     'year': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><rect x="20" y="14" width="32" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="36" y="23" font-size="6" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">YYYY</text></svg>'
@@ -929,8 +935,8 @@ module.exports = do ->
     date = [
       { slug: 'full-date',  label: t('Full date') }
       { slug: 'month-year', label: t('Month & year') }
-      { slug: 'year',       label: t('Year only') }
-      { slug: 'custom',     label: t('Custom') }
+      { slug: 'year',        label: t('Year only') }
+      { slug: 'date-custom', label: t('Custom') }
     ]
     if questionType is 'date' then date else if questionType is 'select_multiple' then select_multiple else select_one
 
@@ -1082,7 +1088,7 @@ module.exports = do ->
         slug = $(evt.currentTarget).data('card-slug')
         @_card = slug
         @_columnCount = null unless @_card in ['columns-buttons', 'columns-labels-only']
-        @_customText = null unless @_card is 'custom'
+        @_customText = null unless @_card in ['custom', 'date-custom']
         @$el.find('.appearance-card').removeClass('is-selected')
         $(evt.currentTarget).addClass('is-selected')
         @_renderSecondaryControl(questionType)
@@ -1150,7 +1156,7 @@ module.exports = do ->
           $ctrl.find('.appearance-columns-control__hint code').text(hintVal)
           @_writeModelValue()
 
-      else if @_card is 'custom'
+      else if @_card in ['custom', 'date-custom']
         existingText = @_customText or ''
         $input = $('<input/>', {
           type: 'text'
