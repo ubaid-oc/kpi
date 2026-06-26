@@ -541,11 +541,11 @@ do ->
     it 'year → "Year only"', ->
       expect(buildPillText('year', null, null)).toBe('Year only')
 
-    it 'date-custom with text → "Custom: compact"', ->
-      expect(buildPillText('date-custom', null, 'compact')).toBe('Custom: compact')
+    it 'custom with text → "Custom: compact"', ->
+      expect(buildPillText('custom', null, 'compact')).toBe('Custom: compact')
 
-    it 'date-custom with no text → "Custom"', ->
-      expect(buildPillText('date-custom', null, null)).toBe('Custom')
+    it 'custom with no text → "Custom"', ->
+      expect(buildPillText('custom', null, null)).toBe('Custom')
 
   ###############################################################
   # appearance picker: parseAppearanceValue — date type
@@ -565,11 +565,11 @@ do ->
     it 'year → year card for date', ->
       expect(parseAppearanceValue('year', 'date')).toEqual { card: 'year', columnCount: null, customText: null }
 
-    it 'unknown value → date-custom for date', ->
-      expect(parseAppearanceValue('compact', 'date')).toEqual { card: 'date-custom', columnCount: null, customText: 'compact' }
+    it 'unknown value → custom for date', ->
+      expect(parseAppearanceValue('compact', 'date')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
 
-    it '"other" → date-custom with empty text for date', ->
-      expect(parseAppearanceValue('other', 'date')).toEqual { card: 'date-custom', columnCount: null, customText: '' }
+    it '"other" → custom with empty text for date', ->
+      expect(parseAppearanceValue('other', 'date')).toEqual { card: 'custom', columnCount: null, customText: '' }
 
     it '"default" → full-date for date (legacy value treated as default)', ->
       expect(parseAppearanceValue('default', 'date')).toEqual { card: 'full-date', columnCount: null, customText: null }
@@ -595,14 +595,14 @@ do ->
     it 'year → "year"', ->
       expect(buildModelValue('year', null, null)).toBe('year')
 
-    it 'date-custom with text → raw text', ->
-      expect(buildModelValue('date-custom', null, 'compact')).toBe('compact')
+    it 'custom with text → raw text', ->
+      expect(buildModelValue('custom', null, 'compact')).toBe('compact')
 
-    it 'date-custom with empty text → "other"', ->
-      expect(buildModelValue('date-custom', null, '')).toBe('other')
+    it 'custom with empty text → "other"', ->
+      expect(buildModelValue('custom', null, '')).toBe('other')
 
-    it 'date-custom with null text → "other"', ->
-      expect(buildModelValue('date-custom', null, null)).toBe('other')
+    it 'custom with null text → "other"', ->
+      expect(buildModelValue('custom', null, null)).toBe('other')
 
 
   ###############################################################
@@ -620,11 +620,11 @@ do ->
     it '"default" → note card for note', ->
       expect(parseAppearanceValue('default', 'note')).toEqual { card: 'note', columnCount: null, customText: null }
 
-    it '"other" → note-custom with empty text for note', ->
-      expect(parseAppearanceValue('other', 'note')).toEqual { card: 'note-custom', columnCount: null, customText: '' }
+    it '"other" → custom with empty text for note', ->
+      expect(parseAppearanceValue('other', 'note')).toEqual { card: 'custom', columnCount: null, customText: '' }
 
-    it 'unknown value → note-custom with raw text for note', ->
-      expect(parseAppearanceValue('compact', 'note')).toEqual { card: 'note-custom', columnCount: null, customText: 'compact' }
+    it 'unknown value → custom with raw text for note', ->
+      expect(parseAppearanceValue('compact', 'note')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
 
     it 'width token stripped before note parse', ->
       expect(parseAppearanceValue('w3', 'note')).toEqual { card: 'note', columnCount: null, customText: null }
@@ -638,14 +638,14 @@ do ->
     it 'note → empty string', ->
       expect(buildModelValue('note', null, null)).toBe('')
 
-    it 'note-custom with text → raw text', ->
-      expect(buildModelValue('note-custom', null, 'compact')).toBe('compact')
+    it 'custom with text → raw text', ->
+      expect(buildModelValue('custom', null, 'compact')).toBe('compact')
 
-    it 'note-custom with empty text → "other"', ->
-      expect(buildModelValue('note-custom', null, '')).toBe('other')
+    it 'custom with empty text → "other"', ->
+      expect(buildModelValue('custom', null, '')).toBe('other')
 
-    it 'note-custom with null text → "other"', ->
-      expect(buildModelValue('note-custom', null, null)).toBe('other')
+    it 'custom with null text → "other"', ->
+      expect(buildModelValue('custom', null, null)).toBe('other')
 
   ###############################################################
   # appearance picker: buildPillText — note cards
@@ -656,11 +656,11 @@ do ->
     it 'note → "Note"', ->
       expect(buildPillText('note', null, null)).toBe('Note')
 
-    it 'note-custom with text → "Custom: compact"', ->
-      expect(buildPillText('note-custom', null, 'compact')).toBe('Custom: compact')
+    it 'custom with text → "Custom: compact"', ->
+      expect(buildPillText('custom', null, 'compact')).toBe('Custom: compact')
 
-    it 'note-custom with no text → "Custom"', ->
-      expect(buildPillText('note-custom', null, null)).toBe('Custom')
+    it 'custom with no text → "Custom"', ->
+      expect(buildPillText('custom', null, null)).toBe('Custom')
 
   describe 'parseAppearanceValue (file)', ->
     {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
@@ -671,11 +671,11 @@ do ->
     it '"default" → file card', ->
       expect(parseAppearanceValue('default', 'file')).toEqual { card: 'file', columnCount: null, customText: null }
 
-    it '"other" → file-custom with empty text', ->
-      expect(parseAppearanceValue('other', 'file')).toEqual { card: 'file-custom', columnCount: null, customText: '' }
+    it '"other" → custom with empty text', ->
+      expect(parseAppearanceValue('other', 'file')).toEqual { card: 'custom', columnCount: null, customText: '' }
 
-    it 'unknown value → file-custom with raw text', ->
-      expect(parseAppearanceValue('compact', 'file')).toEqual { card: 'file-custom', columnCount: null, customText: 'compact' }
+    it 'unknown value → custom with raw text', ->
+      expect(parseAppearanceValue('compact', 'file')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
 
   describe 'buildModelValue (file cards)', ->
     {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
@@ -683,14 +683,14 @@ do ->
     it 'file → empty string', ->
       expect(buildModelValue('file', null, null)).toBe('')
 
-    it 'file-custom with text → raw text', ->
-      expect(buildModelValue('file-custom', null, 'compact')).toBe('compact')
+    it 'custom with text → raw text', ->
+      expect(buildModelValue('custom', null, 'compact')).toBe('compact')
 
-    it 'file-custom with empty text → "other"', ->
-      expect(buildModelValue('file-custom', null, '')).toBe('other')
+    it 'custom with empty text → "other"', ->
+      expect(buildModelValue('custom', null, '')).toBe('other')
 
-    it 'file-custom with null text → "other"', ->
-      expect(buildModelValue('file-custom', null, null)).toBe('other')
+    it 'custom with null text → "other"', ->
+      expect(buildModelValue('custom', null, null)).toBe('other')
 
   describe 'buildPillText (file cards)', ->
     {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
@@ -698,11 +698,11 @@ do ->
     it 'file → "File upload"', ->
       expect(buildPillText('file', null, null)).toBe('File upload')
 
-    it 'file-custom with text → "Custom: compact"', ->
-      expect(buildPillText('file-custom', null, 'compact')).toBe('Custom: compact')
+    it 'custom with text → "Custom: compact"', ->
+      expect(buildPillText('custom', null, 'compact')).toBe('Custom: compact')
 
-    it 'file-custom with no text → "Custom"', ->
-      expect(buildPillText('file-custom', null, null)).toBe('Custom')
+    it 'custom with no text → "Custom"', ->
+      expect(buildPillText('custom', null, null)).toBe('Custom')
 
   # appearance picker: parseAppearanceValue — text type
   ##############################################################################
