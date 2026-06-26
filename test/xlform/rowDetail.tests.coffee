@@ -661,3 +661,45 @@ do ->
 
     it 'note-custom with no text → "Custom"', ->
       expect(buildPillText('note-custom', null, null)).toBe('Custom')
+
+  describe 'parseAppearanceValue (file)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → file card (default)', ->
+      expect(parseAppearanceValue('', 'file')).toEqual { card: 'file', columnCount: null, customText: null }
+
+    it '"default" → file card', ->
+      expect(parseAppearanceValue('default', 'file')).toEqual { card: 'file', columnCount: null, customText: null }
+
+    it '"other" → file-custom with empty text', ->
+      expect(parseAppearanceValue('other', 'file')).toEqual { card: 'file-custom', columnCount: null, customText: '' }
+
+    it 'unknown value → file-custom with raw text', ->
+      expect(parseAppearanceValue('compact', 'file')).toEqual { card: 'file-custom', columnCount: null, customText: 'compact' }
+
+  describe 'buildModelValue (file cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'file → empty string', ->
+      expect(buildModelValue('file', null, null)).toBe('')
+
+    it 'file-custom with text → raw text', ->
+      expect(buildModelValue('file-custom', null, 'compact')).toBe('compact')
+
+    it 'file-custom with empty text → "other"', ->
+      expect(buildModelValue('file-custom', null, '')).toBe('other')
+
+    it 'file-custom with null text → "other"', ->
+      expect(buildModelValue('file-custom', null, null)).toBe('other')
+
+  describe 'buildPillText (file cards)', ->
+    {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'file → "File upload"', ->
+      expect(buildPillText('file', null, null)).toBe('File upload')
+
+    it 'file-custom with text → "Custom: compact"', ->
+      expect(buildPillText('file-custom', null, 'compact')).toBe('Custom: compact')
+
+    it 'file-custom with no text → "Custom"', ->
+      expect(buildPillText('file-custom', null, null)).toBe('Custom')
