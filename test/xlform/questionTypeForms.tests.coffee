@@ -148,6 +148,11 @@ do ->
       result = ctx.html()
       expect(result).toBe('')
 
+    it 'note html() returns empty string (card grid path, no legacy textbox)', ->
+      ctx = buildAppearanceMixinCtx('note')
+      result = ctx.html()
+      expect(result).toBe('')
+
     it 'integer html() renders a dropdown with analog-scale options', ->
       ctx = buildAppearanceMixinCtx('integer')
       result = ctx.html()
