@@ -603,3 +603,60 @@ do ->
 
     it 'date-custom with null text → "other"', ->
       expect(buildModelValue('date-custom', null, null)).toBe('other')
+
+  ###############################################################
+  # appearance picker: parseAppearanceValue — note type
+  ###############################################################
+  describe 'parseAppearanceValue (note)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → note card for note', ->
+      expect(parseAppearanceValue('', 'note')).toEqual { card: 'note', columnCount: null, customText: null }
+
+    it 'null → note card for note', ->
+      expect(parseAppearanceValue(null, 'note')).toEqual { card: 'note', columnCount: null, customText: null }
+
+    it '"default" → note card for note', ->
+      expect(parseAppearanceValue('default', 'note')).toEqual { card: 'note', columnCount: null, customText: null }
+
+    it '"other" → note-custom with empty text for note', ->
+      expect(parseAppearanceValue('other', 'note')).toEqual { card: 'note-custom', columnCount: null, customText: '' }
+
+    it 'unknown value → note-custom with raw text for note', ->
+      expect(parseAppearanceValue('compact', 'note')).toEqual { card: 'note-custom', columnCount: null, customText: 'compact' }
+
+    it 'width token stripped before note parse', ->
+      expect(parseAppearanceValue('w3', 'note')).toEqual { card: 'note', columnCount: null, customText: null }
+
+  ###############################################################
+  # appearance picker: buildModelValue — note cards
+  ###############################################################
+  describe 'buildModelValue (note cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'note → empty string', ->
+      expect(buildModelValue('note', null, null)).toBe('')
+
+    it 'note-custom with text → raw text', ->
+      expect(buildModelValue('note-custom', null, 'compact')).toBe('compact')
+
+    it 'note-custom with empty text → "other"', ->
+      expect(buildModelValue('note-custom', null, '')).toBe('other')
+
+    it 'note-custom with null text → "other"', ->
+      expect(buildModelValue('note-custom', null, null)).toBe('other')
+
+  ###############################################################
+  # appearance picker: buildPillText — note cards
+  ###############################################################
+  describe 'buildPillText (note cards)', ->
+    {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'note → "Note"', ->
+      expect(buildPillText('note', null, null)).toBe('Note')
+
+    it 'note-custom with text → "Custom: compact"', ->
+      expect(buildPillText('note-custom', null, 'compact')).toBe('Custom: compact')
+
+    it 'note-custom with no text → "Custom"', ->
+      expect(buildPillText('note-custom', null, null)).toBe('Custom')
