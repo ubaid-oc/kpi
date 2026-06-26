@@ -1124,7 +1124,7 @@ module.exports = do ->
       for cardDef in cards
         selected = if cardDef.slug is card then ' is-selected' else ''
         cardHtml += """
-          <div class="appearance-card#{selected}" data-card-slug="#{cardDef.slug}">
+          <div class="appearance-card#{selected}" data-card-slug="#{cardDef.slug}" role="button" tabindex="0" aria-pressed="#{if cardDef.slug is card then 'true' else 'false'}">
             <div class="appearance-card__icon">#{APPEARANCE_ICONS[cardDef.slug]}</div>
             <div class="appearance-card__label">#{cardDef.label}</div>
           </div>
@@ -1146,16 +1146,20 @@ module.exports = do ->
         @$select_width.val(width_val) if width_val?
         @$select_width.on 'change', => @_writeModelValue()
 
-      # Card click — namespace so re-renders don't stack handlers
-      @$el.off('click.oc-appearance').on 'click.oc-appearance', '.appearance-card', (evt) =>
-        slug = $(evt.currentTarget).data('card-slug')
+      # Card click/keyboard — namespace so re-renders don't stack handlers
+      selectCard = (el) =>
+        slug = $(el).data('card-slug')
         @_card = slug
         @_columnCount = null unless @_card in ['columns-buttons', 'columns-labels-only']
         @_customText = null unless @_card in ['custom', 'date-custom', 'note-custom', 'file-custom']
-        @$el.find('.appearance-card').removeClass('is-selected')
-        $(evt.currentTarget).addClass('is-selected')
+        @$el.find('.appearance-card').removeClass('is-selected').attr('aria-pressed', 'false')
+        $(el).addClass('is-selected').attr('aria-pressed', 'true')
         @_renderSecondaryControl(questionType)
         @_writeModelValue()
+      @$el.off('click.oc-appearance').on 'click.oc-appearance', '.appearance-card', (evt) =>
+        selectCard(evt.currentTarget)
+      @$el.off('keydown.oc-appearance').on 'keydown.oc-appearance', '.appearance-card', (evt) =>
+        selectCard(evt.currentTarget) if evt.key in ['Enter', ' ']
 
       # Initial pill (section starts collapsed)
       @_refreshPill($pill)

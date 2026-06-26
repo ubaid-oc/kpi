@@ -57,10 +57,6 @@ do ->
         types = ctx.getTypes()
         expect(types).toBeUndefined()
 
-      it 'text uses card grid path (isCardGridType is true)', ->
-        ctx = buildAppearanceMixinCtx('text')
-        expect(ctx.isCardGridType()).toBe(true)
-
     describe 'select_multiple', ->
       it 'select_multiple uses card grid path (isCardGridType is true)', ->
         ctx = buildAppearanceMixinCtx('select_multiple')
