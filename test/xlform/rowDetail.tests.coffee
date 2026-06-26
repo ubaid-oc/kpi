@@ -580,6 +580,9 @@ do ->
     it 'width-only → full-date for date', ->
       expect(parseAppearanceValue('w3', 'date')).toEqual { card: 'full-date', columnCount: null, customText: null }
 
+    it '"default" → full-date for date (legacy value treated as default)', ->
+      expect(parseAppearanceValue('default', 'date')).toEqual { card: 'full-date', columnCount: null, customText: null }
+
   ###############################################################
   # appearance picker: buildModelValue — date cards
   ###############################################################

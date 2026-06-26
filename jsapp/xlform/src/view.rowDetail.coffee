@@ -1097,7 +1097,8 @@ module.exports = do ->
       $pill    = $section.find('.js-appearance-pill').eq(0)
       $toggle  = $section.find('.js-appearance-toggle').eq(0)
 
-      # Build card grid
+      # Build card grid — clear any prior grid before re-rendering
+      @$el.find('.card__settings__appearance-grid').remove()
       cards = getAppearanceCards(questionType)
       cardHtml = ''
       for cardDef in cards
@@ -1125,8 +1126,8 @@ module.exports = do ->
         @$select_width.val(width_val) if width_val?
         @$select_width.on 'change', => @_writeModelValue()
 
-      # Card click
-      @$el.on 'click', '.appearance-card', (evt) =>
+      # Card click — namespace so re-renders don't stack handlers
+      @$el.off('click.oc-appearance').on 'click.oc-appearance', '.appearance-card', (evt) =>
         slug = $(evt.currentTarget).data('card-slug')
         @_card = slug
         @_columnCount = null unless @_card in ['columns-buttons', 'columns-labels-only']
