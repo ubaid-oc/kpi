@@ -916,7 +916,7 @@ module.exports = do ->
         text: ['multiline']
         image: ['draw', 'annotate', 'signature']
         date: ['month-year', 'year']
-        integer: ['analog-scale horizontal', 'analog-scale horizontal no-ticks', 'analog-scale vertical', 'analog-scale vertical no-ticks', 'analog-scale vertical show-scale']
+
       types[@model_type()]
 
     html: ->
@@ -944,6 +944,8 @@ module.exports = do ->
       if @model_is_group(@model)
         return viewRowDetail.Templates.textbox @cid, @model.key, t("Appearance"), 'text'
       else
+        if @model_type() is 'integer'
+          return null
         if @model_type() isnt 'calculate'
           appearances = @getTypes()
           if appearances?
@@ -1207,7 +1209,10 @@ module.exports = do ->
 
         @$select_width.off 'change'
         @$select_width.on 'change', () =>
-          @group_inputs_change_handler()
+          if @model_type() is 'integer'
+            @_integer_width_change_handler()
+          else
+            @group_inputs_change_handler()
 
         @$checkbox_samescreen.off 'change'
         @$checkbox_samescreen.on 'change', () =>
@@ -1331,6 +1336,38 @@ module.exports = do ->
     # -------------------------------------------------------------------------
     # Helpers shared by both paths (kept from original)
     # -------------------------------------------------------------------------
+
+    _integer_width_change_handler: () ->
+      currentModelValue = (@model.get('value') or '').trim()
+      KNOWN_INT_VALUES = [
+        'analog-scale vertical show-scale'
+        'analog-scale horizontal no-ticks'
+        'analog-scale vertical no-ticks'
+        'analog-scale horizontal'
+        'analog-scale vertical'
+      ]
+      appearancePart = ''
+      for v in KNOWN_INT_VALUES
+        if currentModelValue.indexOf(v) > -1
+          appearancePart = v
+          break
+      if not appearancePart
+        width_options = ('w' + i for i in [1..10])
+        stripped = currentModelValue
+        for w in width_options
+          stripped = stripped.replace(new RegExp('\\s*\\b' + w + '\\b\\s*', 'g'), '').trim()
+        appearancePart = stripped
+
+      widthVal = @$select_width.val()
+      widthVal = '' if widthVal is 'select'
+      if appearancePart and widthVal
+        @model.set 'value', "#{appearancePart} #{widthVal}"
+      else if appearancePart
+        @model.set 'value', appearancePart
+      else if widthVal
+        @model.set 'value', widthVal
+      else
+        @model.set 'value', ''
 
     not_group_inputs_change_handler: ->
       model_set_value = ''
