@@ -531,3 +531,241 @@ do ->
 
     it 'custom with no text → "Custom"', ->
       expect(buildPillText('custom', null, null)).toBe('Custom')
+
+    it 'full-date → "Full date"', ->
+      expect(buildPillText('full-date', null, null)).toBe('Full date')
+
+    it 'month-year → "Month & year"', ->
+      expect(buildPillText('month-year', null, null)).toBe('Month & year')
+
+    it 'year → "Year only"', ->
+      expect(buildPillText('year', null, null)).toBe('Year only')
+
+    it 'custom with text → "Custom: compact"', ->
+      expect(buildPillText('custom', null, 'compact')).toBe('Custom: compact')
+
+    it 'custom with no text → "Custom"', ->
+      expect(buildPillText('custom', null, null)).toBe('Custom')
+
+  ###############################################################
+  # appearance picker: parseAppearanceValue — date type
+  ###############################################################
+  describe 'parseAppearanceValue (date)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → full-date for date', ->
+      expect(parseAppearanceValue('', 'date')).toEqual { card: 'full-date', columnCount: null, customText: null }
+
+    it 'null → full-date for date', ->
+      expect(parseAppearanceValue(null, 'date')).toEqual { card: 'full-date', columnCount: null, customText: null }
+
+    it 'month-year → month-year card for date', ->
+      expect(parseAppearanceValue('month-year', 'date')).toEqual { card: 'month-year', columnCount: null, customText: null }
+
+    it 'year → year card for date', ->
+      expect(parseAppearanceValue('year', 'date')).toEqual { card: 'year', columnCount: null, customText: null }
+
+    it 'unknown value → custom for date', ->
+      expect(parseAppearanceValue('compact', 'date')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
+
+    it '"other" → custom with empty text for date', ->
+      expect(parseAppearanceValue('other', 'date')).toEqual { card: 'custom', columnCount: null, customText: '' }
+
+    it '"default" → full-date for date (legacy value treated as default)', ->
+      expect(parseAppearanceValue('default', 'date')).toEqual { card: 'full-date', columnCount: null, customText: null }
+
+    it 'width token stripped before date parse', ->
+      expect(parseAppearanceValue('month-year w3', 'date')).toEqual { card: 'month-year', columnCount: null, customText: null }
+
+    it 'width-only → full-date for date', ->
+      expect(parseAppearanceValue('w3', 'date')).toEqual { card: 'full-date', columnCount: null, customText: null }
+
+  ###############################################################
+  # appearance picker: buildModelValue — date cards
+  ###############################################################
+  describe 'buildModelValue (date cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'full-date → empty string', ->
+      expect(buildModelValue('full-date', null, null)).toBe('')
+
+    it 'month-year → "month-year"', ->
+      expect(buildModelValue('month-year', null, null)).toBe('month-year')
+
+    it 'year → "year"', ->
+      expect(buildModelValue('year', null, null)).toBe('year')
+
+    it 'custom with text → raw text', ->
+      expect(buildModelValue('custom', null, 'compact')).toBe('compact')
+
+    it 'custom with empty text → "other"', ->
+      expect(buildModelValue('custom', null, '')).toBe('other')
+
+    it 'custom with null text → "other"', ->
+      expect(buildModelValue('custom', null, null)).toBe('other')
+
+
+  ###############################################################
+  # appearance picker: parseAppearanceValue — note type
+  ###############################################################
+  describe 'parseAppearanceValue (note)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → note card for note', ->
+      expect(parseAppearanceValue('', 'note')).toEqual { card: 'note', columnCount: null, customText: null }
+
+    it 'null → note card for note', ->
+      expect(parseAppearanceValue(null, 'note')).toEqual { card: 'note', columnCount: null, customText: null }
+
+    it '"default" → note card for note', ->
+      expect(parseAppearanceValue('default', 'note')).toEqual { card: 'note', columnCount: null, customText: null }
+
+    it '"other" → custom with empty text for note', ->
+      expect(parseAppearanceValue('other', 'note')).toEqual { card: 'custom', columnCount: null, customText: '' }
+
+    it 'unknown value → custom with raw text for note', ->
+      expect(parseAppearanceValue('compact', 'note')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
+
+    it 'width token stripped before note parse', ->
+      expect(parseAppearanceValue('w3', 'note')).toEqual { card: 'note', columnCount: null, customText: null }
+
+  ###############################################################
+  # appearance picker: buildModelValue — note cards
+  ###############################################################
+  describe 'buildModelValue (note cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'note → empty string', ->
+      expect(buildModelValue('note', null, null)).toBe('')
+
+    it 'custom with text → raw text', ->
+      expect(buildModelValue('custom', null, 'compact')).toBe('compact')
+
+    it 'custom with empty text → "other"', ->
+      expect(buildModelValue('custom', null, '')).toBe('other')
+
+    it 'custom with null text → "other"', ->
+      expect(buildModelValue('custom', null, null)).toBe('other')
+
+  ###############################################################
+  # appearance picker: buildPillText — note cards
+  ###############################################################
+  describe 'buildPillText (note cards)', ->
+    {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'note → "Note"', ->
+      expect(buildPillText('note', null, null)).toBe('Note')
+
+    it 'custom with text → "Custom: compact"', ->
+      expect(buildPillText('custom', null, 'compact')).toBe('Custom: compact')
+
+    it 'custom with no text → "Custom"', ->
+      expect(buildPillText('custom', null, null)).toBe('Custom')
+
+  describe 'parseAppearanceValue (file)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → file card (default)', ->
+      expect(parseAppearanceValue('', 'file')).toEqual { card: 'file', columnCount: null, customText: null }
+
+    it '"default" → file card', ->
+      expect(parseAppearanceValue('default', 'file')).toEqual { card: 'file', columnCount: null, customText: null }
+
+    it '"other" → custom with empty text', ->
+      expect(parseAppearanceValue('other', 'file')).toEqual { card: 'custom', columnCount: null, customText: '' }
+
+    it 'unknown value → custom with raw text', ->
+      expect(parseAppearanceValue('compact', 'file')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
+
+  describe 'buildModelValue (file cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'file → empty string', ->
+      expect(buildModelValue('file', null, null)).toBe('')
+
+    it 'custom with text → raw text', ->
+      expect(buildModelValue('custom', null, 'compact')).toBe('compact')
+
+    it 'custom with empty text → "other"', ->
+      expect(buildModelValue('custom', null, '')).toBe('other')
+
+    it 'custom with null text → "other"', ->
+      expect(buildModelValue('custom', null, null)).toBe('other')
+
+  describe 'buildPillText (file cards)', ->
+    {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'file → "File upload"', ->
+      expect(buildPillText('file', null, null)).toBe('File upload')
+
+    it 'custom with text → "Custom: compact"', ->
+      expect(buildPillText('custom', null, 'compact')).toBe('Custom: compact')
+
+    it 'custom with no text → "Custom"', ->
+      expect(buildPillText('custom', null, null)).toBe('Custom')
+
+  # appearance picker: parseAppearanceValue — text type
+  ##############################################################################
+
+  describe 'parseAppearanceValue (text)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → single-line', ->
+      expect(parseAppearanceValue('', 'text')).toEqual { card: 'single-line', columnCount: null, customText: null }
+
+    it 'null → single-line', ->
+      expect(parseAppearanceValue(null, 'text')).toEqual { card: 'single-line', columnCount: null, customText: null }
+
+    it '"default" → single-line', ->
+      expect(parseAppearanceValue('default', 'text')).toEqual { card: 'single-line', columnCount: null, customText: null }
+
+    it '"multiline" → paragraph', ->
+      expect(parseAppearanceValue('multiline', 'text')).toEqual { card: 'paragraph', columnCount: null, customText: null }
+
+    it '"other" → custom with empty text', ->
+      expect(parseAppearanceValue('other', 'text')).toEqual { card: 'custom', columnCount: null, customText: '' }
+
+    it 'unknown value → custom with raw text', ->
+      expect(parseAppearanceValue('compact', 'text')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
+
+    it 'w-prefix stripped and maps to single-line', ->
+      expect(parseAppearanceValue('w3', 'text')).toEqual { card: 'single-line', columnCount: null, customText: null }
+
+  # appearance picker: buildModelValue — text cards
+  ##############################################################################
+
+  describe 'buildModelValue (text cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'single-line → empty string', ->
+      expect(buildModelValue('single-line', null, null)).toBe('')
+
+    it 'paragraph → "multiline"', ->
+      expect(buildModelValue('paragraph', null, null)).toBe('multiline')
+
+    it 'custom (text) with text → raw text', ->
+      expect(buildModelValue('custom', null, 'compact')).toBe('compact')
+
+    it 'custom (text) with empty text → "other"', ->
+      expect(buildModelValue('custom', null, '')).toBe('other')
+
+    it 'custom (text) with null text → "other"', ->
+      expect(buildModelValue('custom', null, null)).toBe('other')
+
+  # appearance picker: buildPillText — text cards
+  ##############################################################################
+
+  describe 'buildPillText (text cards)', ->
+    {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'single-line → "Single line"', ->
+      expect(buildPillText('single-line', null, null)).toBe('Single line')
+
+    it 'paragraph → "Paragraph"', ->
+      expect(buildPillText('paragraph', null, null)).toBe('Paragraph')
+
+    it 'custom (text) with text → "Custom: compact"', ->
+      expect(buildPillText('custom', null, 'compact')).toBe('Custom: compact')
+
+    it 'custom (text) with no text → "Custom"', ->
+      expect(buildPillText('custom', null, null)).toBe('Custom')

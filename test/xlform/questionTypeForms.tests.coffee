@@ -38,11 +38,14 @@ do ->
   describe 'questionTypeForms: appearance.getTypes() — per question type', ->
 
     describe 'text', ->
-      it 'returns ["multiline"] for text', ->
+      it 'text uses card grid path (isCardGridType is true)', ->
+        ctx = buildAppearanceMixinCtx('text')
+        expect(ctx.isCardGridType()).toBe(true)
+
+      it 'text getTypes() returns undefined (card grid path)', ->
         ctx = buildAppearanceMixinCtx('text')
         types = ctx.getTypes()
-        expect(Array.isArray(types)).toBe(true)
-        expect(types.indexOf('multiline')).not.toBe(-1)
+        expect(types).toBeUndefined()
 
     describe 'select_one', ->
       it 'select_one uses card grid path (isCardGridType is true)', ->
@@ -53,10 +56,6 @@ do ->
         ctx = buildAppearanceMixinCtx('select_one')
         types = ctx.getTypes()
         expect(types).toBeUndefined()
-
-      it 'text does not use card grid (isCardGridType is false)', ->
-        ctx = buildAppearanceMixinCtx('text')
-        expect(ctx.isCardGridType()).toBe(false)
 
     describe 'select_multiple', ->
       it 'select_multiple uses card grid path (isCardGridType is true)', ->
@@ -100,7 +99,7 @@ do ->
         expect(types).toBeUndefined()
 
     describe 'types with no specific appearance options', ->
-      noAppTypes = ['decimal', 'note', 'file', 'audio', 'video']
+      noAppTypes = ['decimal', 'audio', 'video']
       for qtype in noAppTypes
         do (qtype) ->
           it "#{qtype} getTypes() returns undefined (textbox fallback)", ->
@@ -118,11 +117,10 @@ do ->
   ###############################################################
   describe 'questionTypeForms: appearance.html() — uses dropdown where options exist', ->
 
-    it 'text html() renders a dropdown with at least "select" + "multiline"', ->
+    it 'text html() returns empty string (card grid path, no legacy dropdown)', ->
       ctx = buildAppearanceMixinCtx('text')
       result = ctx.html()
-      expect(result.indexOf('<select')).not.toBe(-1)
-      expect(result.indexOf('multiline')).not.toBe(-1)
+      expect(result).toBe('')
 
     it 'select_one html() returns empty string (card grid rendered in afterRender)', ->
       ctx = buildAppearanceMixinCtx('select_one')
@@ -141,11 +139,20 @@ do ->
       expect(result.indexOf('draw')).not.toBe(-1)
       expect(result.indexOf('signature')).not.toBe(-1)
 
-    it 'date html() renders a dropdown with month-year, year', ->
+    it 'date html() returns empty string (card grid path, no legacy dropdown)', ->
       ctx = buildAppearanceMixinCtx('date')
       result = ctx.html()
-      expect(result.indexOf('<select')).not.toBe(-1)
-      expect(result.indexOf('month-year')).not.toBe(-1)
+      expect(result).toBe('')
+
+    it 'note html() returns empty string (card grid path, no legacy textbox)', ->
+      ctx = buildAppearanceMixinCtx('note')
+      result = ctx.html()
+      expect(result).toBe('')
+
+    it 'file html() returns empty string (card grid path, no legacy textbox)', ->
+      ctx = buildAppearanceMixinCtx('file')
+      result = ctx.html()
+      expect(result).toBe('')
 
     it 'integer html() returns null (card grid rendered by view.row.coffee)', ->
       ctx = buildAppearanceMixinCtx('integer')
