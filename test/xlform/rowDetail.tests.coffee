@@ -531,3 +531,74 @@ do ->
 
     it 'custom with no text → "Custom"', ->
       expect(buildPillText('custom', null, null)).toBe('Custom')
+
+  ###############################################################
+  # Item width helpers: getWidthFromModelValue
+  ###############################################################
+  describe 'getWidthFromModelValue', ->
+    {getWidthFromModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'returns null for null', ->
+      expect(getWidthFromModelValue(null)).toBe(null)
+
+    it 'returns null for empty string', ->
+      expect(getWidthFromModelValue('')).toBe(null)
+
+    it 'returns null when no wN token present', ->
+      expect(getWidthFromModelValue('minimal')).toBe(null)
+
+    it 'returns w1 for "w1"', ->
+      expect(getWidthFromModelValue('w1')).toBe('w1')
+
+    it 'returns w4 for "w4"', ->
+      expect(getWidthFromModelValue('w4')).toBe('w4')
+
+    it 'returns w10 for "w10"', ->
+      expect(getWidthFromModelValue('w10')).toBe('w10')
+
+    it 'extracts wN from combined appearance value', ->
+      expect(getWidthFromModelValue('minimal w3')).toBe('w3')
+
+    it 'extracts wN when it appears first', ->
+      expect(getWidthFromModelValue('w2 minimal')).toBe('w2')
+
+    it 'returns last matched wN when multiple present (highest wins)', ->
+      # iterates w1..w10 in order, last match wins
+      result = getWidthFromModelValue('w2 w5')
+      expect(result).toBe('w5')
+
+  ###############################################################
+  # Item width helpers: buildWidthPillText
+  ###############################################################
+  describe 'buildWidthPillText', ->
+    {buildWidthPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'null widthVal in G=4 → "Full width"', ->
+      expect(buildWidthPillText(null, 4)).toBe('Full width')
+
+    it 'w4 in G=4 → "Full width"', ->
+      expect(buildWidthPillText('w4', 4)).toBe('Full width')
+
+    it 'w3 in G=4 → "3/4 width"', ->
+      expect(buildWidthPillText('w3', 4)).toBe('3/4 width')
+
+    it 'w2 in G=4 → "Half width"', ->
+      expect(buildWidthPillText('w2', 4)).toBe('Half width')
+
+    it 'w1 in G=4 → "1/4 width"', ->
+      expect(buildWidthPillText('w1', 4)).toBe('1/4 width')
+
+    it 'out-of-range w5 in G=4 → "w5"', ->
+      expect(buildWidthPillText('w5', 4)).toBe('w5')
+
+    it 'w1 in G=5 → "1 of 5"', ->
+      expect(buildWidthPillText('w1', 5)).toBe('1 of 5')
+
+    it 'w3 in G=5 → "3 of 5"', ->
+      expect(buildWidthPillText('w3', 5)).toBe('3 of 5')
+
+    it 'w5 in G=5 → "5 of 5"', ->
+      expect(buildWidthPillText('w5', 5)).toBe('5 of 5')
+
+    it 'null widthVal in G=6 → "Full width"', ->
+      expect(buildWidthPillText(null, 6)).toBe('Full width')
