@@ -102,7 +102,7 @@ do ->
         expect(types.indexOf('analog-scale vertical')).not.toBe(-1)
 
     describe 'types with no specific appearance options', ->
-      noAppTypes = ['decimal', 'note', 'file', 'audio', 'video']
+      noAppTypes = ['decimal', 'audio', 'video']
       for qtype in noAppTypes
         do (qtype) ->
           it "#{qtype} getTypes() returns undefined (textbox fallback)", ->
@@ -150,6 +150,11 @@ do ->
 
     it 'note html() returns empty string (card grid path, no legacy textbox)', ->
       ctx = buildAppearanceMixinCtx('note')
+      result = ctx.html()
+      expect(result).toBe('')
+
+    it 'file html() returns empty string (card grid path, no legacy textbox)', ->
+      ctx = buildAppearanceMixinCtx('file')
       result = ctx.html()
       expect(result).toBe('')
 
