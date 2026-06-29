@@ -1505,10 +1505,9 @@ module.exports = do ->
       $wrap = $('<div/>', { class: 'js-item-width-wrap item-width-subsection', style: 'grid-column: 1 / -1' })
 
       # Header row (collapse toggle)
-      $header = $('<div/>', {
+      $header = $('<button/>', {
         class: 'item-width__header js-item-width-toggle'
-        role: 'button'
-        tabindex: '0'
+        type: 'button'
         'aria-expanded': 'false'
       })
       $header.append($('<span/>', { class: 'item-width__title' }).text(t('Item width in group grid')))
@@ -1596,12 +1595,6 @@ module.exports = do ->
           $header.attr('aria-expanded', 'false')
           @_refreshWidthPill($pill)
           $pill.show()
-      $header.off('keydown.widthToggle').on 'keydown.widthToggle', (evt) =>
-        if evt.key in ['Enter', ' ']
-          evt.preventDefault()
-          evt.stopPropagation()
-          $header.trigger('click')
-
     # -------------------------------------------------------------------------
     # Group Columns in Grid picker (replaces Width dropdown in group settings)
     # -------------------------------------------------------------------------
@@ -1707,12 +1700,6 @@ module.exports = do ->
           refreshPill()
           $pill.show()
 
-      $header.off('keydown.groupColsToggle').on 'keydown.groupColsToggle', (evt) =>
-        if evt.key in ['Enter', ' ']
-          evt.preventDefault()
-          evt.stopPropagation()
-          $header.trigger('click')
-
     _writeWidthValue: (widthSlug) ->
       currentVal = @model.get('value') or ''
       stripped = currentVal.replace(/\bw\d+\b/g, '').replace(/\s+/g, ' ').trim()
@@ -1726,7 +1713,7 @@ module.exports = do ->
         currentW = if groupCols is 4 then 'w4' else "w#{groupCols}"
       label = buildWidthPillText(currentW, groupCols)
       k = parseInt(currentW.slice(1), 10)
-      pct = Math.round(k / groupCols * 100)
+      pct = Math.min(100, Math.round(k / groupCols * 100))
       $pill.empty()
         .append($("""<span class="pill-bar"><span class="pill-fill" style="width:#{pct}%"></span></span>"""))
         .append(document.createTextNode(" #{label} · #{currentW}"))
