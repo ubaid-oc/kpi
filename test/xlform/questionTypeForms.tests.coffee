@@ -143,11 +143,10 @@ do ->
       expect(result.indexOf('draw')).not.toBe(-1)
       expect(result.indexOf('signature')).not.toBe(-1)
 
-    it 'date html() renders a dropdown with month-year, year', ->
+    it 'date html() returns empty string (card grid path, no legacy dropdown)', ->
       ctx = buildAppearanceMixinCtx('date')
       result = ctx.html()
-      expect(result.indexOf('<select')).not.toBe(-1)
-      expect(result.indexOf('month-year')).not.toBe(-1)
+      expect(result).toBe('')
 
     it 'integer html() renders a dropdown with analog-scale options', ->
       ctx = buildAppearanceMixinCtx('integer')
