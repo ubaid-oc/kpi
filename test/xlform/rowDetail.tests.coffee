@@ -567,6 +567,9 @@ do ->
       result = getWidthFromModelValue('w2 w5')
       expect(result).toBe('w5')
 
+    it 'does not match partial token: w11 returns null', ->
+      expect(getWidthFromModelValue('w11')).toBeNull()
+
   ###############################################################
   # Item width helpers: buildWidthPillText
   ###############################################################

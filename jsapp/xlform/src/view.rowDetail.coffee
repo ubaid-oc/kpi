@@ -913,7 +913,7 @@ module.exports = do ->
     return null unless modelValue?
     found = null
     for w in WIDTH_OPTIONS
-      found = w if modelValue.indexOf(w) isnt -1
+      found = w if new RegExp("\\b#{w}\\b").test(modelValue)
     found
 
   getParentGroupCols = (mixin) ->
@@ -923,9 +923,9 @@ module.exports = do ->
     return 4 unless appearanceDetail?
     appearance = (appearanceDetail.getValue() or '').trim()
     return 4 unless appearance
-    m = appearance.match(/\bw(\d+)\b/)
-    return 4 unless m
-    n = parseInt(m[1], 10)
+    w = getWidthFromModelValue(appearance)
+    return 4 unless w?
+    n = parseInt(w.slice(1), 10)
     if 1 <= n <= 10 then n else 4
 
   getParentGroupName = (mixin) ->
@@ -1428,7 +1428,10 @@ module.exports = do ->
       $grid.off('click.oc-width').on 'click.oc-width', '.width-card', (evt) =>
         selectWidth(evt.currentTarget)
       $grid.off('keydown.oc-width').on 'keydown.oc-width', '.width-card', (evt) =>
-        selectWidth(evt.currentTarget) if evt.key in ['Enter', ' ']
+        if evt.key in ['Enter', ' ']
+          evt.preventDefault()
+          evt.stopPropagation()
+          selectWidth(evt.currentTarget)
 
       # Collapse toggle
       $header.off('click.widthToggle').on 'click.widthToggle', (evt) =>
@@ -1444,7 +1447,10 @@ module.exports = do ->
           @_refreshWidthPill($pill)
           $pill.show()
       $header.off('keydown.widthToggle').on 'keydown.widthToggle', (evt) =>
-        $header.trigger('click') if evt.key in ['Enter', ' ']
+        if evt.key in ['Enter', ' ']
+          evt.preventDefault()
+          evt.stopPropagation()
+          $header.trigger('click')
 
     _writeWidthValue: (widthSlug) ->
       currentVal = @model.get('value') or ''
