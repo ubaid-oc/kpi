@@ -460,3 +460,184 @@
   font-family: monospace;
   text-align: center;
 }
+
+// ==========================================================================
+// Group Columns in Grid picker — mirrors OC-28006 item-width section style
+// ==========================================================================
+
+.group-cols-section {
+  padding: 6px 0 4px;
+  border-bottom: 1px solid #CBD5E1;
+  margin-bottom: 4px;
+}
+
+.group-cols__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  padding: 2px 0;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  background: none;
+  width: 100%;
+
+  &[aria-expanded="true"] {
+    .group-cols__chev {
+      transform: rotate(180deg);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid #378ADD;
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+}
+
+.group-cols__title {
+  text-align: left;
+  color: #334155;
+}
+
+// Same style as .item-width__pill
+.group-cols__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #edf4fc;
+  border: 0.5px solid #378ADD;
+  border-radius: 10px;
+  padding: 2px 9px;
+  font-size: 11px;
+  color: #185FA5;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+// Same style as .item-width__chev
+.group-cols__chev {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  font-size: 14px;
+  color: #475569;
+  align-self: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.group-cols__body {
+  margin-top: 8px;
+}
+
+.group-cols__instruction {
+  font-size: 11px;
+  color: #64748B;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.group-cols__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+
+// Same base style as .width-card
+.group-cols-card {
+  background: #fff;
+  border: 0.5px solid #CBD5E1;
+  border-radius: 5px;
+  padding: 10px 6px 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    border-color: #94A3B8;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #378ADD;
+    outline-offset: 2px;
+  }
+
+  &.is-default {
+    border: 1px dashed #378ADD;
+    background: #f5f9fe;
+
+    .cols-preview {
+      border-color: #9cc2ea;
+
+      i { border-color: #bcd4ee; }
+    }
+  }
+
+  &.is-selected {
+    border: 1.5px solid #378ADD;
+    background: #edf4fc;
+
+    .group-cols-card__label {
+      color: #185FA5;
+    }
+
+    .cols-preview {
+      border-color: #9cc2ea;
+
+      i { border-color: #bcd4ee; }
+    }
+  }
+}
+
+// Column division preview inside each card
+.cols-preview {
+  width: 40px;
+  height: 20px;
+  display: flex;
+  border: 1px solid #CBD5E1;
+  border-radius: 2px;
+  overflow: hidden;
+  background: #fff;
+
+  i {
+    flex: 1;
+    border-right: 1px solid #CBD5E1;
+
+    &:last-child {
+      border-right: 0;
+    }
+  }
+}
+
+.group-cols-card__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #444;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.group-cols-card__code {
+  font-size: 9px;
+  color: #aaa;
+  font-family: monospace;
+  text-align: center;
+}
+
+.group-cols__advisory {
+  font-size: 11px;
+  color: #94A3B8;
+  font-style: italic;
+  margin-top: 6px;
+}
