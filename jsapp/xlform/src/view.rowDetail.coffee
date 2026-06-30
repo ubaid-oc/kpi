@@ -16,6 +16,44 @@ module.exports = do ->
   parseAppearanceValue = (value, questionType) ->
     cleaned = ((value or '').trim().replace(/\s*\bw\d+\b\s*/g, ' ')).trim()
 
+    # File-specific card grid
+    if questionType is 'file'
+      if cleaned is '' or cleaned is 'default'
+        return { card: 'file', columnCount: null, customText: null }
+      if cleaned is 'other'
+        return { card: 'custom', columnCount: null, customText: '' }
+      return { card: 'custom', columnCount: null, customText: cleaned }
+
+    # Note-specific card grid
+    if questionType is 'note'
+      if cleaned is '' or cleaned is 'default'
+        return { card: 'note', columnCount: null, customText: null }
+      if cleaned is 'other'
+        return { card: 'custom', columnCount: null, customText: '' }
+      return { card: 'custom', columnCount: null, customText: cleaned }
+
+    # Text-specific card grid
+    if questionType is 'text'
+      if cleaned is '' or cleaned is 'default'
+        return { card: 'single-line', columnCount: null, customText: null }
+      if cleaned is 'multiline'
+        return { card: 'paragraph', columnCount: null, customText: null }
+      if cleaned is 'other'
+        return { card: 'custom', columnCount: null, customText: '' }
+      return { card: 'custom', columnCount: null, customText: cleaned }
+
+    # Date-specific card grid
+    if questionType is 'date'
+      if cleaned is 'month-year'
+        return { card: 'month-year', columnCount: null, customText: null }
+      if cleaned is 'year'
+        return { card: 'year', columnCount: null, customText: null }
+      if cleaned is '' or cleaned is 'default'
+        return { card: 'full-date', columnCount: null, customText: null }
+      if cleaned is 'other'
+        return { card: 'custom', columnCount: null, customText: '' }
+      return { card: 'custom', columnCount: null, customText: cleaned }
+
     if cleaned is 'likert'
       if questionType is 'select_one'
         return { card: 'likert-scale', columnCount: null, customText: null }
@@ -59,6 +97,13 @@ module.exports = do ->
   buildModelValue = (card, columnCount, customText) ->
     switch card
       when 'radio-list', 'checkbox-list' then ''
+      when 'single-line' then ''
+      when 'paragraph'   then 'multiline'
+      when 'file'        then ''
+      when 'note'        then ''
+      when 'full-date'   then ''
+      when 'month-year'  then 'month-year'
+      when 'year'        then 'year'
       when 'dropdown'      then 'minimal'
       when 'columns-buttons'
         if columnCount? then "columns-#{columnCount}" else 'columns'
@@ -78,6 +123,13 @@ module.exports = do ->
     switch card
       when 'radio-list'             then t('Radio list')
       when 'checkbox-list'          then t('Checkbox list')
+      when 'single-line'            then t('Single line')
+      when 'paragraph'              then t('Paragraph')
+      when 'file'                   then t('File upload')
+      when 'note'                   then t('Note')
+      when 'full-date'              then t('Full date')
+      when 'month-year'             then t('Month & year')
+      when 'year'                   then t('Year only')
       when 'dropdown'               then t('Dropdown')
       when 'image-grid'             then t('Image grid')
       when 'image-grid-labels-only' then t('Image grid (labels only)')
@@ -879,7 +931,14 @@ module.exports = do ->
     'likert-scale': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><line x1="5" y1="17" x2="47" y2="17" stroke="#444" stroke-width="1.2"/><circle cx="5" cy="17" r="3" stroke="#444" stroke-width="1.2"/><circle cx="16" cy="17" r="3" stroke="#444" stroke-width="1.2"/><circle cx="26" cy="17" r="3" stroke="#444" stroke-width="1.2"/><circle cx="36" cy="17" r="3" stroke="#444" stroke-width="1.2"/><circle cx="47" cy="17" r="3" stroke="#444" stroke-width="1.2"/></svg>'
     'search': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><rect x="3" y="10" width="46" height="14" rx="3" stroke="#444" stroke-width="1.2"/><rect x="7" y="14" width="26" height="5" rx="1.5" fill="#444" opacity="0.15"/><circle cx="40" cy="17" r="3.5" stroke="#444" stroke-width="1.2"/><line x1="43" y1="20" x2="46" y2="23" stroke="#444" stroke-width="1.3"/></svg>'
     'hotspot-image': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><rect x="2" y="2" width="48" height="30" rx="3" stroke="#444" stroke-width="1.2"/><rect x="7" y="6" width="16" height="11" rx="2" stroke="#444" stroke-width="1.1"/><rect x="28" y="6" width="16" height="11" rx="2" stroke="#444" stroke-width="1.1"/><rect x="7" y="20" width="12" height="8" rx="2" stroke="#444" stroke-width="1.1"/><rect x="22" y="20" width="12" height="8" rx="2" stroke="#444" stroke-width="1.1"/></svg>'
+    'single-line': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><rect x="3" y="11" width="46" height="12" rx="2" stroke="#444" stroke-width="1.3"/><text x="8" y="20" font-size="9" fill="#444" font-family="Arial, sans-serif" font-weight="700">abc</text><line x1="24" y1="14" x2="24" y2="21" stroke="#378ADD" stroke-width="1.2"/></svg>'
+    'paragraph': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><rect x="3" y="3" width="46" height="28" rx="2" stroke="#444" stroke-width="1.3"/><line x1="7" y1="10" x2="42" y2="10" stroke="#444" stroke-width="1.1" opacity="0.5"/><line x1="7" y1="16" x2="45" y2="16" stroke="#444" stroke-width="1.1" opacity="0.5"/><line x1="7" y1="22" x2="38" y2="22" stroke="#444" stroke-width="1.1" opacity="0.5"/><path d="M44 27 L48 27 L48 31" stroke="#444" stroke-width="1.1" fill="none"/></svg>'
     'custom': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><path d="M12 8 Q6 8 6 14 L6 20 Q6 26 12 26" stroke="#444" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M40 8 Q46 8 46 14 L46 20 Q46 26 40 26" stroke="#444" stroke-width="1.5" fill="none" stroke-linecap="round"/><text x="17" y="22" font-size="12" fill="#378ADD" font-family="Menlo, Consolas, monospace" font-weight="700">&lt;/&gt;</text></svg>'
+    'file': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><path d="M17 4 L17 40 L55 40 L55 14 L45 4 Z" stroke="#888" stroke-width="1.3"/><path d="M45 4 L45 14 L55 14" stroke="#888" stroke-width="1.1" fill="none"/><line x1="36" y1="33" x2="36" y2="22" stroke="#888" stroke-width="1.4" stroke-linecap="round"/><path d="M31 27 L36 22 L41 27" stroke="#888" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    'note': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><rect x="8" y="6" width="56" height="32" rx="3" stroke="#888" stroke-width="1.2"/><rect x="14" y="13" width="44" height="4" rx="1" fill="#888" fill-opacity="0.22"/><rect x="14" y="21" width="36" height="4" rx="1" fill="#888" fill-opacity="0.22"/><rect x="14" y="29" width="26" height="4" rx="1" fill="#888" fill-opacity="0.22"/></svg>'
+    'full-date': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><rect x="2" y="14" width="18" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="11" y="23" font-size="7" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">DD</text><rect x="27" y="14" width="18" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="36" y="23" font-size="7" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">MM</text><rect x="52" y="14" width="18" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="61" y="23" font-size="6" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">YYYY</text></svg>'
+    'month-year': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><rect x="10" y="14" width="20" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="20" y="23" font-size="7" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">MM</text><rect x="42" y="14" width="20" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="52" y="23" font-size="6" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">YYYY</text></svg>'
+    'year': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><rect x="20" y="14" width="32" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="36" y="23" font-size="6" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">YYYY</text></svg>'
 
   getAppearanceCards = (questionType) ->
     select_one = [
@@ -905,7 +964,26 @@ module.exports = do ->
       { slug: 'hotspot-image',          label: t('Hotspot image') }
       { slug: 'custom',                 label: t('Custom') }
     ]
-    if questionType is 'select_multiple' then select_multiple else select_one
+    date = [
+      { slug: 'full-date',  label: t('Full date') }
+      { slug: 'month-year', label: t('Month & year') }
+      { slug: 'year',        label: t('Year only') }
+      { slug: 'custom', label: t('Custom') }
+    ]
+    note = [
+      { slug: 'note',        label: t('Note') }
+      { slug: 'custom', label: t('Custom') }
+    ]
+    file = [
+      { slug: 'file',        label: t('File upload') }
+      { slug: 'custom', label: t('Custom') }
+    ]
+    text = [
+      { slug: 'single-line', label: t('Single line') }
+      { slug: 'paragraph',   label: t('Paragraph') }
+      { slug: 'custom',      label: t('Custom') }
+    ]
+    if questionType is 'text' then text else if questionType is 'file' then file else if questionType is 'note' then note else if questionType is 'date' then date else if questionType is 'select_multiple' then select_multiple else select_one
 
   WIDTH_OPTIONS = ("w#{n}" for n in [1..10])
 
@@ -950,11 +1028,10 @@ module.exports = do ->
 
   viewRowDetail.DetailViewMixins.appearance =
     isCardGridType: ->
-      @model_type() in ['select_one', 'select_multiple']
+      @model_type() in ['select_one', 'select_multiple', 'date', 'note', 'file', 'text']
 
     getTypes: ->
       types =
-        text: ['multiline']
         image: ['draw', 'annotate', 'signature']
         date: ['month-year', 'year']
         integer: ['analog-scale horizontal', 'analog-scale horizontal no-ticks', 'analog-scale vertical', 'analog-scale vertical no-ticks', 'analog-scale vertical show-scale']
@@ -1058,13 +1135,14 @@ module.exports = do ->
       $pill    = $section.find('.js-appearance-pill').eq(0)
       $toggle  = $section.find('.js-appearance-toggle').eq(0)
 
-      # Build card grid
+      # Build card grid — clear any prior grid before re-rendering
+      @$el.find('.card__settings__appearance-grid').remove()
       cards = getAppearanceCards(questionType)
       cardHtml = ''
       for cardDef in cards
         selected = if cardDef.slug is card then ' is-selected' else ''
         cardHtml += """
-          <div class="appearance-card#{selected}" data-card-slug="#{cardDef.slug}">
+          <div class="appearance-card#{selected}" data-card-slug="#{cardDef.slug}" role="button" tabindex="0" aria-pressed="#{if cardDef.slug is card then 'true' else 'false'}">
             <div class="appearance-card__icon">#{APPEARANCE_ICONS[cardDef.slug]}</div>
             <div class="appearance-card__label">#{cardDef.label}</div>
           </div>
@@ -1074,16 +1152,32 @@ module.exports = do ->
       # Render secondary control for initial state
       @_renderSecondaryControl(questionType)
 
+      # Width select (theme-grid form style only)
+      if @is_form_style_theme_grid()
+        $width_field = $("""<div class="card__settings__fields__field xlf-dv-width-row">
+          <label for="select-width">#{t('Width')}:</label>
+          <span class="settings__input"></span>
+        </div>""")
+        $width_field.find('.settings__input').append(@$select_width)
+        @$el.append($width_field)
+        width_val = @get_width_from_model_value()
+        @$select_width.val(width_val) if width_val?
+        @$select_width.on 'change', => @_writeModelValue()
+
       # Card click
       @$el.on 'click', '.appearance-card', (evt) =>
         slug = $(evt.currentTarget).data('card-slug')
         @_card = slug
         @_columnCount = null unless @_card in ['columns-buttons', 'columns-labels-only']
         @_customText = null unless @_card is 'custom'
-        @$el.find('.appearance-card').removeClass('is-selected')
-        $(evt.currentTarget).addClass('is-selected')
+        @$el.find('.appearance-card').removeClass('is-selected').attr('aria-pressed', 'false')
+        $(el).addClass('is-selected').attr('aria-pressed', 'true')
         @_renderSecondaryControl(questionType)
         @_writeModelValue()
+      @$el.off('click.oc-appearance').on 'click.oc-appearance', '.appearance-card', (evt) =>
+        selectCard(evt.currentTarget)
+      @$el.off('keydown.oc-appearance').on 'keydown.oc-appearance', '.appearance-card', (evt) =>
+        selectCard(evt.currentTarget) if evt.key in ['Enter', ' ']
 
       # Item width section
       @_afterRenderWidth()
