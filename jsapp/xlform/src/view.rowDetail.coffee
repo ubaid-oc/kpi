@@ -1152,18 +1152,6 @@ module.exports = do ->
       # Render secondary control for initial state
       @_renderSecondaryControl(questionType)
 
-      # Width select (theme-grid form style only)
-      if @is_form_style_theme_grid()
-        $width_field = $("""<div class="card__settings__fields__field xlf-dv-width-row">
-          <label for="select-width">#{t('Width')}:</label>
-          <span class="settings__input"></span>
-        </div>""")
-        $width_field.find('.settings__input').append(@$select_width)
-        @$el.append($width_field)
-        width_val = @get_width_from_model_value()
-        @$select_width.val(width_val) if width_val?
-        @$select_width.on 'change', => @_writeModelValue()
-
       # Card click
       @$el.on 'click', '.appearance-card', (evt) =>
         slug = $(evt.currentTarget).data('card-slug')
