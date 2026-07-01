@@ -769,3 +769,60 @@ do ->
 
     it 'custom (text) with no text → "Custom"', ->
       expect(buildPillText('custom', null, null)).toBe('Custom')
+
+  # appearance picker: parseAppearanceValue — audio type
+  ##############################################################################
+
+  describe 'parseAppearanceValue (audio)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → audio-upload card (default)', ->
+      expect(parseAppearanceValue('', 'audio')).toEqual { card: 'audio-upload', columnCount: null, customText: null }
+
+    it 'null → audio-upload card', ->
+      expect(parseAppearanceValue(null, 'audio')).toEqual { card: 'audio-upload', columnCount: null, customText: null }
+
+    it '"default" → audio-upload card', ->
+      expect(parseAppearanceValue('default', 'audio')).toEqual { card: 'audio-upload', columnCount: null, customText: null }
+
+    it '"other" → custom with empty text', ->
+      expect(parseAppearanceValue('other', 'audio')).toEqual { card: 'custom', columnCount: null, customText: '' }
+
+    it 'unknown value → custom with raw text', ->
+      expect(parseAppearanceValue('compact', 'audio')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
+
+    it 'width token stripped → audio-upload card', ->
+      expect(parseAppearanceValue('w3', 'audio')).toEqual { card: 'audio-upload', columnCount: null, customText: null }
+
+  # appearance picker: buildModelValue — audio cards
+  ##############################################################################
+
+  describe 'buildModelValue (audio cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'audio-upload → empty string', ->
+      expect(buildModelValue('audio-upload', null, null)).toBe('')
+
+    it 'custom with text → raw text', ->
+      expect(buildModelValue('custom', null, 'compact')).toBe('compact')
+
+    it 'custom with empty text → "other"', ->
+      expect(buildModelValue('custom', null, '')).toBe('other')
+
+    it 'custom with null text → "other"', ->
+      expect(buildModelValue('custom', null, null)).toBe('other')
+
+  # appearance picker: buildPillText — audio cards
+  ##############################################################################
+
+  describe 'buildPillText (audio cards)', ->
+    {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'audio-upload → "Audio upload"', ->
+      expect(buildPillText('audio-upload', null, null)).toBe('Audio upload')
+
+    it 'custom with text → "Custom: compact"', ->
+      expect(buildPillText('custom', null, 'compact')).toBe('Custom: compact')
+
+    it 'custom with no text → "Custom"', ->
+      expect(buildPillText('custom', null, null)).toBe('Custom')
