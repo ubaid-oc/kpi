@@ -1083,6 +1083,7 @@ module.exports = do ->
     _integerCardValueFromModel: (modelValue) ->
       return '' if not modelValue or modelValue is 'default'
       stripped = modelValue.replace(/\bw\d+\b/g, '').trim()
+      return '' if stripped is ''
       KNOWN_VALUES = [
         'analog-scale vertical show-scale'
         'analog-scale horizontal no-ticks'
