@@ -610,9 +610,9 @@ module.exports = do ->
       if (isLockable and @hasRestriction(LockingRestrictionName.group_settings_edit))
         @$settings.find('.js-card-settings-row-options').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
-      # disable all UI from "Skip Logic" tab of group settings
-      if (isLockable and @hasRestriction(LockingRestrictionName.group_skip_logic_edit))
-        @$settings.find('.js-card-settings-skip-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
+      # disable all UI from "Relevant Logic" tab of group settings
+      if (isLockable and @hasRestriction(LockingRestrictionName.group_skip_logic_edit.name))
+        @$settings.find('.js-card-settings-relevant-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
       return
 
@@ -1029,9 +1029,9 @@ module.exports = do ->
           @$settings.find('.js-card-settings-row-options').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
           @$settings.find('.js-params-view').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
-        # disable all UI from "Skip Logic" tab of question settings
-        if (isLockable and @hasRestriction(LockingRestrictionName.question_skip_logic_edit))
-          @$settings.find('.js-card-settings-skip-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
+        # disable all UI from "Relevant Logic" tab of question settings
+        if (isLockable and @hasRestriction(LockingRestrictionName.question_skip_logic_edit.name))
+          @$settings.find('.js-card-settings-relevant-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
         # disable all UI from "Validation Criteria" tab of question settings
         if (isLockable and @hasRestriction(LockingRestrictionName.question_validation_edit))
@@ -1069,7 +1069,7 @@ module.exports = do ->
       super()
       @$('.xlf-dv-required').hide()
       @$("li[data-card-settings-tab-id='validation-criteria']").hide()
-      @$("li[data-card-settings-tab-id='skip-logic']").hide()
+      @$("li[data-card-settings-tab-id='relevant-logic']").hide()
 
     _renderRow: ->
       @$el.html $viewTemplates.row.koboMatrixView()
