@@ -469,16 +469,21 @@
   padding: 6px 0 4px;
   border-bottom: 1px solid #CBD5E1;
   margin-bottom: 4px;
+
+  > label {
+    vertical-align: middle;
+  }
+
+  .settings__input {
+    vertical-align: middle;
+  }
 }
 
 .group-cols__header {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #334155;
-  padding: 2px 0;
+  padding: 0;
   cursor: pointer;
   user-select: none;
   border: none;
@@ -496,11 +501,6 @@
     outline-offset: 2px;
     border-radius: 3px;
   }
-}
-
-.group-cols__title {
-  text-align: left;
-  color: #334155;
 }
 
 // Same style as .item-width__pill
@@ -523,8 +523,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 35px;
-  height: 35px;
+  width: 20px;
+  height: 20px;
   font-size: 14px;
   color: #475569;
   align-self: center;
@@ -534,14 +534,15 @@
 }
 
 .group-cols__body {
-  margin-top: 8px;
+  margin-top: 2px;
 }
 
 .group-cols__instruction {
   font-size: 11px;
   color: #64748B;
   font-style: italic;
-  margin-bottom: 10px;
+  margin-top: 0;
+  margin-bottom: 8px;
 }
 
 .group-cols__grid {

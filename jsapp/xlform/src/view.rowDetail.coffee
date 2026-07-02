@@ -1610,18 +1610,20 @@ module.exports = do ->
         currentSelCols = parsed unless isNaN(parsed) or parsed < 1 or parsed > 10
       outOfRange = storedVal? and storedVal isnt '' and currentSelCols is null
 
-      $wrap = $('<div/>', { class: 'js-group-cols-wrap group-cols-section' })
+      $wrap = $('<div/>', { class: 'js-group-cols-wrap card__settings__fields__field group-cols-section' })
+      $wrap.append($('<label/>').text(t('Columns in Grid') + ':'))
+
+      $settingsInput = $('<span/>', { class: 'settings__input' })
 
       $header = $('<button/>', {
         class: 'group-cols__header'
         type: 'button'
         'aria-expanded': 'false'
       })
-      $header.append($('<span/>', { class: 'group-cols__title' }).text(t('Columns in Grid')))
       $pill = $('<span/>', { class: 'js-group-cols-pill group-cols__pill' })
       $header.append($pill)
       $header.append($('<i/>', { class: 'k-icon k-icon-angle-down group-cols__chev', 'aria-hidden': 'true' }))
-      $wrap.append($header)
+      $settingsInput.append($header)
 
       $body = $('<div/>', { class: 'js-group-cols-body group-cols__body' })
       $body.append(
@@ -1656,7 +1658,8 @@ module.exports = do ->
         )
 
       $body.hide()
-      $wrap.append($body)
+      $settingsInput.append($body)
+      $wrap.append($settingsInput)
       @$el.append($wrap)
 
       refreshPill = =>
