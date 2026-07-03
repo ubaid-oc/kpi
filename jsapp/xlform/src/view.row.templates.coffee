@@ -78,7 +78,7 @@ module.exports = do ->
           </button>
           <ul class="js-card-settings-row-options card__settings__fields card__settings__fields--active"></ul>
           <div class="js-card-settings-appearance card__settings__appearance-section is-collapsed">
-            <div class="card__settings__appearance-header js-appearance-toggle" aria-expanded="false">
+            <div class="card__settings__appearance-header js-appearance-toggle" role="button" tabindex="0" aria-expanded="false">
               <span class="card__settings__appearance-title">#{t('Appearance')}</span>
               <span class="js-appearance-pill card__settings__appearance-pill" style="display:none"></span>
               <i class="k-icon k-icon-angle-down card__settings__appearance-toggle__icon" aria-hidden="true"></i>
@@ -132,7 +132,7 @@ module.exports = do ->
               <div class="card__settings__fields-col js-card-settings-col-right"></div>
             </div>
             <div class="js-card-settings-appearance card__settings__appearance-section is-collapsed">
-              <div class="card__settings__appearance-header js-appearance-toggle" aria-expanded="false">
+              <div class="card__settings__appearance-header js-appearance-toggle" role="button" tabindex="0" aria-expanded="false">
                 <span class="card__settings__appearance-title">#{t('Appearance')}</span>
                 <span class="js-appearance-pill card__settings__appearance-pill" style="display:none"></span>
                 <i class="k-icon k-icon-angle-down card__settings__appearance-toggle__icon" aria-hidden="true"></i>

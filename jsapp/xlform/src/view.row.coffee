@@ -631,7 +631,8 @@ module.exports = do ->
       @model.on 'add', (row) =>
         if row.constructor.key == 'group'
           appearanceModel = @model.get('appearance')
-          if appearanceModel.getValue() is 'field-list'
+          currentAppearance = (appearanceModel.getValue() or '').trim().replace(/\s*\bw\d+\b\s*/g, ' ').trim()
+          if currentAppearance is 'field-list'
             notify.warning(t("You can't display nested groups on the same screen - the setting has been removed from the parent group"))
             appearanceModel.set('value', '')
 

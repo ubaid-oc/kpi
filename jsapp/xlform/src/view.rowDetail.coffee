@@ -1211,8 +1211,7 @@ module.exports = do ->
       $pill.show()
 
       # Toggle collapse/expand
-      $toggle.off('click.appearanceToggle')
-      $toggle.on 'click.appearanceToggle', =>
+      toggleSection = =>
         isCollapsed = $section.hasClass('is-collapsed')
         if isCollapsed
           $section.removeClass('is-collapsed')
@@ -1223,6 +1222,11 @@ module.exports = do ->
           $toggle.attr('aria-expanded', 'false')
           @_refreshPill($pill)
           $pill.show()
+
+      $toggle.off('click.appearanceToggle keydown.appearanceToggle')
+      $toggle.on 'click.appearanceToggle', => toggleSection()
+      $toggle.on 'keydown.appearanceToggle', (evt) =>
+        toggleSection() if evt.key in ['Enter', ' ']
 
       # Keep pill fresh when model changes from outside (e.g. loading)
       @model.on 'change:value', =>
