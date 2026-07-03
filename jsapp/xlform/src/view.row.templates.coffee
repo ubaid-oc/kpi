@@ -77,6 +77,14 @@ module.exports = do ->
             <i class="k-icon k-icon-arrow-left" aria-hidden="true"></i>
           </button>
           <ul class="js-card-settings-row-options card__settings__fields card__settings__fields--active"></ul>
+          <div class="js-card-settings-appearance card__settings__appearance-section is-collapsed">
+            <div class="card__settings__appearance-header js-appearance-toggle" aria-expanded="false">
+              <span class="card__settings__appearance-title">#{t('Appearance')}</span>
+              <span class="js-appearance-pill card__settings__appearance-pill" style="display:none"></span>
+              <i class="k-icon k-icon-angle-down card__settings__appearance-toggle__icon" aria-hidden="true"></i>
+            </div>
+            <div class="js-appearance-body card__settings__appearance-body"></div>
+          </div>
           <ul class="js-card-settings-relevant-logic card__settings__fields"></ul>
           <ul class="js-card-settings-repeat-count card__settings__fields card__settings__fields--repeat-count"></ul>
           <ul class="js-card-settings-locked-features card__settings__fields locking__ui-hidden"></ul>
