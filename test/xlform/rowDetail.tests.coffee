@@ -826,3 +826,60 @@ do ->
 
     it 'custom with no text → "Custom"', ->
       expect(buildPillText('custom', null, null)).toBe('Custom')
+
+  # appearance picker: parseAppearanceValue — video type
+  ##############################################################################
+
+  describe 'parseAppearanceValue (video)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → video-upload card (default)', ->
+      expect(parseAppearanceValue('', 'video')).toEqual { card: 'video-upload', columnCount: null, customText: null }
+
+    it 'null → video-upload card', ->
+      expect(parseAppearanceValue(null, 'video')).toEqual { card: 'video-upload', columnCount: null, customText: null }
+
+    it '"default" → video-upload card', ->
+      expect(parseAppearanceValue('default', 'video')).toEqual { card: 'video-upload', columnCount: null, customText: null }
+
+    it '"other" → custom with empty text', ->
+      expect(parseAppearanceValue('other', 'video')).toEqual { card: 'custom', columnCount: null, customText: '' }
+
+    it 'unknown value → custom with raw text', ->
+      expect(parseAppearanceValue('compact', 'video')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
+
+    it 'width token stripped → video-upload card', ->
+      expect(parseAppearanceValue('w3', 'video')).toEqual { card: 'video-upload', columnCount: null, customText: null }
+
+  # appearance picker: buildModelValue — video cards
+  ##############################################################################
+
+  describe 'buildModelValue (video cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'video-upload → empty string', ->
+      expect(buildModelValue('video-upload', null, null)).toBe('')
+
+    it 'custom with text → raw text', ->
+      expect(buildModelValue('custom', null, 'compact')).toBe('compact')
+
+    it 'custom with empty text → "other"', ->
+      expect(buildModelValue('custom', null, '')).toBe('other')
+
+    it 'custom with null text → "other"', ->
+      expect(buildModelValue('custom', null, null)).toBe('other')
+
+  # appearance picker: buildPillText — video cards
+  ##############################################################################
+
+  describe 'buildPillText (video cards)', ->
+    {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'video-upload → "Video upload"', ->
+      expect(buildPillText('video-upload', null, null)).toBe('Video upload')
+
+    it 'custom with text → "Custom: compact"', ->
+      expect(buildPillText('custom', null, 'compact')).toBe('Custom: compact')
+
+    it 'custom with no text → "Custom"', ->
+      expect(buildPillText('custom', null, null)).toBe('Custom')
