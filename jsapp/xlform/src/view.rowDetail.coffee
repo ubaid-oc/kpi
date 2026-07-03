@@ -1013,7 +1013,15 @@ module.exports = do ->
       { slug: 'paragraph',   label: t('Paragraph') }
       { slug: 'custom',      label: t('Custom') }
     ]
-    if questionType is 'audio' then audio else if questionType is 'video' then video else if questionType is 'text' then text else if questionType is 'file' then file else if questionType is 'note' then note else if questionType is 'date' then date else if questionType is 'select_multiple' then select_multiple else select_one
+    cardsByType =
+      audio:           audio
+      video:           video
+      text:            text
+      file:            file
+      note:            note
+      date:            date
+      select_multiple: select_multiple
+    cardsByType[questionType] or select_one
 
   viewRowDetail.DetailViewMixins.appearance =
     isCardGridType: ->
