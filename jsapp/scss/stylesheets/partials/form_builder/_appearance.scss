@@ -224,6 +224,12 @@
   margin-right: 60px;
 }
 
+// Group panel: appearance is a sibling of the tab panels, not nested inside row-options,
+// so hide it when row-options is inactive.
+.js-card-settings-row-options:not(.card__settings__fields--active) ~ .js-card-settings-appearance {
+  display: none;
+}
+
 // Group type: always 3 columns (single row)
 
 .card__settings__appearance-grid--group {
