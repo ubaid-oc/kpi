@@ -24,6 +24,14 @@ module.exports = do ->
         return { card: 'custom', columnCount: null, customText: '' }
       return { card: 'custom', columnCount: null, customText: cleaned }
 
+    # Audio-specific card grid
+    if questionType is 'audio'
+      if cleaned is '' or cleaned is 'default'
+        return { card: 'audio-upload', columnCount: null, customText: null }
+      if cleaned is 'other'
+        return { card: 'custom', columnCount: null, customText: '' }
+      return { card: 'custom', columnCount: null, customText: cleaned }
+
     # Note-specific card grid
     if questionType is 'note'
       if cleaned is '' or cleaned is 'default'
@@ -99,6 +107,7 @@ module.exports = do ->
       when 'radio-list', 'checkbox-list' then ''
       when 'single-line' then ''
       when 'paragraph'   then 'multiline'
+      when 'audio-upload' then ''
       when 'file'        then ''
       when 'note'        then ''
       when 'full-date'   then ''
@@ -125,6 +134,7 @@ module.exports = do ->
       when 'checkbox-list'          then t('Checkbox list')
       when 'single-line'            then t('Single line')
       when 'paragraph'              then t('Paragraph')
+      when 'audio-upload'           then t('Audio upload')
       when 'file'                   then t('File upload')
       when 'note'                   then t('Note')
       when 'full-date'              then t('Full date')
@@ -935,6 +945,7 @@ module.exports = do ->
     'single-line': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><rect x="3" y="11" width="46" height="12" rx="2" stroke="#444" stroke-width="1.3"/><text x="8" y="20" font-size="9" fill="#444" font-family="Arial, sans-serif" font-weight="700">abc</text><line x1="24" y1="14" x2="24" y2="21" stroke="#378ADD" stroke-width="1.2"/></svg>'
     'paragraph': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><rect x="3" y="3" width="46" height="28" rx="2" stroke="#444" stroke-width="1.3"/><line x1="7" y1="10" x2="42" y2="10" stroke="#444" stroke-width="1.1" opacity="0.5"/><line x1="7" y1="16" x2="45" y2="16" stroke="#444" stroke-width="1.1" opacity="0.5"/><line x1="7" y1="22" x2="38" y2="22" stroke="#444" stroke-width="1.1" opacity="0.5"/><path d="M44 27 L48 27 L48 31" stroke="#444" stroke-width="1.1" fill="none"/></svg>'
     'custom': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><path d="M12 8 Q6 8 6 14 L6 20 Q6 26 12 26" stroke="#444" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M40 8 Q46 8 46 14 L46 20 Q46 26 40 26" stroke="#444" stroke-width="1.5" fill="none" stroke-linecap="round"/><text x="17" y="22" font-size="12" fill="#378ADD" font-family="Menlo, Consolas, monospace" font-weight="700">&lt;/&gt;</text></svg>'
+    'audio-upload': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><rect x="28" y="4" width="16" height="20" rx="8" stroke="#888" stroke-width="1.3"/><path d="M20 21 Q20 36 36 36 Q52 36 52 21" stroke="#888" stroke-width="1.2"/><line x1="36" y1="36" x2="36" y2="42" stroke="#888" stroke-width="1.2" stroke-linecap="round"/><line x1="28" y1="42" x2="44" y2="42" stroke="#888" stroke-width="1.2" stroke-linecap="round"/></svg>'
     'file': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><path d="M17 4 L17 40 L55 40 L55 14 L45 4 Z" stroke="#888" stroke-width="1.3"/><path d="M45 4 L45 14 L55 14" stroke="#888" stroke-width="1.1" fill="none"/><line x1="36" y1="33" x2="36" y2="22" stroke="#888" stroke-width="1.4" stroke-linecap="round"/><path d="M31 27 L36 22 L41 27" stroke="#888" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
     'note': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><rect x="8" y="6" width="56" height="32" rx="3" stroke="#888" stroke-width="1.2"/><rect x="14" y="13" width="44" height="4" rx="1" fill="#888" fill-opacity="0.22"/><rect x="14" y="21" width="36" height="4" rx="1" fill="#888" fill-opacity="0.22"/><rect x="14" y="29" width="26" height="4" rx="1" fill="#888" fill-opacity="0.22"/></svg>'
     'full-date': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 44" fill="none"><rect x="2" y="14" width="18" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="11" y="23" font-size="7" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">DD</text><rect x="27" y="14" width="18" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="36" y="23" font-size="7" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">MM</text><rect x="52" y="14" width="18" height="16" rx="2.5" stroke="#888" stroke-width="1.3"/><text x="61" y="23" font-size="6" fill="#888" text-anchor="middle" dominant-baseline="middle" font-family="monospace">YYYY</text></svg>'
@@ -971,6 +982,10 @@ module.exports = do ->
       { slug: 'year',        label: t('Year only') }
       { slug: 'custom', label: t('Custom') }
     ]
+    audio = [
+      { slug: 'audio-upload', label: t('Audio upload') }
+      { slug: 'custom',       label: t('Custom') }
+    ]
     note = [
       { slug: 'note',        label: t('Note') }
       { slug: 'custom', label: t('Custom') }
@@ -984,11 +999,11 @@ module.exports = do ->
       { slug: 'paragraph',   label: t('Paragraph') }
       { slug: 'custom',      label: t('Custom') }
     ]
-    if questionType is 'text' then text else if questionType is 'file' then file else if questionType is 'note' then note else if questionType is 'date' then date else if questionType is 'select_multiple' then select_multiple else select_one
+    if questionType is 'audio' then audio else if questionType is 'text' then text else if questionType is 'file' then file else if questionType is 'note' then note else if questionType is 'date' then date else if questionType is 'select_multiple' then select_multiple else select_one
 
   viewRowDetail.DetailViewMixins.appearance =
     isCardGridType: ->
-      @model_type() in ['select_one', 'select_multiple', 'date', 'note', 'file', 'text']
+      @model_type() in ['select_one', 'select_multiple', 'date', 'note', 'file', 'text', 'audio']
 
     getTypes: ->
       types =
