@@ -623,23 +623,18 @@ module.exports = do ->
       @$header.after($viewTemplates.row.groupSettingsView())
       @cardSettingsWrap = @$('.card__settings').eq(0)
       @defaultRowDetailParent = @cardSettingsWrap.find('.card__settings__fields--active').eq(0)
+      @appearanceRowDetailParent = @cardSettingsWrap.find('.js-appearance-body').eq(0)
       for [key, val] in @model.attributesArray()
         if key in ["name", "_isRepeat", "repeat_count", "appearance", "relevant"] or key.match(/^.+::.+/)
           new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
 
       @model.on 'add', (row) =>
         if row.constructor.key == 'group'
-          $appearanceField = @$('.xlf-dv-appearance').eq(0)
-          $appearanceField.hide()
-          $appearanceField.find('input:checkbox').prop('checked', false)
           appearanceModel = @model.get('appearance')
-          if appearanceModel.getValue()
+          currentAppearance = (appearanceModel.getValue() or '').trim().replace(/\s*\bw\d+\b\s*/g, ' ').trim()
+          if currentAppearance is 'field-list'
             notify.warning(t("You can't display nested groups on the same screen - the setting has been removed from the parent group"))
-          appearanceModel.set('value', '')
-
-      @model.on 'remove', (row) =>
-        if row.constructor.key == 'group' && !@hasNestedGroups()
-          @$('.xlf-dv-appearance').eq(0).show()
+            appearanceModel.set('value', '')
 
       @applyLocking()
 

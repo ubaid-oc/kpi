@@ -69,7 +69,12 @@
 }
 
 .card__settings__appearance-body {
-  padding: 16px 60px 20px 32px;
+  padding: 16px 0 20px 0;
+}
+
+.card__settings__fields .card__settings__appearance-body {
+  padding-left: 32px;
+  padding-right: 60px;
 }
 
 .card__settings__appearance-grid {
@@ -211,10 +216,34 @@
   }
 }
 
+// Group panel: appearance section is a sibling of .card__settings__fields (not inside it),
+// so it doesn't inherit the fields' 32px/60px padding. Inset the whole section with margin
+// so both borders and content align with the surrounding fields.
+.card__settings__content > .card__settings__appearance-section {
+  margin-left: 32px;
+  margin-right: 60px;
+}
+
+// Group panel: appearance is a sibling of the tab panels, not nested inside row-options,
+// so hide it when row-options is inactive.
+.js-card-settings-row-options:not(.card__settings__fields--active) ~ .js-card-settings-appearance {
+  display: none;
+}
+
+// Group type: always 3 columns (single row)
+
+.card__settings__appearance-grid--group {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 // Responsive: stack to 2 columns below 1280px
 
 @media screen and (max-width: 1280px) {
   .card__settings__appearance-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .card__settings__appearance-grid--group {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

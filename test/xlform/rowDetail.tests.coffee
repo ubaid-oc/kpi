@@ -827,6 +827,63 @@ do ->
     it 'custom with no text → "Custom"', ->
       expect(buildPillText('custom', null, null)).toBe('Custom')
 
+  # appearance picker: parseAppearanceValue — group type
+  ##############################################################################
+
+  describe 'parseAppearanceValue (group)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → standard-group card (default)', ->
+      expect(parseAppearanceValue('', 'group')).toEqual { card: 'standard-group', columnCount: null, customText: null }
+
+    it 'null → standard-group card', ->
+      expect(parseAppearanceValue(null, 'group')).toEqual { card: 'standard-group', columnCount: null, customText: null }
+
+    it '"default" → standard-group card', ->
+      expect(parseAppearanceValue('default', 'group')).toEqual { card: 'standard-group', columnCount: null, customText: null }
+
+    it '"table-list" → table-list card', ->
+      expect(parseAppearanceValue('table-list', 'group')).toEqual { card: 'table-list', columnCount: null, customText: null }
+
+    it '"field-list" → same-screen card', ->
+      expect(parseAppearanceValue('field-list', 'group')).toEqual { card: 'same-screen', columnCount: null, customText: null }
+
+    it 'unknown value → standard-group (no custom card for group)', ->
+      expect(parseAppearanceValue('compact', 'group')).toEqual { card: 'standard-group', columnCount: null, customText: null }
+
+    it '"other" → standard-group (no custom card for group)', ->
+      expect(parseAppearanceValue('other', 'group')).toEqual { card: 'standard-group', columnCount: null, customText: null }
+
+  # appearance picker: buildModelValue — group cards
+  ##############################################################################
+
+  describe 'buildModelValue (group cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'standard-group → empty string', ->
+      expect(buildModelValue('standard-group', null, null)).toBe('')
+
+    it 'table-list → "table-list"', ->
+      expect(buildModelValue('table-list', null, null)).toBe('table-list')
+
+    it 'same-screen → "field-list"', ->
+      expect(buildModelValue('same-screen', null, null)).toBe('field-list')
+
+  # appearance picker: buildPillText — group cards
+  ##############################################################################
+
+  describe 'buildPillText (group cards)', ->
+    {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'standard-group → "Standard group"', ->
+      expect(buildPillText('standard-group', null, null)).toBe('Standard group')
+
+    it 'table-list → "Table list"', ->
+      expect(buildPillText('table-list', null, null)).toBe('Table list')
+
+    it 'same-screen → "Same screen"', ->
+      expect(buildPillText('same-screen', null, null)).toBe('Same screen')
+
   # appearance picker: parseAppearanceValue — video type
   ##############################################################################
 
