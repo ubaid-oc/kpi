@@ -271,6 +271,7 @@ module.exports = do ->
       where[how || 'append'](@el)
     insertInDOM: (rowView)->
       advancedKeys = [
+
         'readonly'
       ]
 
@@ -1532,7 +1533,7 @@ module.exports = do ->
       viewRowDetail.Templates.textbox @cid, @model.key, t("Item Group"), 'text', 'Enter data set name'
     afterRender: ->
       @listenForInputChange()
-      $('<p/>', { class: 'item-group-helper' }).text(t('The Item Group is the data set this item is stored in. Items that share an Item Group are kept together in the data model and in data extracts.')).appendTo(@$el)
+      $('<p/>', { class: 'item-group-helper' }).text(t('The Item Group is the data set this item is stored in. Items that share an Item Group are kept together in the data model and in data extracts.')).insertAfter(@$el.find('.settings__input'))
       externalValue = @model._parent.getValue('bind::oc:external')
       if externalValue in ['clinicaldata', 'contactdata', 'identifier', 'signature']
         @removeFieldCheckCondition()

@@ -375,6 +375,25 @@ do ->
       @mixin_ctx.html()
       expect(@mixin_ctx.fieldTab).toBe('active')
 
+    it 'oc_item_group insertInDOM() places field in the primary right column, not the advanced panel', ->
+      viewRowDetail = require('../../jsapp/xlform/src/view.rowDetail')
+      $rowView = $('<div/>')
+      $primaryRight = $('<div class="js-card-settings-col-right"/>')
+      $advanced = $('<div class="js-card-settings-row-options-advanced"/>')
+      $default = $('<div class="default-parent"/>')
+      mockRowView =
+        primaryRowDetailParentRight: $primaryRight
+        advancedRowDetailParent: $advanced
+        defaultRowDetailParent: $default
+      viewInstance = $.extend({}, viewRowDetail.DetailViewMixins.oc_item_group, {
+        $el: $('<div/>')
+        modelKey: 'oc_item_group'
+        _insertInDOM: (target) -> target.append(@$el)
+      })
+      viewInstance.insertInDOM(mockRowView)
+      expect($primaryRight.children().length).toBe(1)
+      expect($advanced.children().length).toBe(0)
+
   describe 'view.rowDetail.DetailViewMixins: "oc_briefdescription" html()', ->
     beforeEach ->
       window.xlfHideWarnings = true

@@ -542,10 +542,12 @@
     }
 }
 
-.item-group-helper {
-  font-size: 12px;
-  font-weight: normal;
-  color: colors.$kobo-gray-40;
-  margin-top: 4px;
-  margin-left: 30%;
+.card__settings__fields__field {
+  .item-group-helper {
+    font-size: 12px;
+    font-weight: normal;
+    color: colors.$kobo-gray-40;
+    margin-top: 4px;
+    margin-left: 30%;
+  }
 }
