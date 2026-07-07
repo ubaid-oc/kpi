@@ -377,7 +377,6 @@ do ->
 
     it 'oc_item_group insertInDOM() places field in the primary right column, not the advanced panel', ->
       viewRowDetail = require('../../jsapp/xlform/src/view.rowDetail')
-      $rowView = $('<div/>')
       $primaryRight = $('<div class="js-card-settings-col-right"/>')
       $advanced = $('<div class="js-card-settings-row-options-advanced"/>')
       $default = $('<div class="default-parent"/>')
@@ -385,12 +384,11 @@ do ->
         primaryRowDetailParentRight: $primaryRight
         advancedRowDetailParent: $advanced
         defaultRowDetailParent: $default
-      viewInstance = $.extend({}, viewRowDetail.DetailViewMixins.oc_item_group, {
-        $el: $('<div/>')
+      mockInstance =
         modelKey: 'oc_item_group'
+        $el: $('<div/>')
         _insertInDOM: (target) -> target.append(@$el)
-      })
-      viewInstance.insertInDOM(mockRowView)
+      viewRowDetail.DetailView.prototype.insertInDOM.call(mockInstance, mockRowView)
       expect($primaryRight.children().length).toBe(1)
       expect($advanced.children().length).toBe(0)
 
