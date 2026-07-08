@@ -132,6 +132,8 @@
     }
   }
 
+  &.xlf-dv-name,
+  &.xlf-dv-oc_item_group,
   &.xlf-dv-oc_external {
     label {
       vertical-align: top;
@@ -538,6 +540,16 @@
         background: inherit;
         border-left: 0;
     }
+}
+
+.card__settings__fields__field {
+  .item-group-helper {
+    font-size: 12px;
+    font-weight: normal;
+    color: colors.$kobo-gray-40;
+    margin-top: 4px;
+    margin-left: 30%;
+  }
 }
 
 // ---- Integer appearance card-grid section ----

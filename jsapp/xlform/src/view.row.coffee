@@ -629,9 +629,9 @@ module.exports = do ->
       if (isLockable and @hasRestriction(LockingRestrictionName.group_settings_edit))
         @$settings.find('.js-card-settings-row-options').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
-      # disable all UI from "Skip Logic" tab of group settings
-      if (isLockable and @hasRestriction(LockingRestrictionName.group_skip_logic_edit))
-        @$settings.find('.js-card-settings-skip-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
+      # disable all UI from "Relevant Logic" tab of group settings
+      if (isLockable and @hasRestriction(LockingRestrictionName.group_skip_logic_edit.name))
+        @$settings.find('.js-card-settings-relevant-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
       return
 
@@ -642,23 +642,18 @@ module.exports = do ->
       @$header.after($viewTemplates.row.groupSettingsView())
       @cardSettingsWrap = @$('.card__settings').eq(0)
       @defaultRowDetailParent = @cardSettingsWrap.find('.card__settings__fields--active').eq(0)
+      @appearanceRowDetailParent = @cardSettingsWrap.find('.js-appearance-body').eq(0)
       for [key, val] in @model.attributesArray()
         if key in ["name", "_isRepeat", "repeat_count", "appearance", "relevant"] or key.match(/^.+::.+/)
           new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
 
       @model.on 'add', (row) =>
         if row.constructor.key == 'group'
-          $appearanceField = @$('.xlf-dv-appearance').eq(0)
-          $appearanceField.hide()
-          $appearanceField.find('input:checkbox').prop('checked', false)
           appearanceModel = @model.get('appearance')
-          if appearanceModel.getValue()
+          currentAppearance = (appearanceModel.getValue() or '').trim().replace(/\s*\bw\d+\b\s*/g, ' ').trim()
+          if currentAppearance is 'field-list'
             notify.warning(t("You can't display nested groups on the same screen - the setting has been removed from the parent group"))
-          appearanceModel.set('value', '')
-
-      @model.on 'remove', (row) =>
-        if row.constructor.key == 'group' && !@hasNestedGroups()
-          @$('.xlf-dv-appearance').eq(0).show()
+            appearanceModel.set('value', '')
 
       @applyLocking()
 
@@ -1070,9 +1065,9 @@ module.exports = do ->
           @$settings.find('.js-card-settings-row-options').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
           @$settings.find('.js-params-view').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
-        # disable all UI from "Skip Logic" tab of question settings
-        if (isLockable and @hasRestriction(LockingRestrictionName.question_skip_logic_edit))
-          @$settings.find('.js-card-settings-skip-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
+        # disable all UI from "Relevant Logic" tab of question settings
+        if (isLockable and @hasRestriction(LockingRestrictionName.question_skip_logic_edit.name))
+          @$settings.find('.js-card-settings-relevant-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
         # disable all UI from "Validation Criteria" tab of question settings
         if (isLockable and @hasRestriction(LockingRestrictionName.question_validation_edit))
@@ -1192,7 +1187,7 @@ module.exports = do ->
       super()
       @$('.xlf-dv-required').hide()
       @$("li[data-card-settings-tab-id='validation-criteria']").hide()
-      @$("li[data-card-settings-tab-id='skip-logic']").hide()
+      @$("li[data-card-settings-tab-id='relevant-logic']").hide()
 
     _renderRow: ->
       @$el.html $viewTemplates.row.koboMatrixView()

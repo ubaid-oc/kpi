@@ -769,3 +769,174 @@ do ->
 
     it 'custom (text) with no text → "Custom"', ->
       expect(buildPillText('custom', null, null)).toBe('Custom')
+
+  # appearance picker: parseAppearanceValue — audio type
+  ##############################################################################
+
+  describe 'parseAppearanceValue (audio)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → audio-upload card (default)', ->
+      expect(parseAppearanceValue('', 'audio')).toEqual { card: 'audio-upload', columnCount: null, customText: null }
+
+    it 'null → audio-upload card', ->
+      expect(parseAppearanceValue(null, 'audio')).toEqual { card: 'audio-upload', columnCount: null, customText: null }
+
+    it '"default" → audio-upload card', ->
+      expect(parseAppearanceValue('default', 'audio')).toEqual { card: 'audio-upload', columnCount: null, customText: null }
+
+    it '"other" → custom with empty text', ->
+      expect(parseAppearanceValue('other', 'audio')).toEqual { card: 'custom', columnCount: null, customText: '' }
+
+    it 'unknown value → custom with raw text', ->
+      expect(parseAppearanceValue('compact', 'audio')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
+
+    it 'width token stripped → audio-upload card', ->
+      expect(parseAppearanceValue('w3', 'audio')).toEqual { card: 'audio-upload', columnCount: null, customText: null }
+
+  # appearance picker: buildModelValue — audio cards
+  ##############################################################################
+
+  describe 'buildModelValue (audio cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'audio-upload → empty string', ->
+      expect(buildModelValue('audio-upload', null, null)).toBe('')
+
+    it 'custom with text → raw text', ->
+      expect(buildModelValue('custom', null, 'compact')).toBe('compact')
+
+    it 'custom with empty text → "other"', ->
+      expect(buildModelValue('custom', null, '')).toBe('other')
+
+    it 'custom with null text → "other"', ->
+      expect(buildModelValue('custom', null, null)).toBe('other')
+
+  # appearance picker: buildPillText — audio cards
+  ##############################################################################
+
+  describe 'buildPillText (audio cards)', ->
+    {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'audio-upload → "Audio upload"', ->
+      expect(buildPillText('audio-upload', null, null)).toBe('Audio upload')
+
+    it 'custom with text → "Custom: compact"', ->
+      expect(buildPillText('custom', null, 'compact')).toBe('Custom: compact')
+
+    it 'custom with no text → "Custom"', ->
+      expect(buildPillText('custom', null, null)).toBe('Custom')
+
+  # appearance picker: parseAppearanceValue — group type
+  ##############################################################################
+
+  describe 'parseAppearanceValue (group)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → standard-group card (default)', ->
+      expect(parseAppearanceValue('', 'group')).toEqual { card: 'standard-group', columnCount: null, customText: null }
+
+    it 'null → standard-group card', ->
+      expect(parseAppearanceValue(null, 'group')).toEqual { card: 'standard-group', columnCount: null, customText: null }
+
+    it '"default" → standard-group card', ->
+      expect(parseAppearanceValue('default', 'group')).toEqual { card: 'standard-group', columnCount: null, customText: null }
+
+    it '"table-list" → table-list card', ->
+      expect(parseAppearanceValue('table-list', 'group')).toEqual { card: 'table-list', columnCount: null, customText: null }
+
+    it '"field-list" → same-screen card', ->
+      expect(parseAppearanceValue('field-list', 'group')).toEqual { card: 'same-screen', columnCount: null, customText: null }
+
+    it 'unknown value → standard-group (no custom card for group)', ->
+      expect(parseAppearanceValue('compact', 'group')).toEqual { card: 'standard-group', columnCount: null, customText: null }
+
+    it '"other" → standard-group (no custom card for group)', ->
+      expect(parseAppearanceValue('other', 'group')).toEqual { card: 'standard-group', columnCount: null, customText: null }
+
+  # appearance picker: buildModelValue — group cards
+  ##############################################################################
+
+  describe 'buildModelValue (group cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'standard-group → empty string', ->
+      expect(buildModelValue('standard-group', null, null)).toBe('')
+
+    it 'table-list → "table-list"', ->
+      expect(buildModelValue('table-list', null, null)).toBe('table-list')
+
+    it 'same-screen → "field-list"', ->
+      expect(buildModelValue('same-screen', null, null)).toBe('field-list')
+
+  # appearance picker: buildPillText — group cards
+  ##############################################################################
+
+  describe 'buildPillText (group cards)', ->
+    {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'standard-group → "Standard group"', ->
+      expect(buildPillText('standard-group', null, null)).toBe('Standard group')
+
+    it 'table-list → "Table list"', ->
+      expect(buildPillText('table-list', null, null)).toBe('Table list')
+
+    it 'same-screen → "Same screen"', ->
+      expect(buildPillText('same-screen', null, null)).toBe('Same screen')
+
+  # appearance picker: parseAppearanceValue — video type
+  ##############################################################################
+
+  describe 'parseAppearanceValue (video)', ->
+    {parseAppearanceValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'empty string → video-upload card (default)', ->
+      expect(parseAppearanceValue('', 'video')).toEqual { card: 'video-upload', columnCount: null, customText: null }
+
+    it 'null → video-upload card', ->
+      expect(parseAppearanceValue(null, 'video')).toEqual { card: 'video-upload', columnCount: null, customText: null }
+
+    it '"default" → video-upload card', ->
+      expect(parseAppearanceValue('default', 'video')).toEqual { card: 'video-upload', columnCount: null, customText: null }
+
+    it '"other" → custom with empty text', ->
+      expect(parseAppearanceValue('other', 'video')).toEqual { card: 'custom', columnCount: null, customText: '' }
+
+    it 'unknown value → custom with raw text', ->
+      expect(parseAppearanceValue('compact', 'video')).toEqual { card: 'custom', columnCount: null, customText: 'compact' }
+
+    it 'width token stripped → video-upload card', ->
+      expect(parseAppearanceValue('w3', 'video')).toEqual { card: 'video-upload', columnCount: null, customText: null }
+
+  # appearance picker: buildModelValue — video cards
+  ##############################################################################
+
+  describe 'buildModelValue (video cards)', ->
+    {buildModelValue} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'video-upload → empty string', ->
+      expect(buildModelValue('video-upload', null, null)).toBe('')
+
+    it 'custom with text → raw text', ->
+      expect(buildModelValue('custom', null, 'compact')).toBe('compact')
+
+    it 'custom with empty text → "other"', ->
+      expect(buildModelValue('custom', null, '')).toBe('other')
+
+    it 'custom with null text → "other"', ->
+      expect(buildModelValue('custom', null, null)).toBe('other')
+
+  # appearance picker: buildPillText — video cards
+  ##############################################################################
+
+  describe 'buildPillText (video cards)', ->
+    {buildPillText} = require('../../jsapp/xlform/src/view.rowDetail')
+
+    it 'video-upload → "Video upload"', ->
+      expect(buildPillText('video-upload', null, null)).toBe('Video upload')
+
+    it 'custom with text → "Custom: compact"', ->
+      expect(buildPillText('custom', null, 'compact')).toBe('Custom: compact')
+
+    it 'custom with no text → "Custom"', ->
+      expect(buildPillText('custom', null, null)).toBe('Custom')
