@@ -31,6 +31,25 @@ constants = require('#/constants')
 notify = require('#/utils').notify
 arrayMiddleOut = require('#/oc/utils').processArrayMiddleOut
 
+INTEGER_APPEARANCE_SVGS =
+  'number-input': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><rect x="3" y="11" width="46" height="12" rx="2" stroke="#444" stroke-width="1.3"/><text x="8" y="20" font-size="9" fill="#444" font-family="Arial, sans-serif" font-weight="700">123</text></svg>'
+  'horizontal-slider': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><line x1="4" y1="17" x2="48" y2="17" stroke="#444" stroke-width="1.5"/><circle cx="22" cy="17" r="3.5" fill="#378ADD" stroke="#378ADD" stroke-width="1"/><line x1="6" y1="23" x2="6" y2="26" stroke="#444" stroke-width="1"/><line x1="14" y1="23" x2="14" y2="26" stroke="#444" stroke-width="1"/><line x1="22" y1="23" x2="22" y2="26" stroke="#444" stroke-width="1"/><line x1="30" y1="23" x2="30" y2="26" stroke="#444" stroke-width="1"/><line x1="38" y1="23" x2="38" y2="26" stroke="#444" stroke-width="1"/><line x1="46" y1="23" x2="46" y2="26" stroke="#444" stroke-width="1"/></svg>'
+  'horizontal-slider-no-ticks': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><line x1="4" y1="17" x2="48" y2="17" stroke="#444" stroke-width="1.5"/><circle cx="28" cy="17" r="3.5" fill="#378ADD" stroke="#378ADD" stroke-width="1"/></svg>'
+  'vertical-slider': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><line x1="26" y1="3" x2="26" y2="31" stroke="#444" stroke-width="1.5"/><circle cx="26" cy="17" r="3.5" fill="#378ADD" stroke="#378ADD" stroke-width="1"/><line x1="32" y1="5" x2="35" y2="5" stroke="#444" stroke-width="1"/><line x1="32" y1="11" x2="35" y2="11" stroke="#444" stroke-width="1"/><line x1="32" y1="17" x2="35" y2="17" stroke="#444" stroke-width="1"/><line x1="32" y1="23" x2="35" y2="23" stroke="#444" stroke-width="1"/><line x1="32" y1="29" x2="35" y2="29" stroke="#444" stroke-width="1"/></svg>'
+  'vertical-slider-no-ticks': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><line x1="26" y1="3" x2="26" y2="31" stroke="#444" stroke-width="1.5"/><circle cx="26" cy="20" r="3.5" fill="#378ADD" stroke="#378ADD" stroke-width="1"/></svg>'
+  'vertical-slider-with-scale': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><line x1="20" y1="3" x2="20" y2="31" stroke="#444" stroke-width="1.5"/><circle cx="20" cy="17" r="3.5" fill="#378ADD" stroke="#378ADD" stroke-width="1"/><line x1="26" y1="5" x2="29" y2="5" stroke="#444" stroke-width="1"/><line x1="26" y1="11" x2="29" y2="11" stroke="#444" stroke-width="1"/><line x1="26" y1="17" x2="29" y2="17" stroke="#444" stroke-width="1"/><line x1="26" y1="23" x2="29" y2="23" stroke="#444" stroke-width="1"/><line x1="26" y1="29" x2="29" y2="29" stroke="#444" stroke-width="1"/><text x="32" y="7" font-size="5" fill="#666" font-family="Arial, sans-serif">100</text><text x="32" y="13" font-size="5" fill="#666" font-family="Arial, sans-serif">75</text><text x="32" y="19" font-size="5" fill="#666" font-family="Arial, sans-serif">50</text><text x="32" y="25" font-size="5" fill="#666" font-family="Arial, sans-serif">25</text><text x="32" y="31" font-size="5" fill="#666" font-family="Arial, sans-serif">0</text></svg>'
+  'custom': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><path d="M12 8 Q6 8 6 14 L6 20 Q6 26 12 26" stroke="#444" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M40 8 Q46 8 46 14 L46 20 Q46 26 40 26" stroke="#444" stroke-width="1.5" fill="none" stroke-linecap="round"/><text x="17" y="22" font-size="12" fill="#378ADD" font-family="Menlo, Consolas, monospace" font-weight="700">&lt;/&gt;</text></svg>'
+
+INTEGER_APPEARANCE_CARDS = [
+  { value: '',                                  svgKey: 'number-input' }
+  { value: 'analog-scale horizontal',           svgKey: 'horizontal-slider' }
+  { value: 'analog-scale horizontal no-ticks',  svgKey: 'horizontal-slider-no-ticks' }
+  { value: 'analog-scale vertical',             svgKey: 'vertical-slider' }
+  { value: 'analog-scale vertical no-ticks',    svgKey: 'vertical-slider-no-ticks' }
+  { value: 'analog-scale vertical show-scale',  svgKey: 'vertical-slider-with-scale' }
+  { value: 'other',                             svgKey: 'custom' }
+]
+
 module.exports = do ->
   class BaseRowView extends Backbone.View
     tagName: 'li'
@@ -610,9 +629,9 @@ module.exports = do ->
       if (isLockable and @hasRestriction(LockingRestrictionName.group_settings_edit))
         @$settings.find('.js-card-settings-row-options').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
-      # disable all UI from "Skip Logic" tab of group settings
-      if (isLockable and @hasRestriction(LockingRestrictionName.group_skip_logic_edit))
-        @$settings.find('.js-card-settings-skip-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
+      # disable all UI from "Relevant Logic" tab of group settings
+      if (isLockable and @hasRestriction(LockingRestrictionName.group_skip_logic_edit.name))
+        @$settings.find('.js-card-settings-relevant-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
       return
 
@@ -623,23 +642,18 @@ module.exports = do ->
       @$header.after($viewTemplates.row.groupSettingsView())
       @cardSettingsWrap = @$('.card__settings').eq(0)
       @defaultRowDetailParent = @cardSettingsWrap.find('.card__settings__fields--active').eq(0)
+      @appearanceRowDetailParent = @cardSettingsWrap.find('.js-appearance-body').eq(0)
       for [key, val] in @model.attributesArray()
         if key in ["name", "_isRepeat", "repeat_count", "appearance", "relevant"] or key.match(/^.+::.+/)
           new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
 
       @model.on 'add', (row) =>
         if row.constructor.key == 'group'
-          $appearanceField = @$('.xlf-dv-appearance').eq(0)
-          $appearanceField.hide()
-          $appearanceField.find('input:checkbox').prop('checked', false)
           appearanceModel = @model.get('appearance')
-          if appearanceModel.getValue()
+          currentAppearance = (appearanceModel.getValue() or '').trim().replace(/\s*\bw\d+\b\s*/g, ' ').trim()
+          if currentAppearance is 'field-list'
             notify.warning(t("You can't display nested groups on the same screen - the setting has been removed from the parent group"))
-          appearanceModel.set('value', '')
-
-      @model.on 'remove', (row) =>
-        if row.constructor.key == 'group' && !@hasNestedGroups()
-          @$('.xlf-dv-appearance').eq(0).show()
+            appearanceModel.set('value', '')
 
       @applyLocking()
 
@@ -693,6 +707,7 @@ module.exports = do ->
       @primaryRowDetailParentRight = @cardSettingsWrap.find('.js-card-settings-col-right').eq(0)
       @advancedRowDetailParent = @cardSettingsWrap.find('.js-card-settings-row-options-advanced').eq(0)
       @appearanceRowDetailParent = @cardSettingsWrap.find('.js-appearance-body').eq(0)
+      @appearanceSection = @cardSettingsWrap.find('.js-appearance-section').eq(0)
       @defaultRowDetailParent = @primaryRowDetailParentLeft
       @cardSettingsWrap.off('click.advancedToggle')
       @cardSettingsWrap.on 'click.advancedToggle', '.js-card-settings-advanced-toggle', (evt) =>
@@ -708,6 +723,23 @@ module.exports = do ->
           $advanced.addClass('is-collapsed')
           $toggle.removeClass('is-expanded')
           $toggle.attr('aria-expanded', 'false')
+      @cardSettingsWrap.off('click.appearanceToggle')
+      @cardSettingsWrap.on 'click.appearanceToggle', '.js-appearance-section-toggle', (evt) =>
+        evt.preventDefault()
+        $toggle = $(evt.currentTarget)
+        $content = @appearanceSection.find('.js-appearance-card-content')
+        $pill = @appearanceSection.find('.js-appearance-pill')
+        isExpanded = $toggle.hasClass('is-expanded')
+        if isExpanded
+          $content.addClass('is-collapsed')
+          $toggle.removeClass('is-expanded')
+          $toggle.attr('aria-expanded', 'false')
+          $pill.show()
+        else
+          $content.removeClass('is-collapsed')
+          $toggle.addClass('is-expanded')
+          $toggle.attr('aria-expanded', 'true')
+          $pill.hide()
       questionType = @model.get('type').get('typeId')
       isEConsentSig = econsentSignature.isEConsentSignatureRow(@model)
       externalValue = @model.get('bind::oc:external')?.get('value')
@@ -756,6 +788,10 @@ module.exports = do ->
                 continue
               else if key is 'bind::oc:itemgroup' and isPiiExternalValue
                 val.set 'value', ''
+                continue
+              else if key is 'appearance' and questionType is 'integer'
+                new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
+                @_buildIntegerAppearanceSection(val)
                 continue
               # Note: For PII items, bind::oc:briefdescription and bind::oc:description
               # DetailViews are still rendered so their afterRender can hide+clear values
@@ -1029,15 +1065,97 @@ module.exports = do ->
           @$settings.find('.js-card-settings-row-options').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
           @$settings.find('.js-params-view').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
-        # disable all UI from "Skip Logic" tab of question settings
-        if (isLockable and @hasRestriction(LockingRestrictionName.question_skip_logic_edit))
-          @$settings.find('.js-card-settings-skip-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
+        # disable all UI from "Relevant Logic" tab of question settings
+        if (isLockable and @hasRestriction(LockingRestrictionName.question_skip_logic_edit.name))
+          @$settings.find('.js-card-settings-relevant-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
         # disable all UI from "Validation Criteria" tab of question settings
         if (isLockable and @hasRestriction(LockingRestrictionName.question_validation_edit))
           @$settings.find('.js-card-settings-validation-criteria').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
 
       return
+
+    _integerCardValueFromModel: (modelValue) ->
+      return '' if not modelValue or modelValue is 'default'
+      stripped = modelValue.replace(/\bw\d+\b/g, '').trim()
+      return '' if stripped is ''
+      KNOWN_VALUES = [
+        'analog-scale vertical show-scale'
+        'analog-scale horizontal no-ticks'
+        'analog-scale vertical no-ticks'
+        'analog-scale horizontal'
+        'analog-scale vertical'
+      ]
+      for v in KNOWN_VALUES
+        return v if stripped.indexOf(v) > -1
+      'other'
+
+    _buildIntegerAppearanceSection: (appearanceModel) ->
+      modelValue = (appearanceModel?.get('value') or '').trim()
+      cardValue = @_integerCardValueFromModel(modelValue)
+
+      CARD_LABELS =
+        '': t('Number input')
+        'analog-scale horizontal': t('Horizontal slider')
+        'analog-scale horizontal no-ticks': t('Horizontal slider (no ticks)')
+        'analog-scale vertical': t('Vertical slider')
+        'analog-scale vertical no-ticks': t('Vertical slider (no ticks)')
+        'analog-scale vertical show-scale': t('Vertical slider with scale')
+        'other': t('Custom')
+
+      @appearanceSection.removeClass('appearance-section--hidden')
+
+      $content = @appearanceSection.find('.js-appearance-card-content')
+      $grid = $('<div class="integer-appearance-card-grid"></div>')
+
+      $customInput = $('<input type="text" class="integer-appearance-custom-input" />')
+      $customInput.attr('placeholder', t('Enter appearance value'))
+      if cardValue isnt 'other'
+        $customInput.hide()
+      else if modelValue isnt 'other' and modelValue isnt ''
+        $customInput.val(modelValue)
+
+      for card in INTEGER_APPEARANCE_CARDS
+        do (card) =>
+          isSelected = card.value is cardValue
+          $card = $('<div></div>')
+          $card.addClass('integer-appearance-card')
+          if isSelected
+            $card.addClass('integer-appearance-card--selected')
+          $iconDiv = $('<div class="integer-appearance-card__icon"></div>')
+          $iconDiv.html(INTEGER_APPEARANCE_SVGS[card.svgKey])
+          $labelDiv = $('<div class="integer-appearance-card__label"></div>')
+          $labelDiv.text(CARD_LABELS[card.value])
+          $card.append($iconDiv).append($labelDiv)
+          $grid.append($card)
+
+          $card.on 'click', =>
+            $grid.find('.integer-appearance-card').removeClass('integer-appearance-card--selected')
+            $card.addClass('integer-appearance-card--selected')
+            @appearanceSection.find('.js-appearance-pill').text(CARD_LABELS[card.value] or CARD_LABELS[''])
+            if card.value is 'other'
+              $customInput.show()
+              customVal = $customInput.val().trim()
+              appearanceModel.set('value', if customVal then customVal else 'other')
+            else
+              $customInput.hide()
+              currentFull = (appearanceModel.get('value') or '').trim()
+              widthPart = ''
+              for wOpt in ['w10','w9','w8','w7','w6','w5','w4','w3','w2','w1']
+                if currentFull.indexOf(wOpt) > -1
+                  widthPart = wOpt
+                  break
+              newVal = if card.value and widthPart then "#{card.value} #{widthPart}" else card.value or widthPart or ''
+              appearanceModel.set('value', newVal)
+
+      $content.append($grid).append($customInput)
+
+      @appearanceSection.find('.js-appearance-pill').text(CARD_LABELS[cardValue] or CARD_LABELS[''])
+
+      $customInput.on 'input blur change', =>
+        if $customInput.is(':visible')
+          customVal = $customInput.val().trim()
+          appearanceModel.set('value', if customVal then customVal else 'other')
 
     hideMultioptions: ->
       @$card.removeClass('card--expandedchoices')
@@ -1069,7 +1187,7 @@ module.exports = do ->
       super()
       @$('.xlf-dv-required').hide()
       @$("li[data-card-settings-tab-id='validation-criteria']").hide()
-      @$("li[data-card-settings-tab-id='skip-logic']").hide()
+      @$("li[data-card-settings-tab-id='relevant-logic']").hide()
 
     _renderRow: ->
       @$el.html $viewTemplates.row.koboMatrixView()

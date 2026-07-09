@@ -62,8 +62,8 @@ module.exports = do ->
           <li data-card-settings-tab-id="row-options" class="card__settings__tabs__tab card__settings__tabs__tab--active">
             #{t("All group settings")}
           </li>
-          <li data-card-settings-tab-id="skip-logic" class="card__settings__tabs__tab">
-            #{t("Skip Logic")}
+          <li data-card-settings-tab-id="relevant-logic" class="card__settings__tabs__tab">
+            #{t("Relevant Logic")}
           </li>
           <li data-card-settings-tab-id="repeat-count" class="card__settings__tabs__tab js-repeat-count-tab repeat-count-tab--hidden">
             #{t("Repeat Count")}
@@ -77,7 +77,15 @@ module.exports = do ->
             <i class="k-icon k-icon-arrow-left" aria-hidden="true"></i>
           </button>
           <ul class="js-card-settings-row-options card__settings__fields card__settings__fields--active"></ul>
-          <ul class="js-card-settings-skip-logic card__settings__fields"></ul>
+          <div class="js-card-settings-appearance card__settings__appearance-section is-collapsed">
+            <div class="card__settings__appearance-header js-appearance-toggle" role="button" tabindex="0" aria-expanded="false">
+              <span class="card__settings__appearance-title">#{t('Appearance')}</span>
+              <span class="js-appearance-pill card__settings__appearance-pill" style="display:none"></span>
+              <i class="k-icon k-icon-angle-down card__settings__appearance-toggle__icon" aria-hidden="true"></i>
+            </div>
+            <div class="js-appearance-body card__settings__appearance-body"></div>
+          </div>
+          <ul class="js-card-settings-relevant-logic card__settings__fields"></ul>
           <ul class="js-card-settings-repeat-count card__settings__fields card__settings__fields--repeat-count"></ul>
           <ul class="js-card-settings-locked-features card__settings__fields locking__ui-hidden"></ul>
         </div>
@@ -93,8 +101,8 @@ module.exports = do ->
           <li data-card-settings-tab-id="row-options" class="card__settings__tabs__tab--active">
             #{t("Question Options")}
           </li>
-          <li data-card-settings-tab-id="skip-logic" class="card__settings__tabs__tab">
-            #{t("Skip Logic")}
+          <li data-card-settings-tab-id="relevant-logic" class="card__settings__tabs__tab">
+            #{t("Relevant Logic")}
           </li>
           <li data-card-settings-tab-id="validation-criteria" class="card__settings__tabs__tab">
             #{t("Validation Criteria")}
@@ -124,12 +132,20 @@ module.exports = do ->
               <div class="card__settings__fields-col js-card-settings-col-right"></div>
             </div>
             <div class="js-card-settings-appearance card__settings__appearance-section is-collapsed">
-              <div class="card__settings__appearance-header js-appearance-toggle" aria-expanded="false">
+              <div class="card__settings__appearance-header js-appearance-toggle" role="button" tabindex="0" aria-expanded="false">
                 <span class="card__settings__appearance-title">#{t('Appearance')}</span>
                 <span class="js-appearance-pill card__settings__appearance-pill" style="display:none"></span>
                 <i class="k-icon k-icon-angle-down card__settings__appearance-toggle__icon" aria-hidden="true"></i>
               </div>
               <div class="js-appearance-body card__settings__appearance-body"></div>
+            </div>
+            <div class="js-appearance-section appearance-section appearance-section--hidden">
+              <div class="card__settings__appearance-header js-appearance-section-toggle" aria-expanded="false">
+                <span class="card__settings__appearance-title">#{t('Appearance')}</span>
+                <span class="js-appearance-pill card__settings__appearance-pill"></span>
+                <i class="k-icon k-icon-angle-down card__settings__appearance-toggle__icon" aria-hidden="true"></i>
+              </div>
+              <div class="js-appearance-card-content appearance-card-content is-collapsed"></div>
             </div>
             <div class="card__settings__advanced-toggle js-card-settings-advanced-toggle" aria-expanded="false" aria-controls="js-card-settings-row-options-advanced">
               <span>#{t('Advanced options')}</span>
@@ -137,7 +153,7 @@ module.exports = do ->
             </div>
             <div id="js-card-settings-row-options-advanced" class="card__settings__fields-grid js-card-settings-row-options-advanced is-collapsed"></div>
           </div>
-          <ul class="js-card-settings-skip-logic card__settings__fields"></ul>
+          <ul class="js-card-settings-relevant-logic card__settings__fields"></ul>
           <ul class="js-card-settings-validation-criteria card__settings__fields"></ul>
           <div class="js-card-settings-required-logic card__settings__fields"></div>
           <div class="js-card-settings-default-value card__settings__fields"></div>
