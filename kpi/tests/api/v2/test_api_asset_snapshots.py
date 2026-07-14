@@ -327,6 +327,23 @@ class TestAssetSnapshotDetail(AssetSnapshotBase):
         xml_response = self.client.get(snapshot_url)
         self.assertContains(xml_response, 'Global message in English')
 
+    def test_preview_forces_english_language(self):
+        self.client.login(username='someuser', password='someuser')
+        url = reverse(self._get_endpoint('assetsnapshot-list'))
+        data = {'source': self.form_source}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(
+            response.status_code, status.HTTP_201_CREATED, msg=response.data
+        )
+
+        preview_url = reverse(
+            self._get_endpoint('assetsnapshot-preview'),
+            kwargs={'uid_asset_snapshot': response.data['uid']},
+        )
+        preview_response = self.client.get(preview_url)
+        self.assertEqual(preview_response.status_code, status.HTTP_302_FOUND)
+        self.assertIn('lang=en', preview_response.url)
+
     def test_preview_with_overridden_form_disclaimer(self):
         self.client.login(username='someuser', password='someuser')
         asset = self.create_asset(
