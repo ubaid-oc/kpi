@@ -475,7 +475,10 @@ export default function EditableForm(props: EditableFormProps) {
     if (app?.survey._initialParams?.translations_0) {
       surveyJSON = unnullifyTranslations(surveyJSON, app.survey._initialParams)
     }
-    let params: KoboMatrixParserParams & { asset?: string } = { source: surveyJSON }
+    let params: KoboMatrixParserParams & {
+      asset?: string
+      use_study_designer_preview?: boolean
+    } = { source: surveyJSON, use_study_designer_preview: true }
 
     params = koboMatrixParser(params)
 
