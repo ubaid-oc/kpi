@@ -102,6 +102,27 @@ class DecorateSnapshotWithStudyDesignerPreviewTest(TestCase):
     @patch('kpi.utils.study_designer_preview._cached_client_secret')
     @patch('kpi.utils.study_designer_preview._cached_realm_name')
     @responses.activate
+    def test_falls_back_on_malformed_200_body(
+        self, mock_realm, mock_secret, mock_keycloak
+    ):
+        self._mock_keycloak(mock_realm, mock_secret, mock_keycloak)
+        responses.add(
+            responses.POST,
+            self.form_service_url,
+            body='not xml at all',
+            status=200,
+        )
+
+        original_xml = self.snapshot.xml
+        decorate_snapshot_with_study_designer_preview(self.snapshot, self.request)
+
+        self.snapshot.refresh_from_db()
+        self.assertEqual(self.snapshot.xml, original_xml)
+
+    @patch('kpi.utils.study_designer_preview.KeycloakOpenID')
+    @patch('kpi.utils.study_designer_preview._cached_client_secret')
+    @patch('kpi.utils.study_designer_preview._cached_realm_name')
+    @responses.activate
     def test_falls_back_on_connection_error(
         self, mock_realm, mock_secret, mock_keycloak
     ):

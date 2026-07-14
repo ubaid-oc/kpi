@@ -32,17 +32,27 @@ def decorate_snapshot_with_study_designer_preview(snapshot, request):
         decorated_xml = _fetch_decorated_xml(snapshot, request)
     except Exception as exc:
         LOGGER.warning(
-            'decorate_snapshot_with_study_designer_preview: failed for '
-            'snapshot %s: %s',
+            'decorate_snapshot_with_study_designer_preview: failed to fetch '
+            'decorated XML for snapshot %s: %s',
             snapshot.uid,
             exc,
+            exc_info=True,
         )
         return
 
     if not decorated_xml:
         return
 
-    AssetSnapshot.objects.filter(pk=snapshot.pk).update(xml=decorated_xml)
+    try:
+        AssetSnapshot.objects.filter(pk=snapshot.pk).update(xml=decorated_xml)
+    except Exception as exc:
+        LOGGER.warning(
+            'decorate_snapshot_with_study_designer_preview: failed to '
+            'persist decorated XML for snapshot %s: %s',
+            snapshot.uid,
+            exc,
+            exc_info=True,
+        )
 
 
 def _fetch_decorated_xml(snapshot, request):
@@ -76,6 +86,13 @@ def _fetch_decorated_xml(snapshot, request):
     if not xml or not xml.strip():
         LOGGER.warning(
             'generateXform returned an empty body for snapshot %s',
+            snapshot.uid,
+        )
+        return None
+
+    if not xml.lstrip().startswith(('<?xml', '<h:')):
+        LOGGER.warning(
+            'generateXform returned a malformed (non-XML) body for ' 'snapshot %s',
             snapshot.uid,
         )
         return None

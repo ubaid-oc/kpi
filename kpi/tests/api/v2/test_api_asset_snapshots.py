@@ -289,6 +289,9 @@ class TestAssetSnapshotList(AssetSnapshotBase):
         mock_decorate.assert_called_once()
         called_snapshot = mock_decorate.call_args[0][0]
         self.assertEqual(called_snapshot.uid, response.data['uid'])
+        called_request = mock_decorate.call_args[0][1]
+        self.assertTrue(hasattr(called_request, 'user'))
+        self.assertEqual(called_request.user.username, 'someuser')
 
     def test_use_study_designer_preview_false_by_default(self):
         self.client.login(username='someuser', password='someuser')
