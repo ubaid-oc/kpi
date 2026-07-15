@@ -50,11 +50,44 @@
 // Single/multiple select questions
 // ==========================================================================
 
+// ==========================================================================
+// Response list column headers
+// ==========================================================================
+
+.multioptions__header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-left: 5px;
+  padding: 0 29px 4px 4px;
+}
+
+.multioptions__header__col {
+  font-size: 11px;
+  font-weight: 600;
+  color: colors.$kobo-gray-700;
+  letter-spacing: 0.04em;
+
+  &--label {
+    flex: 1 1 auto;
+  }
+
+  &--value,
+  &--image {
+    flex: 0 0 25%;
+    margin-left: 3%;
+    text-align: right;
+  }
+}
+
 // .xlf-option-view BECOMES .multioptions__option
 .multioptions__option {
   margin-bottom: 4px;
   margin-left: 4px;
   position: relative;
+  border: variables.$thinBorderStyle;
+  border-radius: 4px;
+  transition: background-color 0.1s ease, border-color 0.1s ease;
 
   div.editable-wrapper {
     font-weight: 600;
@@ -143,15 +176,21 @@
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
-    padding-right: 28px;
+    padding: 4px 28px 4px 4px;
 
     div.editable-wrapper {
       flex: 1 1 auto;
       width: auto;
+      border-color: #cbd5e1;
     }
 
     code {
       flex: 0 0 25%;
+
+      span,
+      input[type='text'] {
+        border-color: #cbd5e1;
+      }
     }
   }
 
@@ -170,6 +209,9 @@
 
   &:hover,
   &:focus-within {
+    background-color: colors.$kobo-gray-100;
+    border-color: colors.$kobo-gray-500;
+
     .k-icon.k-icon-trash {
       opacity: 1;
       pointer-events: auto;
