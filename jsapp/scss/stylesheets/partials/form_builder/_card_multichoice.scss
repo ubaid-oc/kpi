@@ -181,7 +181,7 @@
     div.editable-wrapper {
       flex: 1 1 auto;
       width: auto;
-      border-color: #cbd5e1;
+      border-color: colors.$kobo-gray-400;
     }
 
     code {
@@ -189,7 +189,7 @@
 
       span,
       input[type='text'] {
-        border-color: #cbd5e1;
+        border-color: colors.$kobo-gray-400;
       }
     }
   }
