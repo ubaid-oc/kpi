@@ -4,7 +4,7 @@ from unittest.mock import patch
 import responses
 from django.conf import settings
 from django.core.cache import cache
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 
 from kobo.apps.kobo_auth.shortcuts import User
 from kpi.models import Asset, AssetSnapshot
@@ -13,6 +13,7 @@ from kpi.utils.study_designer_preview import (
 )
 
 
+@override_settings(OC_BUILD_URL='http://form-service.test')
 class DecorateSnapshotWithStudyDesignerPreviewTest(TestCase):
     fixtures = ['test_data']
 
