@@ -38,12 +38,26 @@
 }
 
 .option-placeholder {
-  height: 32px;
-  margin-bottom: 10px;
-  border: 2px solid colors.$kobo-gray-500;
-  border-radius: 4px;
-  margin-right: 25px;
+  height: 2px !important;
+  min-height: 0 !important;
+  margin-bottom: 4px;
   margin-left: 5px;
+  background-color: colors.$kobo-blue;
+  border: none !important;
+  border-radius: 1px;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: colors.$kobo-blue;
+  }
 }
 
 // ==========================================================================
@@ -230,11 +244,24 @@
   }
 
   &.ui-sortable-helper {
-    background-color: color.adjust(colors.$kobo-blue, $lightness: 45%);
+    background-color: color.change(colors.$kobo-blue, $lightness: 92%);
     border-color: colors.$kobo-blue;
 
-    .multioptions__drag-handle {
-      color: colors.$kobo-blue;
+    .multioptions__option__row {
+      div.editable-wrapper {
+        background-color: white;
+      }
+
+      code {
+        span,
+        input[type='text'] {
+          background-color: white;
+        }
+      }
+
+      .multioptions__drag-handle {
+        color: colors.$kobo-blue;
+      }
     }
   }
 }
