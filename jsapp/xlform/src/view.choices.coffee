@@ -42,8 +42,9 @@ module.exports = do ->
       if not isSortableDisabled
         @ul.sortable({
             axis: "y"
-            cursor: "move"
+            cursor: "grabbing"
             distance: 5
+            handle: ".js-drag-handle"
             items: "> li"
             placeholder: "option-placeholder"
             opacity: 0.9
@@ -122,6 +123,7 @@ module.exports = do ->
       Backbone.on('consentRowChoiceValueError', @onConsentRowChoiceValueError, @)
       Backbone.on('consentRowChoiceValueNotError', @onConsentRowChoiceValueNotError, @)
     render: ->
+      @h = $("<span class=\"multioptions__drag-handle js-drag-handle\">")
       @t = $("<i class=\"k-icon k-icon-trash js-remove-option\">")
       @pw = $("<div class=\"editable-wrapper js-option-label-input js-cancel-select-row\">")
       @p = $("<input placeholder=\"#{t("No value")}\" class=\"js-cancel-select-row option-view-input\" dir=\"auto\">")
@@ -228,6 +230,7 @@ module.exports = do ->
         return
       ).bind @
 
+      @d.append(@h)
       @d.append(@pw)
       @d.append(@c)
       @d.append(@i)
