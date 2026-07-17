@@ -163,16 +163,12 @@
     font-size: 18px;
     cursor: pointer;
     color: colors.$kobo-gray-500;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.15s ease, color 0.15s ease;
+    transition: color 0.15s ease;
   }
 
   &:hover,
   &:focus-within {
     .k-icon.k-icon-trash {
-      opacity: 1;
-      pointer-events: auto;
       color: colors.$kobo-red;
     }
   }
