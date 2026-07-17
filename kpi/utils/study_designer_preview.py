@@ -53,11 +53,24 @@ def decorate_snapshot_with_study_designer_preview(snapshot, request):
             exc,
             exc_info=True,
         )
+        return
+
+    # Keep the in-memory instance in sync with what was just persisted, so
+    # callers reusing `snapshot` after this call see the decorated XML too.
+    snapshot.xml = decorated_xml
 
 
 def _fetch_decorated_xml(snapshot, request):
     realm_name = _cached_realm_name(request)
     token = _cached_client_credentials_token(realm_name)
+    if not token:
+        LOGGER.warning(
+            'generateXform: no client-credentials token available for '
+            'realm %s, snapshot %s',
+            realm_name,
+            snapshot.uid,
+        )
+        return None
 
     xlsx_io = snapshot.to_xlsx_io()
     response = requests.post(
@@ -107,6 +120,17 @@ def _cached_client_credentials_token(realm_name):
         return token
 
     client_secret = _cached_client_secret(realm_name)
+    if not client_secret:
+        # No client secret configured for this realm: requesting a token
+        # would only fail, and would do so on every preview attempt. Skip
+        # the call rather than raise the same error repeatedly.
+        LOGGER.warning(
+            'no client secret configured for realm %s; skipping '
+            'client-credentials token request',
+            realm_name,
+        )
+        return None
+
     keycloak_openid = KeycloakOpenID(
         server_url=f'{settings.KEYCLOAK_AUTH_URI}/auth/',
         realm_name=realm_name,
@@ -116,7 +140,7 @@ def _cached_client_credentials_token(realm_name):
     )
     token_response = keycloak_openid.token(grant_type='client_credentials')
     access_token = token_response['access_token']
-    expires_in = token_response.get('expires_in', 60)
+    expires_in = int(token_response.get('expires_in', 60))
     ttl = max(expires_in - _TOKEN_CACHE_TTL_BUFFER_SECONDS, 1)
     cache.set(key, access_token, ttl)
     return access_token

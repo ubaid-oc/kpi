@@ -61,6 +61,10 @@ class DecorateSnapshotWithStudyDesignerPreviewTest(TestCase):
         original_xml = self.snapshot.xml
         decorate_snapshot_with_study_designer_preview(self.snapshot, self.request)
 
+        # The in-memory instance should already reflect the decorated XML,
+        # without needing a DB refresh.
+        self.assertEqual(self.snapshot.xml, '<h:html><!-- decorated --></h:html>')
+
         self.snapshot.refresh_from_db()
         self.assertEqual(self.snapshot.xml, '<h:html><!-- decorated --></h:html>')
         self.assertNotEqual(self.snapshot.xml, original_xml)
@@ -180,3 +184,21 @@ class DecorateSnapshotWithStudyDesignerPreviewTest(TestCase):
         decorate_snapshot_with_study_designer_preview(self.snapshot, self.request)
 
         self.assertEqual(mock_keycloak.return_value.token.call_count, 1)
+
+    @patch('kpi.utils.study_designer_preview.KeycloakOpenID')
+    @patch('kpi.utils.study_designer_preview._cached_client_secret')
+    @patch('kpi.utils.study_designer_preview._cached_realm_name')
+    def test_falls_back_when_client_secret_missing(
+        self, mock_realm, mock_secret, mock_keycloak
+    ):
+        mock_realm.return_value = 'test-realm'
+        mock_secret.return_value = None
+
+        original_xml = self.snapshot.xml
+        decorate_snapshot_with_study_designer_preview(self.snapshot, self.request)
+
+        # Should skip requesting a token entirely rather than fail repeatedly.
+        mock_keycloak.assert_not_called()
+
+        self.snapshot.refresh_from_db()
+        self.assertEqual(self.snapshot.xml, original_xml)
