@@ -122,7 +122,7 @@ module.exports = do ->
       @p = $("<input placeholder=\"#{t("No value")}\" class=\"js-cancel-select-row option-view-input\" dir=\"auto\">")
       @c = $("<code><input type=\"text\" class=\"js-option-name-input js-cancel-select-row\"></input></code>")
       @i = $("<code><input type=\"text\" class=\"js-option-image-input js-cancel-select-row\"></input></code>")
-      @d = $('<div>')
+      @d = $('<div class="multioptions__option__row">')
       @optionImageField = 'image'
       if @model
         @p.val @model.get("label") || 'Empty'
@@ -224,9 +224,9 @@ module.exports = do ->
       ).bind @
 
       @d.append(@pw)
-      @d.append(@t)
       @d.append(@c)
       @d.append(@i)
+      @d.append(@t)
       @$el.html(@d)
       return @
     keyupinput: (evt)->
