@@ -196,10 +196,13 @@
       background-image: radial-gradient(circle, currentColor 1.5px, transparent 1.5px);
       background-size: 6px 6px;
       background-repeat: repeat;
-      cursor: grab;
 
-      &:active {
-        cursor: grabbing;
+      .js-sortable-enabled & {
+        cursor: grab;
+
+        &:active {
+          cursor: grabbing;
+        }
       }
     }
 
