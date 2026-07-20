@@ -299,6 +299,29 @@ $modal-custom-header-height: 60px;
   }
 }
 
+.modal.modal--form-languages {
+  border-radius: 12px;
+  overflow: hidden; // so the header's color respects the rounded top corners
+
+  .modal__header {
+    background-color: colors.$kobo-hover-blue;
+    color: colors.$kobo-white;
+  }
+
+  .modal__title {
+    font-size: 18px;
+    padding: 15px 10px;
+  }
+
+  .modal__x {
+    color: colors.$kobo-white;
+  }
+
+  .modal__body {
+    padding-top: 20px;
+  }
+}
+
 .enketo-holder {
   // resets modal window paddings
   margin: 0 -20px;

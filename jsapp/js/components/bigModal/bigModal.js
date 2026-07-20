@@ -169,7 +169,7 @@ class BigModal extends React.Component {
         break
 
       case MODAL_TYPES.FORM_LANGUAGES:
-        this.setModalTitle(t('Manage Languages'))
+        this.setState({ modalClass: 'modal--form-languages' })
         break
 
       case MODAL_TYPES.FORM_TRANSLATIONS_TABLE:
@@ -257,6 +257,12 @@ class BigModal extends React.Component {
         var filename = props.params.filename || ''
         newState.title = t('Uploading XLS file')
         newState.message = t('Uploading: ') + filename
+      }
+
+      if (props.params.type === MODAL_TYPES.FORM_LANGUAGES) {
+        const translations = props.params.asset?.content?.translations
+        const isSettingPrimaryLanguage = translations?.length === 1 && translations[0] === null
+        newState.title = isSettingPrimaryLanguage ? t('Select a primary language') : t('Manage Languages')
       }
 
       // store for later
