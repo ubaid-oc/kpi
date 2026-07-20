@@ -431,6 +431,8 @@ export class TranslationSettings extends React.Component<TranslationSettingsProp
 
               <bem.FormView__cell m='label'>{t('Add a new language')}</bem.FormView__cell>
 
+              <p>{t('We suggest using the official language code (e.g. "English (en)" or "Rohingya (rhg)").')}</p>
+
               <LanguageForm
                 isPending={this.state.isUpdatingAsset}
                 onLanguageChange={this.onLanguageChange.bind(this)}
