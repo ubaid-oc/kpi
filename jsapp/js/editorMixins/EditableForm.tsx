@@ -1138,9 +1138,7 @@ export default function EditableForm(props: EditableFormProps) {
             </bem.FormBuilderHeader__cell>
           )}
 
-          {state.asset?.asset_type === ASSET_TYPES.survey.id && (
-            <bem.FormBuilderHeader__cell m={'verticalRule'} />
-          )}
+          {state.asset?.asset_type === ASSET_TYPES.survey.id && <bem.FormBuilderHeader__cell m={'verticalRule'} />}
 
           <bem.FormBuilderHeader__cell>
             <Button
