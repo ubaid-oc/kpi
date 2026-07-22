@@ -43,6 +43,7 @@ import {
   AssetTypeName,
   type FormStyleDefinition,
   type FormStyleName,
+  MODAL_TYPES,
   NAME_MAX_LENGTH,
   OC_USER_TYPES,
   QuestionTypeName,
@@ -50,6 +51,7 @@ import {
   update_states,
 } from '#/constants'
 import envStore from '#/envStore'
+import pageState from '#/pageState.store'
 import type { RouterProp } from '#/router/legacy'
 import { ROUTES } from '#/router/routerConstants'
 import sessionStore from '#/stores/session'
@@ -715,7 +717,14 @@ export default function EditableForm(props: EditableFormProps) {
     saveAsideSettings(asideSettings)
   }
 
-  function manageLanguages() {}
+  function manageLanguages() {
+    if (state.asset) {
+      pageState.showModal({
+        type: MODAL_TYPES.FORM_LANGUAGES,
+        asset: state.asset,
+      })
+    }
+  }
 
   function toggleAsideLayoutSettings(evt: React.TouchEvent<HTMLButtonElement>) {
     evt.currentTarget.blur()
