@@ -715,6 +715,8 @@ export default function EditableForm(props: EditableFormProps) {
     saveAsideSettings(asideSettings)
   }
 
+  function manageLanguages() {}
+
   function toggleAsideLayoutSettings(evt: React.TouchEvent<HTMLButtonElement>) {
     evt.currentTarget.blur()
     const asideSettings: AsideSettings = {
@@ -1121,6 +1123,22 @@ export default function EditableForm(props: EditableFormProps) {
           </bem.FormBuilderHeader__cell>
 
           <bem.FormBuilderHeader__cell m='verticalRule' />
+
+          {state.asset?.asset_type === ASSET_TYPES.survey.id && (
+            <bem.FormBuilderHeader__cell>
+              <Button
+                type='text'
+                size='m'
+                onClick={manageLanguages}
+                tooltip={t('Manage languages for this form')}
+                tooltipPosition='left'
+                startIcon='language'
+                label={t('Manage Languages')}
+              />
+            </bem.FormBuilderHeader__cell>
+          )}
+
+          {state.asset?.asset_type === ASSET_TYPES.survey.id && <bem.FormBuilderHeader__cell m={'verticalRule'} />}
 
           <bem.FormBuilderHeader__cell>
             <Button
