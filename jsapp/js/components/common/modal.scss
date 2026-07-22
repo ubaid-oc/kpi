@@ -512,7 +512,7 @@ $modal-custom-header-height: 60px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid colors.$kobo-gray-300;
+    border-bottom: 1px solid colors.$kobo-gray-300;
     padding: 6px 0;
 
     .form-view__cell--translation-name {
@@ -530,15 +530,19 @@ $modal-custom-header-height: 60px;
   }
 
   .form-view__label--default-language {
-    display: inline;
+    display: inline-block;
+    background-color: colors.$kobo-bg-blue;
+    color: colors.$kobo-dark-blue;
+    font-size: 11px;
     font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 8px;
     margin-left: 6px;
   }
 
   .form-view__cell--add-language {
     padding-top: 20px;
-    text-align: right;
-    border-top: 1px solid colors.$kobo-gray-300;
+    text-align: left;
   }
 
   .form-view__cell--add-language-form {
