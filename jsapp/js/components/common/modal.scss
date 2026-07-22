@@ -299,14 +299,13 @@ $modal-custom-header-height: 60px;
   }
 }
 
-.modal.modal--form-languages {
+// Shared "OpenClinica" chrome: rounded corners + a bit more breathing room
+// around the title/close-icon/body than the base modal. Plain white header
+// (inherits the base `.modal__header` styling) — no color override. Apply
+// this alongside any modal-specific class (sizing, positioning, etc.).
+.modal.modal--oc {
   border-radius: 12px;
-  overflow: hidden; // so the header's color respects the rounded top corners
-
-  .modal__header {
-    background-color: colors.$kobo-hover-blue;
-    color: colors.$kobo-white;
-  }
+  overflow: hidden;
 
   .modal__title {
     font-size: 18px;
@@ -314,12 +313,23 @@ $modal-custom-header-height: 60px;
   }
 
   .modal__x {
-    color: colors.$kobo-white;
     margin: 10px;
   }
 
   .modal__body {
     padding-top: 20px;
+  }
+
+  // Bumps the Create/Edit Collection field label ("Please enter the name of
+  // your new Collection...") up from the shared TextBox component's default
+  // 12px, and gives it more breathing room above the input box (default is
+  // just 3px). Scoped to `.modal--oc` so it doesn't affect TextBox usage
+  // elsewhere in the app; structural (not a CSS-module class) since
+  // textBox.module.scss's hashed class names aren't stable to select from
+  // outside the component.
+  .library-asset-form label > div:first-child {
+    font-size: 14px;
+    margin-bottom: 12px;
   }
 }
 

@@ -114,11 +114,11 @@ class BigModal extends React.Component {
         break
 
       case MODAL_TYPES.LIBRARY_COLLECTION_CREATE:
-        this.setState({ title: t('Create Collection'), modalClass: 'modal--top-aligned' })
+        this.setState({ title: t('Create Collection'), modalClass: 'modal--top-aligned modal--oc' })
         break
 
       case MODAL_TYPES.LIBRARY_COLLECTION_EDIT:
-        this.setState({ title: t('Edit Collection'), modalClass: 'modal--top-aligned' })
+        this.setState({ title: t('Edit Collection'), modalClass: 'modal--top-aligned modal--oc' })
         break
 
       case MODAL_TYPES.ASSET_TAGS:
@@ -169,7 +169,7 @@ class BigModal extends React.Component {
         break
 
       case MODAL_TYPES.FORM_LANGUAGES:
-        this.setState({ modalClass: 'modal--form-languages' })
+        this.setState({ modalClass: 'modal--oc' })
         break
 
       case MODAL_TYPES.FORM_TRANSLATIONS_TABLE:
