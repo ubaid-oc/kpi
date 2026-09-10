@@ -31,10 +31,12 @@ module.exports = do ->
       if reqVal is 'yes' or reqVal is 'true' or reqVal is 'false'
         @isConditionalSelected = false
       else if @hideConditional
-        # Conditional option is hidden for this question type — force to 'false'
-        # so no radio is left in an unrepresentable selected state
-        @setNewValue('false')
-        reqVal = 'false'
+        # Conditional option is hidden for this question type — force to Never
+        # so no radio is left in an unrepresentable selected state.
+        # OC-28717: canonical Never is '' (not 'false') to keep the XLSForm
+        # required column blank, matching what AC2 specifies.
+        @setNewValue('')
+        reqVal = ''
         @isConditionalSelected = false
       else if reqVal isnt ''
         @isConditionalSelected = true
