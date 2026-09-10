@@ -67,10 +67,12 @@ module.exports = do ->
       @$panelEl = $($viewTemplates.$$render('row.requiredLogicPanel'))
       @$panelEl.appendTo(rowView.cardSettingsWrap.find('.js-card-settings-required-logic'))
       # OC fork (P1.1): AI Generate button in the Required Logic panel header.
-      generateButtonBridge.mountGenerateButton(
-        @$panelEl.find('.required-logic-panel__header').get(0)
-        { row: @model._parent, attribute: 'required' }
-      )
+      # Not mounted when hideConditional=true — no Conditional option, no Generate.
+      unless @hideConditional
+        generateButtonBridge.mountGenerateButton(
+          @$panelEl.find('.required-logic-panel__header').get(0)
+          { row: @model._parent, attribute: 'required' }
+        )
       @_bindPanelEvents()
       # Populate panel input with existing value if conditional
       reqVal = @getChangedValue()
@@ -209,6 +211,9 @@ module.exports = do ->
 
     _updateRequiredLogicTabVisibility: ->
       return unless @rowView
+      if @hideConditional
+        @rowView.cardSettingsWrap.find('.js-required-logic-tab').hide()
+        return
       @rowView.cardSettingsWrap.find('.js-required-logic-tab').show()
       @_updateRequiredLogicTabError()
 
