@@ -139,7 +139,7 @@ module.exports = do ->
           <li data-card-settings-tab-id="validation-criteria" class="card__settings__tabs__tab">
             #{t("Validation Criteria")}
           </li>
-          <li data-card-settings-tab-id="required-logic" class="card__settings__tabs__tab js-required-logic-tab" style="display:none">
+          <li data-card-settings-tab-id="required-logic" class="card__settings__tabs__tab js-required-logic-tab">
             <span class="js-required-logic-tab-label">#{t("Required Logic")}</span>
             <span class="js-required-logic-error required-logic-error-badge" style="display:none">!</span>
           </li>
@@ -482,6 +482,7 @@ module.exports = do ->
     """
     <div class="required-logic-panel">
       <h2 class="required-logic-panel__header">#{t('Required Logic - when should this item be required?')}</h2>
+      <p class="required-logic-panel__status js-required-logic-status"></p>
       <label class="text-box text-box--on-white required-logic-panel__input-wrapper">
         <input
           type="text"
@@ -490,7 +491,7 @@ module.exports = do ->
           placeholder="#{t('e.g. ${AGE} &lt; 18')}"
         >
       </label>
-      <p class="required-logic-panel__hint">#{t('This question has a')} <strong>#{t('Conditional')}</strong> #{t("required setting. It will be treated as required when the expression above is 'true'.")}</p>
+      <p class="required-logic-panel__hint">#{t("This item will be treated as required when the expression above is 'true'.")}</p>
       #{xpathDocLinkHtml()}
     </div>
     """
