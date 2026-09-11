@@ -100,12 +100,25 @@ describe('buildFormContext (P1.5)', () => {
               label: 'Inner',
               logic: {},
               rows: [
-                { kind: 'question', name: 'WEIGHT', type: 'decimal', label: 'Weight (kg)', isTarget: true, logic: { required: '' } },
+                {
+                  kind: 'question',
+                  name: 'WEIGHT',
+                  type: 'decimal',
+                  label: 'Weight (kg)',
+                  isTarget: true,
+                  logic: { required: '' },
+                },
               ],
             },
           ],
         },
-        { kind: 'question', name: 'BMI', type: 'decimal', label: 'BMI', logic: { required: '', calculation: '${WEIGHT} div 2' } },
+        {
+          kind: 'question',
+          name: 'BMI',
+          type: 'decimal',
+          label: 'BMI',
+          logic: { required: '', calculation: '${WEIGHT} div 2' },
+        },
       ],
     })
     chai.expect(warnSpy.mock.calls.length).to.equal(0)
@@ -309,9 +322,14 @@ describe('buildFormContext (P1.5)', () => {
               ? { odd: true }
               : undefined
     surveyOf([plain])
-    chai
-      .expect(buildFormContext(plain).rows[0])
-      .to.deep.equal({ kind: 'question', name: 'P', type: 'text', hint: 'plain hint', isTarget: true, logic: { required: '' } })
+    chai.expect(buildFormContext(plain).rows[0]).to.deep.equal({
+      kind: 'question',
+      name: 'P',
+      type: 'text',
+      hint: 'plain hint',
+      isTarget: true,
+      logic: { required: '' },
+    })
   })
 
   it('serialises a question that merely has a forEachRow (rank/score) as a question, not a group', () => {
