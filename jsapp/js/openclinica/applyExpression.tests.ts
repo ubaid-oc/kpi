@@ -17,17 +17,23 @@ function makeRow(options: { detail?: any; survey?: any } = {}) {
 // stored attribute (updated by set), while `getValue()` returns the facade's
 // re-serialization of the current raw value — the lossy round-trip that drops
 // clauses it can't resolve and reformats the rest (round-7). `serialize` is the
-// per-test facade behavior.
-function makeFacadeRow(opts: { raw?: string; serialize?: (raw: string) => string } = {}) {
+// per-test facade behavior. Pass `presenters` to set the builder's live state
+// used by readCurrentExpression to distinguish a visual clear from non-serializable
+// conditions (OC-28602 review).
+function makeFacadeRow(opts: { raw?: string; serialize?: (raw: string) => string; presenters?: any[] } = {}) {
   const serialize = opts.serialize ?? ((raw: string) => raw)
   let value = opts.raw ?? ''
   const set = jest.fn((_key: string, v: string) => {
     value = v
   })
-  const detail = {
+  const facade = 'presenters' in opts ? { context: { state: { presenters: opts.presenters } } } : undefined
+  const detail: any = {
     set,
     get: jest.fn((key: string) => (key === 'value' ? value : undefined)),
     getValue: jest.fn(() => serialize(value)),
+  }
+  if (facade != null) {
+    detail.facade = facade
   }
   const made = makeRow({ detail })
   return { ...made, rawValue: () => value }
@@ -323,12 +329,46 @@ describe('readCurrentExpression (P1.3 AC2)', () => {
   })
 
   it('prefers RAW for facade attributes when non-empty — never the lossy getValue() serialization', () => {
-    const { row, detail } = makeFacadeRow({
+    // getValue() is now consulted for the emptiness check (OC-28602) but its
+    // return value never replaces raw when the facade is non-empty.
+    const { row } = makeFacadeRow({
       raw: "${A} = '1' and ${GONE} = '2'",
       serialize: () => "${A} = '1'",
     })
     chai.expect(readCurrentExpression(row, 'relevant')).to.equal("${A} = '1' and ${GONE} = '2'")
-    chai.expect(detail.getValue.mock.calls.length).to.equal(0)
+  })
+
+  it('returns empty when the panel is visually clear after being manually cleared (OC-28602)', () => {
+    // After AI Apply, raw holds '${A} > 0'; user then manually clears all
+    // conditions. Presenters are empty (panel clear), facade serializes to ''.
+    // Must return '' so Apply does not fire a false overwrite confirmation.
+    const { row } = makeFacadeRow({ raw: '${A} > 0', serialize: () => '', presenters: [] })
+    chai.expect(readCurrentExpression(row, 'constraint')).to.equal('')
+  })
+
+  it('returns empty for relevant too when panel is visually clear and facade is empty (OC-28602)', () => {
+    const { row } = makeFacadeRow({ raw: '${B} = 1', serialize: () => '', presenters: [] })
+    chai.expect(readCurrentExpression(row, 'relevant')).to.equal('')
+  })
+
+  it('returns empty when the panel is visually clear after a referenced field is renamed (OC-28602 review Issue 1)', () => {
+    // q2 was renamed to q3; user cleared q1's condition panel. The builder
+    // removed the stale criterion, leaving presenters empty. Raw still holds
+    // ${q2}. findRowByName('q2') would return false (field gone by name) and
+    // fire a false overwrite confirmation. The presenter check returns '' —
+    // the panel is empty regardless of what raw contains.
+    const { row } = makeFacadeRow({ raw: '${q2} > 0', serialize: () => '', presenters: [] })
+    chai.expect(readCurrentExpression(row, 'constraint')).to.equal('')
+  })
+
+  it('retains raw when presenters are non-empty and facade serializes to empty — conditions visible but non-serializable (OC-28602 review Issue 2)', () => {
+    // The condition row is still shown in the builder (presenters non-empty) but
+    // the facade cannot serialize it — e.g. the response value fails validation
+    // (non-integer on an Integer field) or an unsupported comparison. getValue()
+    // returns '' as if the panel were clear. Raw must be returned so the
+    // overwrite confirmation fires instead of silently overwriting visible content.
+    const { row } = makeFacadeRow({ raw: '${A} > 0', serialize: () => '', presenters: [{}] })
+    chai.expect(readCurrentExpression(row, 'relevant')).to.equal('${A} > 0')
   })
 
   it('returns empty string when the row has no RowDetail for the attribute', () => {

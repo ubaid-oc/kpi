@@ -153,6 +153,18 @@ export function readCurrentExpression(row: any, attribute: string): string {
     return ''
   }
   if (raw.trim() !== '') {
+    if (FACADE_ATTRIBUTES.has(attribute) && String(detail?.getValue?.() ?? '').trim() === '') {
+      // Use the builder's live presenter state to distinguish a genuine user-clear
+      // from a non-serializable condition (OC-28602 review). Empty presenters mean
+      // the panel is visually clear — return '' so no confirmation fires. Non-empty
+      // presenters mean conditions are visible but the facade can't serialize them
+      // (e.g. renamed/deleted field not yet cleaned up, invalid response value) —
+      // fall through and return raw so the overwrite confirmation fires.
+      const state = (detail as any)?.facade?.context?.state
+      if ((state?.presenters?.length ?? 0) === 0) {
+        return ''
+      }
+    }
     return raw
   }
   // relevant/constraint: the raw value is only the facade's SEED — conditions
