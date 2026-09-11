@@ -482,7 +482,7 @@ module.exports = do ->
     """
     <div class="required-logic-panel">
       <h2 class="required-logic-panel__header">#{t('Required Logic - when should this item be required?')}</h2>
-      <p class="required-logic-panel__status js-required-logic-status"></p>
+      <p class="required-logic-panel__status js-required-logic-status" aria-live="polite"></p>
       <label class="text-box text-box--on-white required-logic-panel__input-wrapper">
         <input
           type="text"

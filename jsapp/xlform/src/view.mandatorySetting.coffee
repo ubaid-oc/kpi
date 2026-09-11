@@ -147,6 +147,13 @@ module.exports = do ->
             return
         @isConditionalSelected = false
         @setNewValue(val)
+        # Sync _selectorVal and banner immediately — setNewValue may be a no-op
+        # when the model already holds this value. Switching Conditional (empty)
+        # → Never writes '' both times, so Backbone suppresses the change event
+        # and render() never fires; _selectorVal and the banner stay stuck on
+        # the previous Always/Never state. OC-28718.
+        @_selectorVal = val
+        @_updateStatusBanner()
         @_hideRequiredLogicTab()
         @hideMessage()
       return
