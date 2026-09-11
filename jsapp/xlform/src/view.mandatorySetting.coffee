@@ -35,7 +35,9 @@ module.exports = do ->
         # so no radio is left in an unrepresentable selected state.
         # OC-28717: canonical Never is '' (not 'false') to keep the XLSForm
         # required column blank, matching what AC2 specifies.
-        @setNewValue('')
+        # Guard: setNewValue calls onChange on every invocation — only write
+        # when the value actually needs to change to avoid re-render loops.
+        @setNewValue('') unless reqVal is ''
         reqVal = ''
         @isConditionalSelected = false
       else if reqVal isnt ''
