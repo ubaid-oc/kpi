@@ -113,7 +113,9 @@ ANTHROPIC_API_KEY = env.str('ANTHROPIC_API_KEY', '')
 # generation parameters), mounted into the container from the deployment
 # repository and hot-reloaded by the private oc-logic-builder-server package.
 # Missing or blank file = compiled-in defaults. Never surfaced in any UI.
-LOGIC_BUILDER_AI_CONFIG_PATH = env.str('LOGIC_BUILDER_AI_CONFIG_PATH', '/srv/ai-config/overrides.json')
+LOGIC_BUILDER_AI_CONFIG_PATH = env.str(
+    'LOGIC_BUILDER_AI_CONFIG_PATH', '/srv/ai-config/overrides.json'
+)
 
 # Instances of this model will be treated as allowed origins; see
 # https://github.com/ottoyiu/django-cors-headers#cors_model
