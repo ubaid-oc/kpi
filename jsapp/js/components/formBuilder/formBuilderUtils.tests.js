@@ -547,6 +547,42 @@ describe('mergeFreshTranslations', () => {
     expect(result.survey[0]['label::Polski (pl)']).to.equal('Cześć')
     expect(result.survey[0]).to.not.have.property('label')
   })
+
+  it("9. doesn't reintroduce required_message on a signature row from fresh content (OC-28719)", () => {
+    // Reproduces the reviewer-reported gap: `surveyToValidJson` already
+    // stripped `required_message` from this signature row, but the
+    // last-saved asset (`freshContent`) still has it translated - a
+    // plausible pre-fix save, or a value pyxform kept from the original
+    // XLSForm import. Without re-running the discard after the merge, this
+    // step would silently restore it in every language.
+    const result = merge(
+      {
+        survey: [
+          {
+            name: 'q1',
+            type: 'select_multiple',
+            'bind::oc:external': ECONSENT_SIGNATURE_EXTERNAL_VALUE,
+          },
+        ],
+      },
+      {
+        translated: ['required_message'],
+        translations: ['English (en)', 'Spanish (es)'],
+        survey: [
+          {
+            name: 'q1',
+            'bind::oc:external': ECONSENT_SIGNATURE_EXTERNAL_VALUE,
+            required_message: ['This field is required', 'Este campo es obligatorio'],
+          },
+        ],
+      },
+      'English (en)',
+    )
+    const row = result.survey[0]
+    expect(row).to.not.have.property('required_message')
+    expect(row).to.not.have.property('required_message::English (en)')
+    expect(row).to.not.have.property('required_message::Spanish (es)')
+  })
 })
 
 describe('resolveCurrentPrimaryLanguage', () => {
@@ -598,18 +634,20 @@ describe('surveyToValidJson - discard unsupported eConsent signature settings (O
     'bind::oc:itemgroup': 'group1',
     appearance: 'multiline',
     required: 'yes',
+    required_message: 'This field is required',
     readonly: 'yes',
     default: 'today()',
     calculation: 'today()+3',
     trigger: '${other_question}',
   })
 
-  it('strips item group, appearance, required, readonly, default, calculation and trigger from a "signature" row', () => {
+  it('strips item group, appearance, required, required message, readonly, default, calculation and trigger from a "signature" row', () => {
     const result = toValidSurvey([unsupportedRow(ECONSENT_SIGNATURE_EXTERNAL_VALUE)])
     const row = result.survey[0]
     expect(row).to.not.have.property('bind::oc:itemgroup')
     expect(row).to.not.have.property('appearance')
     expect(row).to.not.have.property('required')
+    expect(row).to.not.have.property('required_message')
     expect(row).to.not.have.property('readonly')
     expect(row).to.not.have.property('default')
     expect(row).to.not.have.property('calculation')
@@ -622,6 +660,7 @@ describe('surveyToValidJson - discard unsupported eConsent signature settings (O
       expect(row['bind::oc:itemgroup']).to.equal('group1')
       expect(row.appearance).to.equal('multiline')
       expect(row.required).to.equal('yes')
+      expect(row.required_message).to.equal('This field is required')
       expect(row.readonly).to.equal('yes')
       expect(row.default).to.equal('today()')
       expect(row.calculation).to.equal('today()+3')
@@ -662,6 +701,7 @@ describe('surveyToValidJson - discard unsupported eConsent signature settings (O
         'bind::oc:itemgroup': 'group1',
         appearance: 'multiline',
         required: 'yes',
+        required_message: 'This field is required',
         readonly: 'yes',
         default: 'today()',
         calculation: 'today()+3',
@@ -672,6 +712,7 @@ describe('surveyToValidJson - discard unsupported eConsent signature settings (O
     expect(row['bind::oc:itemgroup']).to.equal('group1')
     expect(row.appearance).to.equal('multiline')
     expect(row.required).to.equal('yes')
+    expect(row.required_message).to.equal('This field is required')
     expect(row.readonly).to.equal('yes')
     expect(row.default).to.equal('today()')
     expect(row.calculation).to.equal('today()+3')
@@ -683,6 +724,28 @@ describe('surveyToValidJson - discard unsupported eConsent signature settings (O
       { type: 'select_multiple', name: 'q1', 'bind::oc:external': ECONSENT_SIGNATURE_EXTERNAL_VALUE },
     ])
     expect(result.survey[0]).to.not.have.property('appearance')
+  })
+
+  it("doesn't add required_message to a signature row that never had it", () => {
+    const result = toValidSurvey([
+      { type: 'select_multiple', name: 'q1', 'bind::oc:external': ECONSENT_SIGNATURE_EXTERNAL_VALUE },
+    ])
+    expect(result.survey[0]).to.not.have.property('required_message')
+  })
+
+  it('strips required_message for every language, not just the primary one', () => {
+    const result = toValidSurvey([
+      {
+        type: 'select_multiple',
+        name: 'q1',
+        'bind::oc:external': ECONSENT_SIGNATURE_EXTERNAL_VALUE,
+        required_message: 'This field is required',
+        'required_message::Spanish (es)': 'Este campo es obligatorio',
+      },
+    ])
+    const row = result.survey[0]
+    expect(row).to.not.have.property('required_message')
+    expect(row).to.not.have.property('required_message::Spanish (es)')
   })
 
   it('only strips fields on the matching signature row, leaving other rows in the same survey untouched', () => {
