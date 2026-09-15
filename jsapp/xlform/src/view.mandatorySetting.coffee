@@ -115,6 +115,10 @@ module.exports = do ->
       if val is 'custom'
         @isConditionalSelected = true
         @setNewValue('')
+        # setNewValue('') is a no-op when Never is the current state (model already
+        # holds ''), so Backbone suppresses the change event and render() never fires.
+        # Update the banner explicitly so it switches to Conditional immediately.
+        @_updateStatusBanner()
         @_showRequiredLogicTab()
         @$panelEl?.find('.mandatory-setting-custom-text').val('').focus()
         # Don't show the inline error message yet — only after user interaction
@@ -275,6 +279,9 @@ module.exports = do ->
         latestVal = (@$panelEl?.find('.mandatory-setting-custom-text').val() or '').trim()
         @setNewValue(latestVal)
         @showOrHideCondition()
+        # Mirror the blur-time syntax check from onCustomTextBlur — expressions
+        # authored from Always/Never bypass that path via the AC3 modal (OC-28718).
+        runSyntaxCheck(@model._parent, 'required', @$panelEl?.find('.mandatory-setting-custom-text').get(0))
       onCancel = =>
         @_ac3ModalPending = false
         @$panelEl?.find('.mandatory-setting-custom-text').val('')
