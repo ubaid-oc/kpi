@@ -14,7 +14,8 @@
  * exported TYPES mirror the package's public surface faithfully so kpi's code is
  * still type-checked in CI; the runtime exports are inert — the two components
  * never render and the generate client never reaches the network.
- * Keep in sync with the pinned logic-builder version (0.6.0).
+ * Keep in sync with the pinned logic-builder version (0.7.0 — its public
+ * surface is unchanged from 0.6.0; only the server package changed).
  */
 import type { RefObject } from 'react'
 
