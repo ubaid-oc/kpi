@@ -1227,6 +1227,57 @@ do ->
       document.dispatchEvent(new CustomEvent('ocRowStructureChange'))
       expect(renderCount).toBe(0)
 
+    it 'Item width for a legacy-path type (e.g. integer) goes live on Grid to Simple', ->
+      # OC-28752 regression: afterRender used to register the
+      # ocFormStyleChange listener only for isCardGridType() types, so
+      # integer/decimal/image never removed a stale Item width control
+      # while their settings panel stayed open across the switch.
+      $model = require('../../jsapp/xlform/src/_model')
+      survey = new $model.Survey()
+      survey.rows.add(type: 'integer', name: 'q1', label: 'Q1')
+      row = survey.rows.at(0)
+      renderAppearanceForRow(@mixin, @viewRowDetail, @$cardSettingsWrap, row)
+      expect(@$cardSettingsWrap.find('.js-item-width-wrap').length).toBe(1)
+
+      sessionStorage.setItem('kpi.editable-form.form-style', '')
+      document.dispatchEvent(new CustomEvent('ocFormStyleChange'))
+
+      expect(@$cardSettingsWrap.find('.js-item-width-wrap').length).toBe(0)
+
+    it 'Item width for a legacy-path type (e.g. integer) comes back on Simple to Grid', ->
+      sessionStorage.setItem('kpi.editable-form.form-style', '')
+      $model = require('../../jsapp/xlform/src/_model')
+      survey = new $model.Survey()
+      survey.rows.add(type: 'integer', name: 'q1', label: 'Q1')
+      row = survey.rows.at(0)
+      renderAppearanceForRow(@mixin, @viewRowDetail, @$cardSettingsWrap, row)
+      expect(@$cardSettingsWrap.find('.js-item-width-wrap').length).toBe(0)
+
+      sessionStorage.setItem('kpi.editable-form.form-style', 'theme-grid')
+      document.dispatchEvent(new CustomEvent('ocFormStyleChange'))
+
+      expect(@$cardSettingsWrap.find('.js-item-width-wrap').length).toBe(1)
+
+    it 'tears down the ocFormStyleChange listener on remove() for a legacy-path type (e.g. integer)', ->
+      $model = require('../../jsapp/xlform/src/_model')
+      survey = new $model.Survey()
+      survey.rows.add(type: 'integer', name: 'q1', label: 'Q1')
+      row = survey.rows.at(0)
+      detail = row.get('appearance')
+      rowView = $.extend({}, Backbone.Events, { cardSettingsWrap: @$cardSettingsWrap, model: row })
+      dv = new @viewRowDetail.DetailView({ model: detail, rowView: rowView })
+      dv.render()
+      expect(dv.isCardGridType()).toBe(false)
+
+      renderCount = 0
+      original = dv._afterRenderWidth.bind(dv)
+      dv._afterRenderWidth = -> renderCount++; original()
+
+      dv.remove()
+      sessionStorage.setItem('kpi.editable-form.form-style', '')
+      document.dispatchEvent(new CustomEvent('ocFormStyleChange'))
+      expect(renderCount).toBe(0)
+
     it 'item whose settings panel was closed (detached wrap) does not update on structural change', ->
       $model = require('../../jsapp/xlform/src/_model')
       survey = new $model.Survey()
@@ -1427,12 +1478,17 @@ do ->
         _afterRenderWidth: ->
         get_width_token_from_model_value: -> null
 
-    it 'returns early when not a card grid type', ->
+    it 'still updates a type outside isCardGridType (e.g. integer, decimal, image)', ->
+      # OC-28752 regression: onOcFormStyleChange used to return early for
+      # these types, so their Item width control went stale while the
+      # settings panel stayed open across a form style change.
       widthCalled = false
       @ctx.isCardGridType = -> false
+      @ctx.is_form_style_theme_grid = -> true
+      @ctx.model_type = -> 'integer'
       @ctx._afterRenderWidth = -> widthCalled = true
       @mixin.onOcFormStyleChange.call(@ctx)
-      expect(widthCalled).toBe(false)
+      expect(widthCalled).toBe(true)
 
     it 'switching TO grid on a non-group calls _afterRenderWidth', ->
       widthCalled = false
