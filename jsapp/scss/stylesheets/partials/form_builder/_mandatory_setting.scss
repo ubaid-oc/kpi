@@ -22,8 +22,27 @@
     display: block;
     margin-bottom: 8px;
 
+    // Matches the other logic panels' fields (e.g. repeat-count-panel__input) —
+    // this one had never gotten the same border/padding/focus treatment, only
+    // ever setting background-color.
     input[type='text'] {
+      width: 100%;
+      padding: 7px 10px;
+      font-size: 13px;
       background-color: colors.$kobo-white;
+      border: 1px solid colors.$kobo-gray-85;
+      border-radius: 4px;
+      box-sizing: border-box;
+
+      &:focus {
+        border-color: colors.$kobo-blue;
+        outline: 2px solid colors.$kobo-blue;
+        outline-offset: 1px;
+      }
+
+      &::placeholder {
+        color: colors.$kobo-gray-65;
+      }
     }
 
     &.input-error {
