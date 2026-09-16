@@ -82,10 +82,10 @@ export function mountGenerateButton(anchor: unknown, options: MountOptions): HTM
 
   const mountEl = document.createElement('span')
   mountEl.className = MOUNT_CLASS
-  // Separate the button from the panel header title it sits beside, and keep
-  // it vertically centered against the header text.
-  mountEl.style.marginLeft = '12px'
-  mountEl.style.verticalAlign = 'middle'
+  // Positioning (spacing beside a title, or flush-left when standalone above
+  // Relevant/Constraint's mode-selector buttons) is CSS, scoped per panel
+  // next to that panel's own header styling — see each panel's SCSS partial
+  // (e.g. _calculation.scss's `.calculation-panel__header .logic-builder-generate-mount`).
   anchorEl.appendChild(mountEl)
 
   const root = createRoot(mountEl)

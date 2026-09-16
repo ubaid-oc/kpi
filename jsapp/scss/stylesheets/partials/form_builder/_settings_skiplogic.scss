@@ -153,3 +153,12 @@ select.skiplogic__delimselect {
     border-radius: 0;
   }
 }
+
+// P1.18: Relevant/Constraint mount the AI Assistant button alone in
+// .skiplogic__extras, above the "+ Add a condition" / "Manually enter..."
+// mode-selector buttons — no title to space it off, and those buttons start
+// flush with the row's left edge. Resets _card_settings.scss's default
+// title-relative spacing.
+.skiplogic__extras > .logic-builder-generate-mount {
+  margin-left: 0;
+}
