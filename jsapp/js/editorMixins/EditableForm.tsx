@@ -1825,10 +1825,15 @@ export default function EditableForm(props: EditableFormProps) {
           state.preventNavigatingOut && <Prompt />
         }
         <div className='form-builder-wrapper' ref={formBuilderWrapRef}>
-          {renderAside()}
-
           <bem.FormBuilder>
             {renderFormBuilderHeader()}
+
+            {/* OC-28753: the aside must be a DOM sibling AFTER the header (which
+                holds the "Layout & Settings"/"Add from Library" triggers) and
+                BEFORE the contents (which holds "Add Item"), so native Tab order
+                flows trigger -> open panel -> rest of the form, matching visual
+                order. It's still visually docked via CSS (position: absolute). */}
+            {renderAside()}
 
             <bem.FormBuilder__contents>
               {/* OC fork (P1.1 AC2): layout-neutral wrapper so the AI dialog's
