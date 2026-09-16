@@ -476,7 +476,7 @@ module.exports = do ->
           type="text"
           class="text-box__input mandatory-setting-custom-text js-mandatory-setting-custom-text"
           value=""
-          placeholder="#{t('e.g. ${AGE} &lt; 18')}"
+          placeholder="#{t('No required condition yet — type one, or use the AI Assistant.')}"
         >
       </label>
       <p class="required-logic-panel__hint">#{t('This question has a')} <strong>#{t('Conditional')}</strong> #{t("required setting. It will be treated as required when the expression above is 'true'.")}</p>
@@ -535,7 +535,7 @@ module.exports = do ->
       <h2 class="default-value-panel__header">#{t('Default value - Prefilled when the form loads')}</h2>
       <textarea
         class="default-value-panel__input js-default-value-input"
-        placeholder="#{t('Enter value or expression')}"
+        placeholder="#{t('No default value yet — type one, or use the AI Assistant.')}"
       ></textarea>
       <div class="default-value-panel__hint">
         <p>#{t('If a Default value is provided, this item will be automatically filled in with that Default when the form is first opened. The Default Value can be:')}</p>
@@ -556,7 +556,7 @@ module.exports = do ->
         <label class="calculation-panel__label">#{t('Calculation expression')}</label>
         <textarea
           class="calculation-panel__textarea js-calculation-input"
-          placeholder="#{t('e.g. ${WEIGHT} div (${HEIGHT} * ${HEIGHT})')}"
+          placeholder="#{t('No calculation yet — type one, or use the AI Assistant.')}"
         ></textarea>
       </div>
       <div class="calculation-panel__field">
