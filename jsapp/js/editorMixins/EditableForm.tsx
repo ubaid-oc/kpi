@@ -1004,8 +1004,15 @@ export default function EditableForm(props: EditableFormProps) {
     return ooo
   }
 
-  function toggleAsideLibrarySearch(evt: React.TouchEvent<HTMLButtonElement>) {
-    evt.currentTarget.blur()
+  function toggleAsideLibrarySearch(evt: React.MouseEvent<HTMLButtonElement>) {
+    // OC-28753: only blur on a real pointer click (detail > 0), not on
+    // keyboard activation (Enter/Space, detail === 0) — blurring
+    // unconditionally dropped focus before Tab could reach the newly
+    // opened panel, since the panel only follows the trigger in DOM
+    // order while the trigger still has focus.
+    if (evt.detail !== 0) {
+      evt.currentTarget.blur()
+    }
     const asideSettings: AsideSettings = {
       asideLayoutSettingsVisible: false,
       asideLibrarySearchVisible: !state.asideLibrarySearchVisible,
@@ -1027,8 +1034,12 @@ export default function EditableForm(props: EditableFormProps) {
     }
   }
 
-  function toggleAsideLayoutSettings(evt: React.TouchEvent<HTMLButtonElement>) {
-    evt.currentTarget.blur()
+  function toggleAsideLayoutSettings(evt: React.MouseEvent<HTMLButtonElement>) {
+    // OC-28753: see toggleAsideLibrarySearch above — keep focus on the
+    // trigger for keyboard activation so Tab reliably reaches the panel.
+    if (evt.detail !== 0) {
+      evt.currentTarget.blur()
+    }
     const asideSettings: AsideSettings = {
       asideLayoutSettingsVisible: !state.asideLayoutSettingsVisible,
       asideLibrarySearchVisible: false,
