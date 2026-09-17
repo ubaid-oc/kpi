@@ -63,9 +63,11 @@ do ->
 
       ctx =
         isConditionalSelected: true
+        _selectorVal: ''
         $panelEl: $panelEl
         render: jest.fn()
         _hideRequiredLogicTab: jest.fn()
+        _updateStatusBanner: jest.fn()
         hideMessage: jest.fn()
         setNewValue: (val) -> model.set 'value', val
         model: model

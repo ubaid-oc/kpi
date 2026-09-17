@@ -262,6 +262,8 @@ module.exports = do ->
         labels:
           ok: t('Set Conditional')
           cancel: t('Cancel')
+        closable: false
+        closableByDimmer: false
         onok: =>
           onConfirm()
           return
