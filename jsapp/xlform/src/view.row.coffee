@@ -802,7 +802,11 @@ module.exports = do ->
 
       # don't display columns that start with a $
       hiddenFields = ['label', 'hint', 'type', 'select_from_list_name', 'kobo--matrix_list', 'parameters', 'tags', 'instance::oc:contactdata', 'instance::oc:identifier']
-      for [key, val] in @model.attributesArray() when !key.match(/^\$/) and not $modelUtils.isHiddenField(key, hiddenFields)
+      # constraint_message/required_message each have their own settings
+      # field for the primary language further down - only hide their
+      # translated (non-primary-language) form here.
+      translatedOnlyHiddenFields = ['constraint_message', 'required_message']
+      for [key, val] in @model.attributesArray() when !key.match(/^\$/) and not $modelUtils.isHiddenField(key, hiddenFields, translatedOnlyHiddenFields)
         if key is 'required'
           if questionType isnt 'note' and !isEConsentSig
             @mandatorySetting = new $viewMandatorySetting.MandatorySettingView({
@@ -828,14 +832,7 @@ module.exports = do ->
               new $viewRowDetail.DetailView(model: val, rowView: @).render().insertInDOM(@)
           else
             if key isnt 'select_one_from_file_filename'
-              # `required_message` is translatable: on a form with 2+
-              # languages, toFlatJSON()/attributesArray() surface it as one
-              # key per language - `required_message` for the primary
-              # language, `required_message::<langName>` for every other one
-              # (see flatten_translated_fields in model.inputParser.coffee).
-              # An exact-match `key in [...]` only ever catches the primary
-              # language, so non-primary translations still render here.
-              isUnsupportedEConsentSigField = key in [
+              unsupportedEConsentSigFields = [
                 'bind::oc:itemgroup'
                 'bind::oc:external'
                 'bind::oc:briefdescription'
@@ -848,7 +845,8 @@ module.exports = do ->
                 'constraint'
                 'constraint_message'
                 'required_message'
-              ] or key.indexOf('required_message::') is 0
+              ]
+              isUnsupportedEConsentSigField = $modelUtils.isHiddenField(key, unsupportedEConsentSigFields)
               if isEConsentSig and isUnsupportedEConsentSigField
                 val.set 'value', '' if key is 'bind::oc:itemgroup'
                 continue

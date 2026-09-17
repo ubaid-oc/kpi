@@ -151,6 +151,11 @@ module.exports = do ->
     return str
 
   # OC (OC-28780): is `key` in `hiddenFields`, exactly or as a translation?
+  # `translatedOnlyFields` is for fields that DO have their own dedicated
+  # settings field for the primary language (e.g. 'constraint_message' has
+  # its own "Constraint Message" box) but should still be hidden for every
+  # OTHER language, so only their '<field>::<lang>' form counts as hidden,
+  # never the bare name.
   #
   # Example: hiddenFields includes 'label'. On a form with 2+ languages,
   # the non-primary-language value of a field gets its own key, so a
@@ -158,9 +163,10 @@ module.exports = do ->
   # in model.inputParser.coffee). Both 'label' and 'label::French' should
   # count as hidden - otherwise the French label leaks into the Form
   # Designer row settings as its own field.
-  utils.isHiddenField = (key, hiddenFields) ->
+  utils.isHiddenField = (key, hiddenFields, translatedOnlyFields = []) ->
     return true if key in hiddenFields
-    return _.some(hiddenFields, (f) -> key.indexOf("#{f}::") is 0)
+    return true if _.some(hiddenFields, (f) -> key.indexOf("#{f}::") is 0)
+    return _.some(translatedOnlyFields, (f) -> key.indexOf("#{f}::") is 0)
 
   # OC (OC-28464): decide whether to prompt the user to make an item
   # read-only. A non-Calculate item that carries a calculation must be

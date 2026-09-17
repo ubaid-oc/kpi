@@ -44,7 +44,7 @@ export function isValidXmlTag(str: string): boolean
 export function sluggify(str: string, opts?: SluggifyOptions): string
 
 /** OC-28780: is `key` in `hiddenFields`, exactly or as a `<field>::<language>` translation of one? */
-export function isHiddenField(key: string, hiddenFields: string[]): boolean
+export function isHiddenField(key: string, hiddenFields: string[], translatedOnlyFields?: string[]): boolean
 
 export interface CalculationReadonlyHintOptions {
   questionType?: string
