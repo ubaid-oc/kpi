@@ -247,4 +247,25 @@ do ->
       ).toBe(false)
       return
     return
+
+  describe 'model.utils: isHiddenField', ->
+    hiddenFields = ['label', 'hint', 'required_message']
+
+    it 'OC-28780: hides an exact match', ->
+      expect($utils.isHiddenField('label', hiddenFields)).toBe(true)
+      return
+
+    it 'OC-28780: hides a translated variant of a hidden field', ->
+      expect($utils.isHiddenField('label::French', hiddenFields)).toBe(true)
+      expect($utils.isHiddenField('hint::German (de)', hiddenFields)).toBe(true)
+      return
+
+    it 'OC-28780: does not hide an unrelated key', ->
+      expect($utils.isHiddenField('constraint_message', hiddenFields)).toBe(false)
+      return
+
+    it 'OC-28780: does not hide a key that merely starts with a hidden name', ->
+      expect($utils.isHiddenField('labelled', hiddenFields)).toBe(false)
+      return
+    return
   return
