@@ -12,7 +12,13 @@
  * host sees every trigger (generation through the injected GenerateClient,
  * Apply through onApply), so the emitter lives here (design.md §10).
  */
-import type { ExpressionTab, FailureReason } from '@openclinica/logic-builder'
+import type {
+  ExpressionTab,
+  FailureReason,
+  GenerateClient,
+  GenerationRequest,
+  GenerationResult,
+} from '@openclinica/logic-builder'
 import userpilot from '#/userpilot'
 
 /** Event names are permanent in UserPilot (archive only) — agreed before the first production send. */
@@ -139,5 +145,111 @@ export function emitGenerateApply(scope: ApplyScope): string | undefined {
   } catch (e) {
     warn('apply emission failed', e)
     return undefined
+  }
+}
+
+const FAILURE_REASONS: readonly FailureReason[] = [
+  'insufficient_detail',
+  'invalid_reference',
+  'other_prompt_issue',
+  'unavailable',
+]
+
+function isFailureReason(value: unknown): value is FailureReason {
+  return typeof value === 'string' && (FAILURE_REASONS as readonly string[]).includes(value)
+}
+
+/**
+ * Fail-safe polarity, mirroring the dialog: only an explicit success with a
+ * usable expression counts as success; an unrecognised reason or shape reads
+ * as unavailable. The metric must classify exactly as the user experienced it.
+ */
+function outcomeOf(result: GenerationResult): GenerationOutcome {
+  const shape = result as Partial<{ kind: unknown; expression: unknown; reason: unknown }> | null | undefined
+  if (shape?.kind === 'success') {
+    return typeof shape.expression === 'string' && shape.expression.trim() !== '' ? 'success' : 'unavailable'
+  }
+  const reason = shape?.reason
+  return isFailureReason(reason) ? reason : 'unavailable'
+}
+
+// Matched on the name, like the package's httpClient: an abort can arrive as
+// any object named AbortError, cross-realm DOMExceptions included.
+function isAbortError(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && (error as { name?: unknown }).name === 'AbortError'
+}
+
+/** Run analytics bookkeeping so that nothing it does can escape to the caller (AC4). */
+function guarded(work: () => void): void {
+  try {
+    work()
+  } catch (e) {
+    warn('emission failed', e)
+  }
+}
+
+function emitRequest(
+  req: GenerationRequest,
+  generationId: string,
+  outcome: GenerationOutcome,
+  latencyMs: number,
+): void {
+  const event: GenerateRequestEvent = {
+    attribute: req.attribute,
+    itemName: req.targetFieldName,
+    generationId,
+    outcome,
+    latencyMs,
+    latencyBucket: latencyBucket(latencyMs),
+  }
+  userpilot.track(LOGIC_BUILDER_EVENTS.generateRequest, event)
+}
+
+/**
+ * Decorate a GenerateClient with P1.12 emission (AC1). The inner client's
+ * promise settles exactly as before — the same result by identity, the same
+ * rejection — and every piece of bookkeeping is guarded, so analytics can
+ * never change what the dialog sees (AC4).
+ *
+ * - success → request event + ledger entry for the Apply that may follow
+ * - labeled failure / malformed result → request event with that outcome, ledger cleared
+ *   (the dialog clears its proposal on any failure)
+ * - AbortError → rethrown, nothing emitted (a superseded or cancelled request has no outcome)
+ * - any other rejection → request event with outcome `unavailable`, then rethrown
+ */
+export function withGenerationAnalytics(inner: GenerateClient): GenerateClient {
+  return {
+    async generate(req, opts) {
+      const generationId = newGenerationId()
+      const started = performance.now()
+      let result: GenerationResult
+      try {
+        result = await inner.generate(req, opts)
+      } catch (error) {
+        if (!isAbortError(error)) {
+          guarded(() => {
+            clearGenerationLedger()
+            emitRequest(req, generationId, 'unavailable', Math.round(performance.now() - started))
+          })
+        }
+        throw error
+      }
+      guarded(() => {
+        const latencyMs = Math.round(performance.now() - started)
+        const outcome = outcomeOf(result)
+        if (outcome === 'success' && result.kind === 'success') {
+          recordGeneration({
+            generationId,
+            itemName: req.targetFieldName,
+            attribute: req.attribute,
+            expression: result.expression,
+          })
+        } else {
+          clearGenerationLedger()
+        }
+        emitRequest(req, generationId, outcome, latencyMs)
+      })
+      return result
+    },
   }
 }
