@@ -349,3 +349,10 @@ do ->
       expect($container.find('#q1-handcode').val()).toBe('. < 5')
       $container.remove()
       return
+
+    it 'names the AI Assistant in the empty-state placeholder (P1.18 AC3)', ->
+      $container = $('<div class="skiplogic__main"></div>').appendTo(document.body)
+      makeHelper('').render($container)
+      expect($container.find('#q1-handcode').attr('placeholder')).toBe('No constraint yet — type one, or use the AI Assistant.')
+      $container.remove()
+      return

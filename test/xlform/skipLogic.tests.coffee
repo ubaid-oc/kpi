@@ -531,3 +531,22 @@ do ->
     it 'does reformat a well-formed expression (contrast: reformatting only happens on the success path)', ->
       applied = "${q1}='yes'"
       expect(applyToRelevant(applied)).not.toBe(applied)
+
+  ###############################################################
+  # mv.skipLogicHelpers: SkipLogicHandCodeHelper.render() (P1.18 AC3)
+  ###############################################################
+  describe 'skipLogic: SkipLogicHandCodeHelper.render()', ->
+
+    $ = require('jquery')
+    $viewRowDetailSkipLogic = require('../../jsapp/xlform/src/view.rowDetail.SkipLogic')
+
+    it 'names the AI Assistant in the empty-state placeholder', ->
+      $container = $('<div class="skiplogic__main"></div>').appendTo(document.body)
+      view_factory = new $viewRowDetailSkipLogic.SkipLogicViewFactory({ on: -> })
+      context = { view_factory: { survey: { trigger: -> } } }
+      helper = new $skipLogicHelpers.SkipLogicHandCodeHelper('', null, view_factory, context)
+      helper.render($container)
+      placeholder = $container.find('textarea.skiplogic__handcode-edit').attr('placeholder')
+      expect(placeholder).toBe('Always shown — type a rule, or use the AI Assistant.')
+      $container.remove()
+      return
