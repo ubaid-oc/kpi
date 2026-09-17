@@ -802,7 +802,12 @@ module.exports = do ->
 
       # don't display columns that start with a $
       hiddenFields = ['label', 'hint', 'type', 'select_from_list_name', 'kobo--matrix_list', 'parameters', 'tags', 'instance::oc:contactdata', 'instance::oc:identifier']
-      for [key, val] in @model.attributesArray() when !key.match(/^\$/) and key not in hiddenFields
+      # On a 2+ language form, a field's non-primary translations show up as
+      # separate keys, e.g. 'label' becomes 'label::French'. Hide those too,
+      # not just the bare field name, so translated labels/hints don't leak
+      # through as their own settings row.
+      isHiddenField = (key) -> key in hiddenFields or _.some(hiddenFields, (f) -> key.indexOf("#{f}::") is 0)
+      for [key, val] in @model.attributesArray() when !key.match(/^\$/) and not isHiddenField(key)
         if key is 'required'
           if questionType isnt 'note' and !isEConsentSig
             @mandatorySetting = new $viewMandatorySetting.MandatorySettingView({
