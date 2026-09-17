@@ -958,7 +958,7 @@ module.exports = do ->
       @$input = $('<input/>', {
         type: 'text'
         class: 'repeat-count-panel__input'
-        placeholder: t('e.g. ${NUM_VISITS}')
+        placeholder: t('No repeat count yet — type one, or use the AI Assistant.')
       })
       @$el.append($header).append($hint).append($docLink).append(@$input)
 

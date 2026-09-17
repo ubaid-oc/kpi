@@ -280,18 +280,18 @@ describe('focusGenerateButton (P1.1 AC6, dismiss)', () => {
   })
 
   it("focuses the panel's Generate button by its accessible name", () => {
-    document.body.innerHTML = '<button aria-label="Generate Relevant Logic with AI">Generate</button>'
+    document.body.innerHTML = '<button aria-label="Generate Relevant Logic with the AI Assistant">Generate</button>'
     const focused = focusGenerateButton('relevant')
     chai.expect(focused).to.equal(true)
     chai
       .expect((document.activeElement as HTMLElement)?.getAttribute('aria-label'))
-      .to.equal('Generate Relevant Logic with AI')
+      .to.equal('Generate Relevant Logic with the AI Assistant')
   })
 
   it('scopes to the requested attribute when several Generate buttons are present', () => {
     document.body.innerHTML =
-      '<button aria-label="Generate Calculation with AI">g1</button>' +
-      '<button aria-label="Generate Constraint Logic with AI" id="target">g2</button>'
+      '<button aria-label="Generate Calculation with the AI Assistant">g1</button>' +
+      '<button aria-label="Generate Constraint Logic with the AI Assistant" id="target">g2</button>'
     focusGenerateButton('constraint')
     chai.expect((document.activeElement as HTMLElement)?.id).to.equal('target')
   })
@@ -299,8 +299,8 @@ describe('focusGenerateButton (P1.1 AC6, dismiss)', () => {
   it('scopes to the given root so the right row is focused (round-5 #2)', () => {
     // Same attribute, two rows; the row's settings root disambiguates.
     document.body.innerHTML =
-      '<div id="rowA" class="card__settings"><button aria-label="Generate Relevant Logic with AI" id="a">g</button></div>' +
-      '<div id="rowB" class="card__settings"><button aria-label="Generate Relevant Logic with AI" id="b">g</button></div>'
+      '<div id="rowA" class="card__settings"><button aria-label="Generate Relevant Logic with the AI Assistant" id="a">g</button></div>' +
+      '<div id="rowB" class="card__settings"><button aria-label="Generate Relevant Logic with the AI Assistant" id="b">g</button></div>'
     const rowB = document.getElementById('rowB')!
     focusGenerateButton('relevant', rowB)
     chai.expect((document.activeElement as HTMLElement)?.id).to.equal('b')

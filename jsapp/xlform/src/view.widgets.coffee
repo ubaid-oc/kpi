@@ -52,13 +52,15 @@ module.exports = do ->
     render: () ->
       @$el.val @text
       @$el.addClass @className
+      @$el.attr 'placeholder', @placeholder
       @$el.on 'paste', (e) -> e.stopPropagation()
 
       return @
-    constructor: (text, className) ->
+    constructor: (text, className, placeholder) ->
       super()
       @text = text
       @className = className
+      @placeholder = placeholder
 
   class viewWidgets.TextBox extends viewWidgets.Base
     tagName: 'input'

@@ -82,10 +82,10 @@ export function mountGenerateButton(anchor: unknown, options: MountOptions): HTM
 
   const mountEl = document.createElement('span')
   mountEl.className = MOUNT_CLASS
-  // Separate the button from the panel header title it sits beside, and keep
-  // it vertically centered against the header text.
-  mountEl.style.marginLeft = '12px'
-  mountEl.style.verticalAlign = 'middle'
+  // Positioning (spacing beside a title, or flush-left when standalone above
+  // Relevant/Constraint's mode-selector buttons) is CSS: the shared default in
+  // _card_settings.scss's `.logic-builder-generate-mount`, overridden for the
+  // two standalone panels in _settings_skiplogic.scss.
   anchorEl.appendChild(mountEl)
 
   const root = createRoot(mountEl)

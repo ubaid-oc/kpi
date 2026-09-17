@@ -1874,3 +1874,39 @@ do ->
       ctx.afterRender.call(ctx)
       expect($el.hasClass('hidden')).toBe(true)
       expect(detail.get('value')).toBe('')
+
+  ###############################################################
+  # view.row.templates — panel templates (P1.18 AC3 empty-state copy)
+  ###############################################################
+  describe 'view.row.templates: panel empty-state placeholders (P1.18 AC3)', ->
+    beforeEach ->
+      @rowTemplates = require('../../jsapp/xlform/src/view.row.templates')
+
+    it 'calculationPanel() names the AI Assistant in the empty-state placeholder', ->
+      html = @rowTemplates.calculationPanel()
+      expect(html.indexOf('No calculation yet — type one, or use the AI Assistant.')).not.toBe(-1)
+
+    it 'defaultValuePanel() names the AI Assistant in the empty-state placeholder', ->
+      html = @rowTemplates.defaultValuePanel()
+      expect(html.indexOf('No default value yet — type one, or use the AI Assistant.')).not.toBe(-1)
+
+    it 'requiredLogicPanel() names the AI Assistant in the empty-state placeholder', ->
+      html = @rowTemplates.requiredLogicPanel()
+      expect(html.indexOf('No required condition yet — type one, or use the AI Assistant.')).not.toBe(-1)
+
+  describe 'view.rowDetail.DetailViewMixins: "repeat_count" html() (P1.18 AC3)', ->
+    beforeEach ->
+      window.xlfHideWarnings = true
+      @viewRowDetail = require('../../jsapp/xlform/src/view.rowDetail')
+      @mixin_ctx = $.extend({}, @viewRowDetail.DetailViewMixins.repeat_count, {
+        cid: 'cid_repeat'
+        $el: $('<div/>')
+        model: {}
+      })
+    afterEach ->
+      window.xlfHideWarnings = false
+
+    it 'names the AI Assistant in the empty-state placeholder', ->
+      @mixin_ctx.html()
+      placeholder = @mixin_ctx.$el.find('input.repeat-count-panel__input').attr('placeholder')
+      expect(placeholder).toBe('No repeat count yet — type one, or use the AI Assistant.')
