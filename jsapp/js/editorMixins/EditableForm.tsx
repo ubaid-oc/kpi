@@ -328,6 +328,8 @@ export default function EditableForm(props: EditableFormProps) {
         unlistenSurveyState()
       }
       stores.surveyState.setState({ [GENERATE_REQUEST_KEY]: null })
+      // P1.12: no dialog, no applicable generation.
+      clearGenerationLedger()
     }
   }, [])
 
@@ -437,6 +439,10 @@ export default function EditableForm(props: EditableFormProps) {
       // proposal as received (before any newline stripping), so it equals the
       // ledger's recorded expression. Fire-and-forget; never affects the return.
       const tab = columnToTab(request.attribute)
+      // An attribute with no logic tab is already warned about and its dangling
+      // request cleared (and the ledger with it, P1.12) by the effect above,
+      // before the dialog can ever render — so this is defence in depth and
+      // unreachable in practice, never a silent drop of a real apply event.
       if (tab) {
         emitGenerateApply({ itemName: readItemName(request.row), attribute: tab, expression })
       }
@@ -491,6 +497,8 @@ export default function EditableForm(props: EditableFormProps) {
         generateRequest.attribute,
       )
       stores.surveyState.setState({ [GENERATE_REQUEST_KEY]: null })
+      // P1.12: no dialog, no applicable generation.
+      clearGenerationLedger()
     }
   }, [generateRequest, generateTab])
 

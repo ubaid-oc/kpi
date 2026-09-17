@@ -123,10 +123,12 @@ function warn(message: string, ...detail: unknown[]): void {
  * proposal — in which case the event still goes out without an id and a
  * warning names the gap (spec Decision 6). The slot is retained: a rejected
  * Apply keeps the dialog open for a retry; the host clears the ledger on close.
+ * The id is returned even if event delivery throws (P1.13 consumes it).
  */
 export function emitGenerateApply(scope: ApplyScope): string | undefined {
+  let generationId: string | undefined
   try {
-    const generationId =
+    generationId =
       ledger !== null &&
       ledger.itemName === scope.itemName &&
       ledger.attribute === scope.attribute &&
@@ -141,22 +143,27 @@ export function emitGenerateApply(scope: ApplyScope): string | undefined {
         ? { attribute: scope.attribute, itemName: scope.itemName }
         : { attribute: scope.attribute, itemName: scope.itemName, generationId }
     userpilot.track(LOGIC_BUILDER_EVENTS.generateApply, event)
-    return generationId
   } catch (e) {
     warn('apply emission failed', e)
-    return undefined
   }
+  return generationId
 }
 
-const FAILURE_REASONS: readonly FailureReason[] = [
-  'insufficient_detail',
-  'invalid_reference',
-  'other_prompt_issue',
-  'unavailable',
-]
+// A keyed map rather than an array: `satisfies Record<FailureReason, true>`
+// turns a reason the package adds later into a compile error here, so
+// analytics can never quietly record it as `unavailable` while the dialog
+// renders it correctly.
+const FAILURE_REASONS = {
+  insufficient_detail: true,
+  invalid_reference: true,
+  other_prompt_issue: true,
+  unavailable: true,
+} satisfies Record<FailureReason, true>
 
 function isFailureReason(value: unknown): value is FailureReason {
-  return typeof value === 'string' && (FAILURE_REASONS as readonly string[]).includes(value)
+  // hasOwnProperty (not `in`) so a hostile shape cannot reach the prototype
+  // chain — the same guard the dialog's normalizeReason uses.
+  return typeof value === 'string' && Object.prototype.hasOwnProperty.call(FAILURE_REASONS, value)
 }
 
 /**

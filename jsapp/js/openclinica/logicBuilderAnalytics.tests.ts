@@ -142,13 +142,19 @@ describe('emitGenerateApply (P1.12 AC2 — apply carries the generation id)', ()
     warn.mockRestore()
   })
 
-  it('never throws when the tracker throws', () => {
+  it('never throws when the tracker throws, and still returns the matched id', () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
     mockTrack.mockImplementation(() => {
       throw new Error('sdk down')
     })
     recordGeneration({ generationId: 'g1', ...scope })
-    chai.expect(() => emitGenerateApply(scope)).to.not.throw()
+    let id: string | undefined
+    chai
+      .expect(() => {
+        id = emitGenerateApply(scope)
+      })
+      .to.not.throw()
+    chai.expect(id).to.equal('g1')
     warn.mockRestore()
   })
 })
@@ -249,6 +255,22 @@ describe('withGenerationAnalytics (P1.12 AC1 request event, AC4 never alters the
     chai
       .expect(mockTrack.mock.calls.map((call) => (call[1] as GenerateRequestEvent).outcome))
       .to.deep.equal(['unavailable', 'unavailable'])
+  })
+
+  it('reads a reason the package has not defined yet as unavailable, and leaves the ledger empty', async () => {
+    const bogus = { kind: 'failure', reason: 'bogus' } as unknown as GenerationResult
+    const out = await withGenerationAnalytics(resolving(bogus)).generate(req)
+    chai.expect(out).to.equal(bogus)
+    chai.expect(mockTrack.mock.calls[0][1]).to.include({ outcome: 'unavailable' })
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
+    chai.expect(emitGenerateApply({ itemName: 'BMI', attribute: 'calculation', expression: 'x' })).to.equal(undefined)
+  })
+
+  it('reads a reason shadowing an Object.prototype member as unavailable (prototype-chain guard)', async () => {
+    const prototypeShadow = { kind: 'failure', reason: 'toString' } as unknown as GenerationResult
+    const out = await withGenerationAnalytics(resolving(prototypeShadow)).generate(req)
+    chai.expect(out).to.equal(prototypeShadow)
+    chai.expect(mockTrack.mock.calls[0][1]).to.include({ outcome: 'unavailable' })
   })
 
   it('rethrows an AbortError and emits nothing', async () => {
