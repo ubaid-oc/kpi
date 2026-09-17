@@ -30,9 +30,9 @@ export const LOGIC_BUILDER_EVENTS = {
 export type LatencyBucket = '<1s' | '1-2s' | '2-3s' | '3-5s' | '5-10s' | '>10s'
 
 /**
- * Lower bound inclusive. UserPilot cannot average an event property, so the
- * distribution is charted from this bucket; the 3-5s / 5-10s bins straddle
- * the 5 s p95 budget (design.md §6.4).
+ * Lower bound inclusive. A stable binning for distribution charts alongside
+ * the raw `latencyMs` (which UserPilot's Trends can also average directly);
+ * the 3-5s / 5-10s bins straddle the 5 s p95 budget (design.md §6.4).
  */
 export function latencyBucket(ms: number): LatencyBucket {
   if (ms < 1000) return '<1s'
