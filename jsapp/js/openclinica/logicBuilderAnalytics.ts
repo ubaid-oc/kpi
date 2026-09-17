@@ -13,6 +13,7 @@
  * Apply through onApply), so the emitter lives here (design.md §10).
  */
 import type { ExpressionTab, FailureReason } from '@openclinica/logic-builder'
+import userpilot from '#/userpilot'
 
 /** Event names are permanent in UserPilot (archive only) — agreed before the first production send. */
 export const LOGIC_BUILDER_EVENTS = {
@@ -75,3 +76,68 @@ export type GenerateApplyEvent =
   | { readonly attribute: ExpressionTab; readonly itemName: string; readonly generationId: string }
   // Ledger miss only (spec Decision 6): the event still goes out, without an id.
   | { readonly attribute: ExpressionTab; readonly itemName: string }
+
+export interface LedgerEntry {
+  readonly generationId: string
+  readonly itemName: string
+  readonly attribute: ExpressionTab
+  readonly expression: string
+}
+
+// One slot: the open dialog's last successful generation. design.md D2 gives
+// one dialog at a time; the dialog clears its proposal on any failure and
+// applies only the displayed proposal, verbatim — so this entry is exactly the
+// generation that produced whatever the host is asked to apply (spec §6).
+let ledger: LedgerEntry | null = null
+
+/** Called by the decorated client on a successful generation. */
+export function recordGeneration(entry: LedgerEntry): void {
+  ledger = entry
+}
+
+/** Called on dialog close (and by the decorator on a failed generation). */
+export function clearGenerationLedger(): void {
+  ledger = null
+}
+
+export interface ApplyScope {
+  readonly itemName: string
+  readonly attribute: ExpressionTab
+  readonly expression: string
+}
+
+function warn(message: string, ...detail: unknown[]): void {
+  console.warn(`Logic Builder analytics: ${message}`, ...detail)
+}
+
+/**
+ * Emit the apply event for the proposal the host just persisted (AC2). Returns
+ * the generation id so P1.13 can stamp the post-Apply verdict; `undefined` on a
+ * ledger miss — unreachable while the dialog applies only its displayed
+ * proposal — in which case the event still goes out without an id and a
+ * warning names the gap (spec Decision 6). The slot is retained: a rejected
+ * Apply keeps the dialog open for a retry; the host clears the ledger on close.
+ */
+export function emitGenerateApply(scope: ApplyScope): string | undefined {
+  try {
+    const generationId =
+      ledger !== null &&
+      ledger.itemName === scope.itemName &&
+      ledger.attribute === scope.attribute &&
+      ledger.expression === scope.expression
+        ? ledger.generationId
+        : undefined
+    if (generationId === undefined) {
+      warn('apply had no matching generation in the ledger', scope.attribute, scope.itemName)
+    }
+    const event: GenerateApplyEvent =
+      generationId === undefined
+        ? { attribute: scope.attribute, itemName: scope.itemName }
+        : { attribute: scope.attribute, itemName: scope.itemName, generationId }
+    userpilot.track(LOGIC_BUILDER_EVENTS.generateApply, event)
+    return generationId
+  } catch (e) {
+    warn('apply emission failed', e)
+    return undefined
+  }
+}
