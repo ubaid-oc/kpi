@@ -22,7 +22,7 @@ interface ViewFactory {
   create_question_picker(currentQuestion: Row): any
   create_criterion_view(questionPicker: any, operatorPicker: any, responseValueView: any): any
   create_criterion_builder_view(): any
-  create_textarea(value: string, className: string): any
+  create_textarea(value: string, className: string, placeholder?: string): any
   create_button(html: string, className: string): any
   create_skip_logic_picker_view(context: any): any
 }
