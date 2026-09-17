@@ -1315,13 +1315,14 @@ module.exports = do ->
       getWidthTokenFromModelValue(@model.get('value'))
 
     afterRender: ->
+      # Register for every question type, even ones outside isCardGridType()
+      # (e.g. integer, decimal). Those still show an Item width control and
+      # need it to update live when the form style changes, or it goes stale
+      # while the settings panel is left open.
+      @rowView._appearanceDV = @
+      @_onOcFormStyleChangeBound = => @onOcFormStyleChange()
+      document.addEventListener('ocFormStyleChange', @_onOcFormStyleChangeBound)
       if @isCardGridType()
-        # Register the ocFormStyleChange listener here (not in initialize) so the
-        # gate, the _appearanceDV back-ref, and the listener are all set together
-        # only for card-grid types. Non-card-grid types never register or leak.
-        @rowView._appearanceDV = @
-        @_onOcFormStyleChangeBound = => @onOcFormStyleChange()
-        document.addEventListener('ocFormStyleChange', @_onOcFormStyleChangeBound)
         @_afterRenderCardGrid()
       else
         @rowView.cardSettingsWrap.find('.js-card-settings-appearance').eq(0).hide()
@@ -1334,7 +1335,6 @@ module.exports = do ->
       # Guard against deleted rows — row.detach() nulls _parent, and walking
       # _parent._parent._parent in model_get_parent_group would throw.
       return unless @model?._parent?
-      return unless @isCardGridType()
       questionType = @model_type()
       if @is_form_style_theme_grid()
         # Switching TO grid — render the sections.
