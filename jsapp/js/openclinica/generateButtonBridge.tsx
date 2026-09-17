@@ -83,9 +83,9 @@ export function mountGenerateButton(anchor: unknown, options: MountOptions): HTM
   const mountEl = document.createElement('span')
   mountEl.className = MOUNT_CLASS
   // Positioning (spacing beside a title, or flush-left when standalone above
-  // Relevant/Constraint's mode-selector buttons) is CSS, scoped per panel
-  // next to that panel's own header styling — see each panel's SCSS partial
-  // (e.g. _calculation.scss's `.calculation-panel__header .logic-builder-generate-mount`).
+  // Relevant/Constraint's mode-selector buttons) is CSS: the shared default in
+  // _card_settings.scss's `.logic-builder-generate-mount`, overridden for the
+  // two standalone panels in _settings_skiplogic.scss.
   anchorEl.appendChild(mountEl)
 
   const root = createRoot(mountEl)
