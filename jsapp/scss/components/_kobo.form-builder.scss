@@ -32,12 +32,12 @@ $s-form-builder-content-width: 1024px;
   }
 }
 
-.form-builder-aside--visible + .form-builder {
-  .form-builder__contents {
-    margin-right: $s-form-builder-aside;
-  }
+// OC-28753: the aside is now a DOM sibling of .form-builder__contents (inside
+// .form-builder, after the header) rather than a sibling of .form-builder
+// itself, so the content-push selector targets .form-builder__contents directly.
+.form-builder-aside--visible + .form-builder__contents {
+  margin-right: $s-form-builder-aside;
 }
-
 
 .form-wrap {
   width: 100%;
