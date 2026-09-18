@@ -43,12 +43,27 @@ export function isValidXmlTag(str: string): boolean
 /** The core string transformation engine that converts labels into slugs */
 export function sluggify(str: string, opts?: SluggifyOptions): string
 
+/** OC-28780: is `key` in `hiddenFields`, exactly or as a `<field>::<language>` translation of one? */
+export function isHiddenField(key: string, hiddenFields: string[], translatedOnlyFields?: string[]): boolean
+
+export interface CalculationReadonlyHintOptions {
+  questionType?: string
+  calculation?: string
+  trigger?: string
+  readonly?: boolean | string
+}
+
+/** Whether to prompt the user to make an item with a calculation read-only */
+export function shouldShowCalculationReadonlyHint(opts?: CalculationReadonlyHintOptions): boolean
+
 declare const utils: {
   split_paste: typeof split_paste
   parseHelper: typeof parseHelper
   sluggifyLabel: typeof sluggifyLabel
   isValidXmlTag: typeof isValidXmlTag
   sluggify: typeof sluggify
+  isHiddenField: typeof isHiddenField
+  shouldShowCalculationReadonlyHint: typeof shouldShowCalculationReadonlyHint
   Validator: any
   skipLogicParser: any
   validationLogicParser: any

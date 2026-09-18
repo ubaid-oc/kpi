@@ -247,4 +247,51 @@ do ->
       ).toBe(false)
       return
     return
+
+  describe 'model.utils: isHiddenField', ->
+    # mirrors the real hiddenFields array in view.row.coffee
+    hiddenFields = ['label', 'hint']
+
+    it 'OC-28780: hides an exact match', ->
+      expect($utils.isHiddenField('label', hiddenFields)).toBe(true)
+      return
+
+    it 'OC-28780: hides a translated variant of a hidden field', ->
+      expect($utils.isHiddenField('label::French', hiddenFields)).toBe(true)
+      expect($utils.isHiddenField('hint::German (de)', hiddenFields)).toBe(true)
+      return
+
+    it 'OC-28780: does not hide an unrelated key', ->
+      expect($utils.isHiddenField('constraint_message', hiddenFields)).toBe(false)
+      return
+
+    it 'OC-28780: does not hide a key that merely starts with a hidden name', ->
+      expect($utils.isHiddenField('labelled', hiddenFields)).toBe(false)
+      return
+
+    describe 'translatedOnlyFields', ->
+      translatedOnlyFields = ['constraint_message', 'required_message']
+
+      it 'OC-28780: does not hide the bare (primary-language) field', ->
+        expect(
+          $utils.isHiddenField('constraint_message', hiddenFields, translatedOnlyFields)
+        ).toBe(false)
+        expect(
+          $utils.isHiddenField('required_message', hiddenFields, translatedOnlyFields)
+        ).toBe(false)
+        return
+
+      it 'OC-28780: hides a translated variant', ->
+        expect(
+          $utils.isHiddenField('constraint_message::French', hiddenFields, translatedOnlyFields)
+        ).toBe(true)
+        expect(
+          $utils.isHiddenField('required_message::German (de)', hiddenFields, translatedOnlyFields)
+        ).toBe(true)
+        return
+
+      it 'OC-28780: defaults to no translatedOnlyFields when omitted', ->
+        expect($utils.isHiddenField('constraint_message::French', hiddenFields)).toBe(false)
+        return
+    return
   return
