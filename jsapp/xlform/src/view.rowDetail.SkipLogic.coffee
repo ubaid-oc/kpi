@@ -404,8 +404,8 @@ module.exports = do ->
       return new viewRowDetailSkipLogic.SkipLogicCriterion question_picker_view, operator_picker_view, response_value_view, presenter
     create_criterion_builder_view: () ->
       return new viewRowDetailSkipLogic.SkipLogicCriterionBuilderView()
-    create_textarea: (text, className) ->
-      return new $viewWidgets.TextArea text, className
+    create_textarea: (text, className, placeholder='') ->
+      return new $viewWidgets.TextArea text, className, placeholder
     create_button: (text, className) ->
       return new $viewWidgets.Button text, className
     create_textbox: (text, className='', placeholder='') ->

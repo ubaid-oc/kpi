@@ -255,7 +255,9 @@ export function focusGenerateButton(attribute: string, root: ParentNode = docume
   if (!tab) {
     return false
   }
-  const btn = root.querySelector<HTMLElement>(`button[aria-label="Generate ${ATTRIBUTE_LABELS[tab]} with AI"]`)
+  const btn = root.querySelector<HTMLElement>(
+    `button[aria-label="Generate ${ATTRIBUTE_LABELS[tab]} with the AI Assistant"]`,
+  )
   if (!btn) {
     console.warn('Logic Builder: could not find the Generate button to focus after dismiss', attribute)
     return false

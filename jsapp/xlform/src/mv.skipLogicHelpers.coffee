@@ -406,7 +406,10 @@ module.exports = do ->
       @textarea.$el.val() || @criteria
     constructor: (@criteria, @builder, @view_factory, @context) ->
       @$parent = $('<div>')
-      @textarea = @view_factory.create_textarea @criteria, 'skiplogic__handcode-edit'
+      # P1.18 AC3 — empty-state copy naming the AI Assistant as the typing
+      # alternative; Relevant is the only user of this base hand-code helper
+      # (Constraint overrides with its own template — ValidationLogicHandCodeHelper).
+      @textarea = @view_factory.create_textarea @criteria, 'skiplogic__handcode-edit', t('Always shown — type a rule, or use the AI Assistant.')
       @button = @view_factory.create_button '<i class="k-icon k-icon-trash"></i>', 'skiplogic-handcode__cancel'
     textarea_change_handler: () ->
       @criteria = @textarea.val()

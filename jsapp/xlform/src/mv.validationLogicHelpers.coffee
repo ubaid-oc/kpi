@@ -108,7 +108,7 @@ module.exports = do ->
         <div class="card__settings__fields__field">
           <label for="#{@context.helper_factory.current_question.cid}-handcode">#{t("Constraint:")}</label>
           <span class="settings__input">
-            <input type="text" name="constraint" id="#{@context.helper_factory.current_question.cid}-handcode" class="text" value="#{@criteria_value}">
+            <input type="text" name="constraint" id="#{@context.helper_factory.current_question.cid}-handcode" class="text" value="#{@criteria_value}" placeholder="#{t('No constraint yet — type one, or use the AI Assistant.')}">
           </span>
         </div>
       """)
