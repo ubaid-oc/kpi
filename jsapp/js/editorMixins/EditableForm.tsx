@@ -60,6 +60,7 @@ import {
   readCurrentExpression,
 } from '#/openclinica/applyExpression'
 import { unmountAll } from '#/openclinica/generateButtonBridge'
+import { clearGenerationLedger, emitGenerateApply } from '#/openclinica/logicBuilderAnalytics'
 import { logicBuilderClient } from '#/openclinica/logicBuilderClient'
 import { buildFormContext, readItemName } from '#/openclinica/logicBuilderContext'
 import { GENERATE_REQUEST_KEY, columnToTab } from '#/openclinica/logicBuilderTabs'
@@ -327,6 +328,8 @@ export default function EditableForm(props: EditableFormProps) {
         unlistenSurveyState()
       }
       stores.surveyState.setState({ [GENERATE_REQUEST_KEY]: null })
+      // P1.12: no dialog, no applicable generation.
+      clearGenerationLedger()
     }
   }, [])
 
@@ -396,6 +399,10 @@ export default function EditableForm(props: EditableFormProps) {
     // drawer — or a group + child row sharing a class — can't be hit (round-5 #2).
     const root: ParentNode = request?.settingsRoot instanceof HTMLElement ? request.settingsRoot : document
     stores.surveyState.setState({ [GENERATE_REQUEST_KEY]: null })
+    // P1.12: the dialog is closing (Apply or dismiss) — its last successful
+    // generation no longer applies to anything. Runs synchronously, before the
+    // deferred focus/syntax-check work below.
+    clearGenerationLedger()
     if (!attribute) {
       return
     }
@@ -427,6 +434,18 @@ export default function EditableForm(props: EditableFormProps) {
     // this handler only maps the outcome onto user feedback + focus intent.
     const outcome = applyExpressionToRow(request.row, request.attribute, expression)
     if (outcome.status === 'applied') {
+      // P1.12 AC2: the proposal is persisted — emit the apply event, stamped
+      // with the generation that produced it. `expression` is the dialog's
+      // proposal as received (before any newline stripping), so it equals the
+      // ledger's recorded expression. Fire-and-forget; never affects the return.
+      const tab = columnToTab(request.attribute)
+      // An attribute with no logic tab is already warned about and its dangling
+      // request cleared (and the ledger with it, P1.12) by the effect above,
+      // before the dialog can ever render — so this is defence in depth and
+      // unreachable in practice, never a silent drop of a real apply event.
+      if (tab) {
+        emitGenerateApply({ itemName: readItemName(request.row), attribute: tab, expression })
+      }
       // Persisted. Flag the focus target for the package-driven close (the
       // panel's expression field, not the Generate button) and report success.
       closingViaApplyRef.current = true
@@ -478,6 +497,8 @@ export default function EditableForm(props: EditableFormProps) {
         generateRequest.attribute,
       )
       stores.surveyState.setState({ [GENERATE_REQUEST_KEY]: null })
+      // P1.12: no dialog, no applicable generation.
+      clearGenerationLedger()
     }
   }, [generateRequest, generateTab])
 

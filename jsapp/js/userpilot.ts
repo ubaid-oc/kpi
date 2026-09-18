@@ -5,6 +5,9 @@ import type { AccountResponse } from 'js/dataInterface'
  */
 import { Userpilot } from 'userpilot'
 
+/** Flat metadata UserPilot accepts on a tracked event: primitives only, no arrays or nested objects. */
+export type AnalyticsValue = string | number | boolean | null
+
 class UserPilotService {
   private readonly userPilotSdkToken: string | null = null
 
@@ -68,6 +71,22 @@ class UserPilotService {
       Userpilot.reload(url)
     } catch (error) {
       console.warn('UserPilot reload failed:', error)
+    }
+  }
+
+  /**
+   * Emit a custom tracked event (OC product analytics). Fire-and-forget: a
+   * no-op without a token, never throws, never awaited — emission must never
+   * block or fail the caller (PRD P1.12 AC4). The SDK queues and delivers.
+   */
+  track(event: string, meta: Record<string, AnalyticsValue>): void {
+    if (!this.userPilotSdkToken) {
+      return
+    }
+    try {
+      Userpilot.track(event, meta)
+    } catch (error) {
+      console.warn('[Userpilot] track failed:', error)
     }
   }
 }

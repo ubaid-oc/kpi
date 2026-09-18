@@ -2,9 +2,11 @@
  * OC fork — P1.2 (OC-28277): the real GenerateClient. All generation logic
  * (prompts, model, stripping) lives server-side in the private package; this
  * module only points the package's HTTP client at the kpi proxy endpoint.
+ * P1.12 (OC-28781) decorates it with usage analytics — see logicBuilderAnalytics.
  */
 import { createHttpGenerateClient } from '@openclinica/logic-builder'
 import { ROOT_URL } from '#/constants'
+import { withGenerationAnalytics } from './logicBuilderAnalytics'
 
 /** Same cookie the api.ts fetch helpers use (custom OC CSRF cookie name). */
 export function getOcCsrfToken(): string | null {
@@ -12,7 +14,9 @@ export function getOcCsrfToken(): string | null {
   return match ? match[1] : null
 }
 
-export const logicBuilderClient = createHttpGenerateClient({
-  url: `${ROOT_URL}/api/v2/ai/generate-expression/`,
-  getCsrfToken: getOcCsrfToken,
-})
+export const logicBuilderClient = withGenerationAnalytics(
+  createHttpGenerateClient({
+    url: `${ROOT_URL}/api/v2/ai/generate-expression/`,
+    getCsrfToken: getOcCsrfToken,
+  }),
+)
