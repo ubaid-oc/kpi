@@ -283,7 +283,8 @@ module.exports = do ->
       # P1.13: the expression is now empty without a check having run (builder
       # removed its last condition, or the hand-code trash button) — reset the
       # verdict memory so re-entering the same text counts as a new state.
-      $syntaxCheckBridge.forgetSyntaxVerdictFor(@helper_factory.current_question, 'relevant')
+      row = @helper_factory.current_question
+      $syntaxCheckBridge.forgetSyntaxVerdictFor(row, 'relevant')
       return
     constructor: (@model_factory, @view_factory, @helper_factory, serialized_criteria) ->
       @state = serialize: () -> return serialized_criteria # Initial seeding, will be re-assigned a proper helper in next lines.

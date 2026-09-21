@@ -6,7 +6,7 @@ $baseView = require './view.pluggedIn.backboneView'
 $viewTemplates = require './view.templates'
 generateButtonBridge = require '#/openclinica/generateButtonBridge'
 runSyntaxCheck = require('#/openclinica/syntaxCheckBridge').runSyntaxCheck
-forgetSyntaxVerdictFor = require('#/openclinica/syntaxCheckBridge').forgetSyntaxVerdictFor
+{forgetSyntaxVerdictFor} = require('#/openclinica/syntaxCheckBridge')
 
 module.exports = do ->
   class MandatorySettingView extends $baseView

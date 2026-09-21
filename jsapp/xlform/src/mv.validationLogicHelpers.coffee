@@ -54,7 +54,8 @@ module.exports = do ->
         @render @destination
         # P1.13: the expression is now empty without a check having run — reset
         # the verdict memory (see mv.skipLogicHelpers use_mode_selector_helper).
-        $syntaxCheckBridge.forgetSyntaxVerdictFor(@helper_factory.current_question, 'constraint')
+        row = @helper_factory.current_question
+        $syntaxCheckBridge.forgetSyntaxVerdictFor(row, 'constraint')
       return
     use_hand_code_helper: () ->
       @state = new validationLogicHelpers.ValidationLogicHandCodeHelper(@state.serialize(), @builder, @view_factory, @)
