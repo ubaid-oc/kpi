@@ -123,14 +123,18 @@ describe('checkSyntaxDetailed (P1.13 AC1 error categories)', () => {
   })
 
   it('tags each condition with its category and keeps the P1.11 message', () => {
-    chai.expect(checkSyntaxDetailed('(${A}', emptyForm)).to.deep.equal([{ category: 'paren', message: MISSING_CLOSE_PAREN }])
+    chai
+      .expect(checkSyntaxDetailed('(${A}', emptyForm))
+      .to.deep.equal([{ category: 'paren', message: MISSING_CLOSE_PAREN }])
     chai
       .expect(checkSyntaxDetailed('position()=1]', emptyForm))
       .to.deep.equal([{ category: 'bracket', message: MISSING_OPEN_BRACKET }])
     chai
       .expect(checkSyntaxDetailed("${STATUS} = 'active", emptyForm))
       .to.deep.equal([{ category: 'string', message: MISSING_SINGLE_QUOTE }])
-    chai.expect(checkSyntaxDetailed('${WEIGHT', bmiForm)).to.deep.equal([{ category: 'brace', message: MISSING_CLOSE_BRACE }])
+    chai
+      .expect(checkSyntaxDetailed('${WEIGHT', bmiForm))
+      .to.deep.equal([{ category: 'brace', message: MISSING_CLOSE_BRACE }])
     chai
       .expect(checkSyntaxDetailed('${HIEGHT}', bmiForm))
       .to.deep.equal([{ category: 'unknown_item', message: invalidItemRef('HIEGHT') }])
