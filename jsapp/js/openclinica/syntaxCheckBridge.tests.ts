@@ -23,7 +23,7 @@ jest.mock('./logicBuilderAnalytics', () => ({
 }))
 
 import { buildFormContext } from './logicBuilderContext'
-import { findSyntaxCheckAnchor, runSyntaxCheck } from './syntaxCheckBridge'
+import { findSyntaxCheckAnchor, forgetSyntaxVerdictFor, runSyntaxCheck } from './syntaxCheckBridge'
 
 const mockBuildFormContext = buildFormContext as jest.Mock
 
@@ -169,18 +169,16 @@ describe('runSyntaxCheck analytics (P1.13 AC1, AC2)', () => {
 
     runSyntaxCheck(makeRow('(${HIEGHT}'), 'calculation', anchor)
 
-    chai
-      .expect(mockEmitSyntaxVerdict.mock.calls)
-      .to.deep.equal([
-        [
-          {
-            itemName: 'BMI',
-            attribute: 'calculation',
-            expression: '(${HIEGHT}',
-            categories: ['paren', 'unknown_item'],
-          },
-        ],
-      ])
+    chai.expect(mockEmitSyntaxVerdict.mock.calls).to.deep.equal([
+      [
+        {
+          itemName: 'BMI',
+          attribute: 'calculation',
+          expression: '(${HIEGHT}',
+          categories: ['paren', 'unknown_item'],
+        },
+      ],
+    ])
   })
 
   it('maps the xlform column to the ExpressionTab vocabulary and passes the after-Apply marker through', () => {
@@ -218,6 +216,22 @@ describe('runSyntaxCheck analytics (P1.13 AC1, AC2)', () => {
     runSyntaxCheck(makeRow('${A}'), 'calculation', null)
     chai.expect(mockEmitSyntaxVerdict.mock.calls.length).to.equal(0)
     chai.expect(mockCheckSyntaxDetailed.mock.calls.length).to.equal(0)
+  })
+})
+
+describe('forgetSyntaxVerdictFor (P1.13 — clears that bypass the check)', () => {
+  beforeEach(() => {
+    mockForgetSyntaxVerdict.mockReset()
+  })
+
+  it('forgets the item + attribute entry in the ExpressionTab vocabulary', () => {
+    forgetSyntaxVerdictFor(makeRow(''), 'repeat_count')
+    chai.expect(mockForgetSyntaxVerdict.mock.calls).to.deep.equal([['BMI', 'repeatCount']])
+  })
+
+  it('does nothing for an attribute with no logic tab', () => {
+    forgetSyntaxVerdictFor(makeRow(''), 'label')
+    chai.expect(mockForgetSyntaxVerdict.mock.calls.length).to.equal(0)
   })
 })
 

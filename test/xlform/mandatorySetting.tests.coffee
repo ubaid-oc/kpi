@@ -21,6 +21,7 @@ do ->
     capturedSetOpts = null
     MandatorySettingView = null
     mockDestroy = null
+    mockForgetSyntaxVerdictFor = null
 
     beforeAll ->
       mockDestroy = jest.fn()
@@ -37,8 +38,10 @@ do ->
       jest.doMock '#/openclinica/generateButtonBridge', ->
         mountGenerateButton: jest.fn()
         unmountAll: jest.fn()
+      mockForgetSyntaxVerdictFor = jest.fn()
       jest.doMock '#/openclinica/syntaxCheckBridge', ->
         runSyntaxCheck: jest.fn()
+        forgetSyntaxVerdictFor: mockForgetSyntaxVerdictFor
 
       {MandatorySettingView} = require('../../jsapp/xlform/src/view.mandatorySetting')
 
@@ -50,6 +53,7 @@ do ->
     # full Backbone view (which needs a mounted DOM and generateButtonBridge).
     buildCtx = (exprValue = '') ->
       modelValue = 'existing_expr'
+      row = {name: 'fake-row'}
       model =
         get: (key) -> if key is 'value' then modelValue else undefined
         set: (key, val) -> modelValue = val if key is 'value'
@@ -57,6 +61,7 @@ do ->
         changed: null
         cid: 'c1'
         on: ->
+        _parent: row
 
       $panelEl = $('<div><input class="mandatory-setting-custom-text"></div>')
       $panelEl.find('.mandatory-setting-custom-text').val(exprValue)
@@ -67,16 +72,43 @@ do ->
         $panelEl: $panelEl
         render: jest.fn()
         _hideRequiredLogicTab: jest.fn()
+        _showRequiredLogicTab: jest.fn()
         _updateStatusBanner: jest.fn()
         hideMessage: jest.fn()
         setNewValue: (val) -> model.set 'value', val
         model: model
 
-      {ctx, model}
+      {ctx, model, row}
 
     call = (ctx, radioValue) ->
       MandatorySettingView.prototype.onRadioChange.call ctx,
         currentTarget: value: radioValue
+
+    # ------------------------------------------------------------------
+    # P1.13 (OC-28782): switching Required to Always/Never clears the
+    # conditional expression without running the instant check, so the
+    # verdict dedupe memory must be told, or retyping the same expression
+    # later would never emit a verdict (Copilot review, PR #341).
+    describe 'P1.13 verdict memory on a selector-driven clear', ->
+      beforeEach -> mockForgetSyntaxVerdictFor.mockReset()
+
+      it 'forgets the Required verdict when switching to Always with an empty expression', ->
+        {ctx, row} = buildCtx('')
+        call(ctx, 'yes')
+        expect(mockForgetSyntaxVerdictFor.mock.calls).toEqual([[row, 'required']])
+
+      it 'forgets the Required verdict once the discard of a non-empty expression is confirmed', ->
+        capturedSetOpts = null
+        {ctx, row} = buildCtx('${A} = 1')
+        call(ctx, '')
+        expect(mockForgetSyntaxVerdictFor.mock.calls.length).toBe(0)
+        capturedSetOpts.onok()
+        expect(mockForgetSyntaxVerdictFor.mock.calls).toEqual([[row, 'required']])
+
+      it 'does not touch the memory when selecting Conditional', ->
+        {ctx} = buildCtx('')
+        call(ctx, 'custom')
+        expect(mockForgetSyntaxVerdictFor.mock.calls.length).toBe(0)
 
     # ------------------------------------------------------------------
     describe 'when the expression is empty', ->

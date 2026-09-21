@@ -65,6 +65,23 @@ function readExpressionToCheck(row: any, attribute: string): string {
   return readCurrentExpression(row, attribute)
 }
 
+/**
+ * P1.13: an expression cleared by a path that never runs the check — the
+ * Relevant/Constraint panels returning to their mode selector, the Required
+ * selector discarding a conditional expression — must still reset the verdict
+ * dedupe memory, or re-entering the same text later would never emit a
+ * verdict. Column vocabulary in, ExpressionTab vocabulary out; guarded so the
+ * CoffeeScript callers can never be broken by analytics.
+ */
+export function forgetSyntaxVerdictFor(row: any, attribute: string): void {
+  try {
+    const tab = columnToTab(attribute)
+    if (tab) forgetSyntaxVerdict(readItemName(row), tab)
+  } catch (e) {
+    console.warn('Logic Builder analytics: could not reset the syntax verdict memory', e)
+  }
+}
+
 /** P1.13 AC2: set by the host when the check follows an Apply from the AI Assistant. */
 export interface SyntaxCheckAnalytics {
   readonly afterAiApply: true

@@ -6,6 +6,7 @@ $baseView = require './view.pluggedIn.backboneView'
 $viewTemplates = require './view.templates'
 generateButtonBridge = require '#/openclinica/generateButtonBridge'
 runSyntaxCheck = require('#/openclinica/syntaxCheckBridge').runSyntaxCheck
+forgetSyntaxVerdictFor = require('#/openclinica/syntaxCheckBridge').forgetSyntaxVerdictFor
 
 module.exports = do ->
   class MandatorySettingView extends $baseView
@@ -139,6 +140,9 @@ module.exports = do ->
               onok: =>
                 @isConditionalSelected = false
                 @setNewValue(val)
+                # P1.13: the conditional expression is discarded without a
+                # check having run — reset the verdict memory for Required.
+                forgetSyntaxVerdictFor(@model._parent, 'required')
                 @_hideRequiredLogicTab()
                 @hideMessage()
                 return
@@ -151,6 +155,9 @@ module.exports = do ->
             return
         @isConditionalSelected = false
         @setNewValue(val)
+        # P1.13: Always/Never replaces any conditional expression — reset the
+        # verdict memory so the same expression typed later counts again.
+        forgetSyntaxVerdictFor(@model._parent, 'required')
         # Sync _selectorVal and banner immediately — setNewValue may be a no-op
         # when the model already holds this value. Switching Conditional (empty)
         # → Never writes '' both times, so Backbone suppresses the change event
