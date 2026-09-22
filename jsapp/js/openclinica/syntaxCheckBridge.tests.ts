@@ -219,6 +219,31 @@ describe('runSyntaxCheck analytics (P1.13 AC1, AC2)', () => {
   })
 })
 
+describe('runSyntaxCheck memory key (P1.13 — unnamed items)', () => {
+  beforeEach(() => {
+    mockCheckSyntaxDetailed.mockReset()
+    mockEmitSyntaxVerdict.mockReset()
+    mockForgetSyntaxVerdict.mockReset()
+    document.body.innerHTML = ''
+  })
+
+  it('passes the Backbone cid as the row key, so the item name is only payload', () => {
+    mockCheckSyntaxDetailed.mockReturnValue([])
+    const row = { ...makeRow('${A}'), cid: 'c42' }
+    const anchor = document.createElement('textarea')
+    document.body.appendChild(anchor)
+
+    runSyntaxCheck(row, 'calculation', anchor)
+
+    chai.expect(mockEmitSyntaxVerdict.mock.calls[0][0]).to.include({ rowKey: 'c42', itemName: 'BMI' })
+  })
+
+  it('forgets by the cid when the row has one', () => {
+    forgetSyntaxVerdictFor({ ...makeRow(''), cid: 'c42' }, 'calculation')
+    chai.expect(mockForgetSyntaxVerdict.mock.calls).to.deep.equal([['c42', 'calculation']])
+  })
+})
+
 describe('forgetSyntaxVerdictFor (P1.13 — clears that bypass the check)', () => {
   beforeEach(() => {
     mockForgetSyntaxVerdict.mockReset()

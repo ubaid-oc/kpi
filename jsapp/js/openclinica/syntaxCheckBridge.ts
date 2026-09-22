@@ -73,10 +73,20 @@ function readExpressionToCheck(row: any, attribute: string): string {
  * verdict. Column vocabulary in, ExpressionTab vocabulary out; guarded so the
  * CoffeeScript callers can never be broken by analytics.
  */
+/**
+ * The dedupe memory's row identity: the Backbone cid when the row has one
+ * (unique per row for the form session, unchanged by a rename), else the item
+ * name. Returned as `undefined` when only the name is available so the
+ * emitter's own fallback applies and the payload stays exactly the whitelist.
+ */
+function verdictRowKey(row: any): string | undefined {
+  return typeof row?.cid === 'string' && row.cid !== '' ? row.cid : undefined
+}
+
 export function forgetSyntaxVerdictFor(row: any, attribute: string): void {
   try {
     const tab = columnToTab(attribute)
-    if (tab) forgetSyntaxVerdict(readItemName(row), tab)
+    if (tab) forgetSyntaxVerdict(verdictRowKey(row) ?? readItemName(row), tab)
   } catch (e) {
     console.warn('Logic Builder analytics: could not reset the syntax verdict memory', e)
   }
@@ -117,7 +127,7 @@ export function runSyntaxCheck(
     renderMessages(anchor, [])
     // A cleared field is not an authored expression, so no verdict — but
     // retyping the same text later is a new authored state and should count.
-    if (tab) forgetSyntaxVerdict(readItemName(row), tab)
+    if (tab) forgetSyntaxVerdict(verdictRowKey(row) ?? readItemName(row), tab)
     return
   }
   const errors = checkSyntaxDetailed(expression, buildFormContext(row))
@@ -126,9 +136,11 @@ export function runSyntaxCheck(
     errors.map((error) => error.message),
   )
   if (tab) {
+    const rowKey = verdictRowKey(row)
     emitSyntaxVerdict({
       itemName: readItemName(row),
       attribute: tab,
+      ...(rowKey ? { rowKey } : {}),
       expression,
       categories: errors.map((error) => error.category),
       ...(analytics

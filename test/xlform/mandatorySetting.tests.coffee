@@ -105,6 +105,38 @@ do ->
         capturedSetOpts.onok()
         expect(mockForgetSyntaxVerdictFor.mock.calls).toEqual([[row, 'required']])
 
+      it 'forgets the Required verdict when the Set-Conditional modal is cancelled after an AI Apply', ->
+        {ctx, row} = buildCtx('${age} > 18')
+        ctx._selectorVal = 'yes'
+        ctx._ac3ModalPending = true
+        ctx._showAc3Modal = (onConfirm, onCancel) -> onCancel()
+        MandatorySettingView.prototype._showAc3ModalForGenerate.call ctx
+        expect(ctx.model.get('value')).toBe('yes')
+        expect(mockForgetSyntaxVerdictFor.mock.calls).toEqual([[row, 'required']])
+
+      it 'forgets the Required verdict when a type change to Calculate clears a conditional expression', ->
+        {ctx, row} = buildCtx('')
+        ctx.hideConditional = true
+        ctx.getChangedValue = -> '${age} > 18'
+        ctx.$el = $('<div>')
+        ctx.$panelEl = null
+        ctx._updateRequiredLogicTabVisibility = jest.fn()
+        ctx._hasRenderedOnce = false
+        MandatorySettingView.prototype.render.call ctx
+        expect(ctx.model.get('value')).toBe('')
+        expect(mockForgetSyntaxVerdictFor.mock.calls).toEqual([[row, 'required']])
+
+      it 'does not forget when Calculate finds Required already blank', ->
+        {ctx} = buildCtx('')
+        ctx.hideConditional = true
+        ctx.getChangedValue = -> ''
+        ctx.$el = $('<div>')
+        ctx.$panelEl = null
+        ctx._updateRequiredLogicTabVisibility = jest.fn()
+        ctx._hasRenderedOnce = false
+        MandatorySettingView.prototype.render.call ctx
+        expect(mockForgetSyntaxVerdictFor.mock.calls.length).toBe(0)
+
       it 'does not touch the memory when selecting Conditional', ->
         {ctx} = buildCtx('')
         call(ctx, 'custom')

@@ -39,7 +39,12 @@ module.exports = do ->
         # required column blank, matching what AC2 specifies.
         # Guard: setNewValue calls onChange on every invocation — only write
         # when the value actually needs to change to avoid re-render loops.
-        @setNewValue('') unless reqVal is ''
+        unless reqVal is ''
+          @setNewValue('')
+          # P1.13: a conditional expression was cleared by the type change
+          # (e.g. to Calculate) without a check running — reset the verdict
+          # memory so the same expression typed later counts again.
+          forgetSyntaxVerdictFor(@model._parent, 'required')
         reqVal = ''
         @isConditionalSelected = false
       else if reqVal isnt ''
@@ -305,6 +310,9 @@ module.exports = do ->
         @_ac3ModalPending = false
         @isConditionalSelected = false
         @setNewValue(@_selectorVal)
+        # P1.13: Cancel discards the just-applied expression after its
+        # post-Apply verdict was recorded — reset the verdict memory.
+        forgetSyntaxVerdictFor(@model._parent, 'required')
       @_showAc3Modal(onConfirm, onCancel)
       return
 

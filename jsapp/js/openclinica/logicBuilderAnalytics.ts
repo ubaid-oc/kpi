@@ -285,6 +285,12 @@ export type SyntaxVerdictEvent = {
 export interface SyntaxVerdictInput {
   readonly itemName: string
   readonly attribute: ExpressionTab
+  /**
+   * Stable identity of the row for the dedupe memory (the Backbone cid). Falls
+   * back to `itemName`, but an unnamed new question has an empty name, so two
+   * unnamed questions would otherwise share one slot; a rename keeps the slot.
+   */
+  readonly rowKey?: string
   /** The checked expression — used ONLY to suppress repeat verdicts; never emitted. */
   readonly expression: string
   readonly categories: readonly SyntaxErrorCategory[]
@@ -298,13 +304,17 @@ export interface SyntaxVerdictInput {
 // lives here only; it never enters a payload.
 const lastVerdictExpression = new Map<string, string>()
 
-function verdictKey(itemName: string, attribute: ExpressionTab): string {
-  return `${itemName}\u0000${attribute}`
+function verdictKey(rowKey: string, attribute: ExpressionTab): string {
+  return `${rowKey}\u0000${attribute}`
 }
 
-/** Forget one item+attribute, e.g. when its expression was cleared, so retyping the same text counts again. */
-export function forgetSyntaxVerdict(itemName: string, attribute: ExpressionTab): void {
-  lastVerdictExpression.delete(verdictKey(itemName, attribute))
+/**
+ * Forget one row+attribute (the same `rowKey` the verdict was emitted with, or
+ * the item name when the row had none), e.g. when its expression was cleared,
+ * so retyping the same text counts again.
+ */
+export function forgetSyntaxVerdict(rowKey: string, attribute: ExpressionTab): void {
+  lastVerdictExpression.delete(verdictKey(rowKey, attribute))
 }
 
 /** Called when the form is closed. */
@@ -321,7 +331,7 @@ export function clearSyntaxVerdictMemory(): void {
  */
 export function emitSyntaxVerdict(input: SyntaxVerdictInput): void {
   try {
-    const key = verdictKey(input.itemName, input.attribute)
+    const key = verdictKey(input.rowKey ?? input.itemName, input.attribute)
     if (!input.afterAiApply && lastVerdictExpression.get(key) === input.expression) {
       return
     }

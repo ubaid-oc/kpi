@@ -394,6 +394,27 @@ describe('emitSyntaxVerdict (P1.13 AC1–AC3)', () => {
     chai.expect(mockTrack.mock.calls.length).to.equal(3)
   })
 
+  it('keys the memory on the row key when given, so two unnamed items do not share a slot', () => {
+    emitSyntaxVerdict({ itemName: '', attribute: 'relevant', rowKey: 'c1', expression: '${a} + 1', categories: [] })
+    emitSyntaxVerdict({ itemName: '', attribute: 'relevant', rowKey: 'c2', expression: '${a} + 1', categories: [] })
+    emitSyntaxVerdict({ itemName: '', attribute: 'relevant', rowKey: 'c2', expression: '${a} + 1', categories: [] })
+    chai.expect(mockTrack.mock.calls.length).to.equal(2)
+  })
+
+  it('keeps deduping across a rename when keyed on the row', () => {
+    emitSyntaxVerdict({ itemName: 'OLD', attribute: 'calculation', rowKey: 'c9', expression: '${A}', categories: [] })
+    emitSyntaxVerdict({ itemName: 'NEW', attribute: 'calculation', rowKey: 'c9', expression: '${A}', categories: [] })
+    chai.expect(mockTrack.mock.calls.length).to.equal(1)
+    chai.expect(mockTrack.mock.calls[0][1]).to.include({ itemName: 'OLD' })
+  })
+
+  it('forgets by row key', () => {
+    emitSyntaxVerdict({ itemName: '', attribute: 'relevant', rowKey: 'c1', expression: '${a}', categories: [] })
+    forgetSyntaxVerdict('c1', 'relevant')
+    emitSyntaxVerdict({ itemName: '', attribute: 'relevant', rowKey: 'c1', expression: '${a}', categories: [] })
+    chai.expect(mockTrack.mock.calls.length).to.equal(2)
+  })
+
   it('never throws when the tracker throws', () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
     mockTrack.mockImplementation(() => {
