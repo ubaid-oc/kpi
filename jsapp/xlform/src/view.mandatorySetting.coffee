@@ -6,6 +6,7 @@ $baseView = require './view.pluggedIn.backboneView'
 $viewTemplates = require './view.templates'
 generateButtonBridge = require '#/openclinica/generateButtonBridge'
 runSyntaxCheck = require('#/openclinica/syntaxCheckBridge').runSyntaxCheck
+{forgetSyntaxVerdictFor} = require('#/openclinica/syntaxCheckBridge')
 
 module.exports = do ->
   class MandatorySettingView extends $baseView
@@ -38,7 +39,12 @@ module.exports = do ->
         # required column blank, matching what AC2 specifies.
         # Guard: setNewValue calls onChange on every invocation — only write
         # when the value actually needs to change to avoid re-render loops.
-        @setNewValue('') unless reqVal is ''
+        unless reqVal is ''
+          @setNewValue('')
+          # P1.13: a conditional expression was cleared by the type change
+          # (e.g. to Calculate) without a check running — reset the verdict
+          # memory so the same expression typed later counts again.
+          forgetSyntaxVerdictFor(@model._parent, 'required')
         reqVal = ''
         @isConditionalSelected = false
       else if reqVal isnt ''
@@ -139,6 +145,9 @@ module.exports = do ->
               onok: =>
                 @isConditionalSelected = false
                 @setNewValue(val)
+                # P1.13: the conditional expression is discarded without a
+                # check having run — reset the verdict memory for Required.
+                forgetSyntaxVerdictFor(@model._parent, 'required')
                 @_hideRequiredLogicTab()
                 @hideMessage()
                 return
@@ -151,6 +160,9 @@ module.exports = do ->
             return
         @isConditionalSelected = false
         @setNewValue(val)
+        # P1.13: Always/Never replaces any conditional expression — reset the
+        # verdict memory so the same expression typed later counts again.
+        forgetSyntaxVerdictFor(@model._parent, 'required')
         # Sync _selectorVal and banner immediately — setNewValue may be a no-op
         # when the model already holds this value. Switching Conditional (empty)
         # → Never writes '' both times, so Backbone suppresses the change event
@@ -298,6 +310,9 @@ module.exports = do ->
         @_ac3ModalPending = false
         @isConditionalSelected = false
         @setNewValue(@_selectorVal)
+        # P1.13: Cancel discards the just-applied expression after its
+        # post-Apply verdict was recorded — reset the verdict memory.
+        forgetSyntaxVerdictFor(@model._parent, 'required')
       @_showAc3Modal(onConfirm, onCancel)
       return
 
