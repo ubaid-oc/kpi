@@ -52,6 +52,7 @@ import {
   update_states,
 } from '#/constants'
 import envStore from '#/envStore'
+import { useSafeUsernameStorageKey } from '#/hooks/useSafeUsernameStorageKey'
 import { LogicBuilderErrorBoundary } from '#/openclinica/LogicBuilderErrorBoundary'
 import {
   applyExpressionToRow,
@@ -239,6 +240,12 @@ export default function EditableForm(props: EditableFormProps) {
   const prevPrimaryLangRef = useRef<string | null | undefined>(undefined)
 
   const assetUid = props.assetUid || ''
+  // P1.14: scope the last-prompt sessionStorage key to (asset, user) so prompts
+  // never bleed across forms or across users sharing a browser tab.
+  // assetUid is '' for unsaved new assets — promptKeyPrefix stays undefined and
+  // read/write helpers no-op silently (no prompt restore for unsaved assets).
+  const promptKeyPrefix = assetUid ? `oc-lb-${assetUid}` : undefined
+  const promptStorageKey = useSafeUsernameStorageKey(promptKeyPrefix, sessionStore.currentAccount.username)
 
   const assetQuery = useAssetsRetrieve(
     assetUid,
@@ -528,6 +535,23 @@ export default function EditableForm(props: EditableFormProps) {
   const generateDialogOpen = Boolean(generateRequest?.row && generateTab)
   useBuilderInert(generateDialogOpen, formBuilderWrapRef, builderContentsInnerRef)
 
+  function readLastPrompt(itemName: string, attribute: string): string {
+    if (!promptStorageKey) return ''
+    try {
+      return sessionStorage.getItem(`${promptStorageKey}::${itemName}::${attribute}`) ?? ''
+    } catch {
+      return ''
+    }
+  }
+  function writeLastPrompt(itemName: string, attribute: string, p: string): void {
+    if (!promptStorageKey) return
+    try {
+      sessionStorage.setItem(`${promptStorageKey}::${itemName}::${attribute}`, p)
+    } catch {
+      // private-mode or quota exceeded — degrade silently
+    }
+  }
+
   function renderAiGeneratorDialog() {
     const request = generateRequest
     const tab = generateTab
@@ -565,6 +589,8 @@ export default function EditableForm(props: EditableFormProps) {
           // drives the dialog's inline overwrite confirmation.
           getCurrentExpression={() => readCurrentExpression(request.row, request.attribute)}
           onClose={closeGenerateDialog}
+          initialPrompt={readLastPrompt(itemName, tab)}
+          onPromptSubmit={(p: string) => writeLastPrompt(itemName, tab, p)}
         />
       </LogicBuilderErrorBoundary>
     )
