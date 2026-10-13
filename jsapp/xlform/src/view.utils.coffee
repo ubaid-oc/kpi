@@ -5,6 +5,19 @@ module.exports = do ->
   viewUtils = {}
   viewUtils.Validator = Validator
 
+  # OC-28482: tell screen readers that a field has an error. `$message` is the
+  # error text shown under `$field`. role=alert reads it out once, when it is
+  # inserted, so callers create it once and remove it when the value is fixed.
+  viewUtils.markFieldInvalid = ($field, $message) ->
+    id = _.uniqueId('field-error-')
+    $message.attr(id: id, role: 'alert')
+    $field.attr('aria-invalid': 'true', 'aria-describedby': id)
+    return
+
+  viewUtils.clearFieldInvalid = ($field) ->
+    $field.removeAttr('aria-invalid aria-describedby')
+    return
+
   # replaces characters that jQuery can't handle in event name
   viewUtils.normalizeEventName = (eventName) ->
     regex = new RegExp('[: ()]', 'g')

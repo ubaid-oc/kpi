@@ -134,9 +134,12 @@ export default function TextBox(props: TextBoxProps) {
   } else if (typeof props.errors === 'string' && props.errors.length > 0) {
     errors.push(props.errors)
   }
-  if (errors.length > 0 || props.errors === true) {
+  const isInvalid = errors.length > 0 || props.errors === true
+  if (isInvalid) {
     rootClassNames.push(styles.hasError)
   }
+  // Screen readers read the error text as the field's description.
+  const errorsId = `${inputId}-errors`
 
   if (props.disabled) {
     rootClassNames.push(styles.isDisabled)
@@ -156,6 +159,9 @@ export default function TextBox(props: TextBoxProps) {
   // and for all the other types we use the `<input>` HTML tag.
   const inputProps = {
     id: inputId,
+    // Left out (not `false`) when there is no error.
+    'aria-invalid': isInvalid || undefined,
+    'aria-describedby': errors.length > 0 ? errorsId : undefined,
     value: props.value,
     placeholder: props.placeholder,
     onBlur: onBlur,
@@ -242,7 +248,7 @@ export default function TextBox(props: TextBoxProps) {
       </div>
 
       {errors.length > 0 && (
-        <section className={styles.errorMessages}>
+        <section id={errorsId} role='alert' className={styles.errorMessages}>
           {errors.map((message: string, index: number) => (
             <div key={`textbox-error-${index}`}>{message}</div>
           ))}

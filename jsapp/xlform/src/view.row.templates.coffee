@@ -493,6 +493,7 @@ module.exports = do ->
         <input
           type="text"
           class="text-box__input mandatory-setting-custom-text js-mandatory-setting-custom-text"
+          aria-required="true"
           value=""
           placeholder="#{t('No required condition yet — type one, or use the AI Assistant.')}"
         >

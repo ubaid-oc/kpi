@@ -4,6 +4,7 @@ alertify = require 'alertifyjs'
 $configs = require './model.configs'
 $baseView = require './view.pluggedIn.backboneView'
 $viewTemplates = require './view.templates'
+$viewUtils = require './view.utils'
 generateButtonBridge = require '#/openclinica/generateButtonBridge'
 runSyntaxCheck = require('#/openclinica/syntaxCheckBridge').runSyntaxCheck
 {forgetSyntaxVerdictFor} = require('#/openclinica/syntaxCheckBridge')
@@ -121,12 +122,14 @@ module.exports = do ->
       if $customEl.siblings('.message').length is 0
         $message = $('<div/>').addClass('message').text(t("This field is required"))
         $customEl.after($message)
+        $viewUtils.markFieldInvalid($customEl, $message)
 
     hideMessage: () ->
       return unless @$panelEl
       $customEl = @$panelEl.find('.mandatory-setting-custom-text')
       $customEl.closest('label').removeClass('input-error')
       $customEl.siblings('.message').remove()
+      $viewUtils.clearFieldInvalid($customEl)
 
     showOrHideCondition: () ->
       return unless @$panelEl

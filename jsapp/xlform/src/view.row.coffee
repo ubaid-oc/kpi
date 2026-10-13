@@ -992,9 +992,12 @@ module.exports = do ->
               if $calcTextarea.siblings('.message').length is 0
                 $message = $('<div/>').addClass('message').text(t('This field is required'))
                 $calcTextarea.after($message)
+                $viewUtils.markFieldInvalid($calcTextarea, $message)
             else
               $field.removeClass('input-error')
               $calcTextarea.siblings('.message').remove()
+              $viewUtils.clearFieldInvalid($calcTextarea)
+          $calcTextarea.attr('aria-required', 'true')
           $calcTextarea.on('blur input', makeRequiredCheck)
 
         else
@@ -1020,9 +1023,11 @@ module.exports = do ->
                   .addClass('message js-calculation-readonly-hint')
                   .text(hintText)
                 $calcTextarea.after($hint)
+                $viewUtils.markFieldInvalid($calcTextarea, $hint)
             else
               $field.removeClass('input-error')
               $field.find('.js-calculation-readonly-hint').remove()
+              $viewUtils.clearFieldInvalid($calcTextarea)
             return
           $calcTextarea.on('blur input', updateCalcReadonlyHint)
           @listenTo(calculationModel, 'change:value', updateCalcReadonlyHint)
