@@ -1024,12 +1024,12 @@ module.exports = do ->
                 $hint = $('<div/>')
                   .addClass('message js-calculation-readonly-hint')
                   .text(hintText)
-                $viewUtils.markFieldInvalid($calcTextarea, $hint)
+                # Guidance about Read only or the trigger, not an error in the
+                # expression, so the field is not marked invalid.
                 $calcTextarea.after($hint)
             else
               $field.removeClass('input-error')
               $field.find('.js-calculation-readonly-hint').remove()
-              $viewUtils.clearFieldInvalid($calcTextarea)
             return
           $calcTextarea.on('blur input', updateCalcReadonlyHint)
           @listenTo(calculationModel, 'change:value', updateCalcReadonlyHint)
