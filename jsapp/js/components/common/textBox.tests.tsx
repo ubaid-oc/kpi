@@ -14,6 +14,11 @@ describe('TextBox — OC-28482 error and required states', () => {
     chai.expect(input.getAttribute('aria-describedby')).to.equal(alert.id)
   })
 
+  it('keeps the error text out of the field name', () => {
+    render(<TextBox label='Name' value='' errors='Name is required' />)
+    chai.expect(screen.getByRole('textbox', { name: 'Name' })).to.not.equal(null)
+  })
+
   it('leaves out aria-invalid and aria-describedby once corrected (AC2)', () => {
     const { rerender } = render(<TextBox label='Name' value='' errors='Name is required' />)
     rerender(<TextBox label='Name' value='Ann' errors={false} />)

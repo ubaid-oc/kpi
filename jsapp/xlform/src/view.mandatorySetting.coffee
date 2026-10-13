@@ -118,17 +118,21 @@ module.exports = do ->
     showMessage: () ->
       return unless @$panelEl
       $customEl = @$panelEl.find('.mandatory-setting-custom-text')
-      $customEl.closest('label').addClass('input-error')
-      if $customEl.siblings('.message').length is 0
+      $label = $customEl.closest('label')
+      $label.addClass('input-error')
+      # After the <label>, not inside it, or the error becomes part of the
+      # field's name as well as its description.
+      if $label.next('.message').length is 0
         $message = $('<div/>').addClass('message').text(t("This field is required"))
-        $customEl.after($message)
+        $label.after($message)
         $viewUtils.markFieldInvalid($customEl, $message)
 
     hideMessage: () ->
       return unless @$panelEl
       $customEl = @$panelEl.find('.mandatory-setting-custom-text')
-      $customEl.closest('label').removeClass('input-error')
-      $customEl.siblings('.message').remove()
+      $label = $customEl.closest('label')
+      $label.removeClass('input-error')
+      $label.next('.message').remove()
       $viewUtils.clearFieldInvalid($customEl)
 
     showOrHideCondition: () ->
