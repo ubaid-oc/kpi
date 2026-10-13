@@ -402,6 +402,40 @@ do ->
         MandatorySettingView.prototype.render.call ctx
         expect(ctx.hideMessage.mock.calls.length).toBe(0)
 
+    # OC-28482: the real showMessage/hideMessage against the real panel
+    # markup, so the alert placement and ARIA linkage are checked directly.
+    describe 'Required Logic error state in the DOM (OC-28482)', ->
+      buildPanelCtx = ->
+        $viewTemplates = require('../../jsapp/xlform/src/view.templates')
+        $panelEl = $($viewTemplates.$$render('row.requiredLogicPanel'))
+        {ctx: {$panelEl}, $panelEl, $input: $panelEl.find('.mandatory-setting-custom-text')}
+
+      it 'puts the alert after the label and links it to the field', ->
+        {ctx, $input} = buildPanelCtx()
+        MandatorySettingView.prototype.showMessage.call ctx
+        $label = $input.closest('label')
+        $alert = $label.next('.message')
+        expect($alert.length).toBe(1)
+        expect($label.find('.message').length).toBe(0)
+        expect($alert.attr('role')).toBe('alert')
+        expect($input.attr('aria-invalid')).toBe('true')
+        expect($input.attr('aria-describedby')).toBe($alert.attr('id'))
+        expect($input.attr('aria-required')).toBe('true')
+
+      it 'removes the alert and both attributes once cleared', ->
+        {ctx, $input} = buildPanelCtx()
+        MandatorySettingView.prototype.showMessage.call ctx
+        MandatorySettingView.prototype.hideMessage.call ctx
+        expect($input.closest('label').next('.message').length).toBe(0)
+        expect($input.attr('aria-invalid')).toBe(undefined)
+        expect($input.attr('aria-describedby')).toBe(undefined)
+
+      it 'adds only one alert when shown twice', ->
+        {ctx, $input} = buildPanelCtx()
+        MandatorySettingView.prototype.showMessage.call ctx
+        MandatorySettingView.prototype.showMessage.call ctx
+        expect($input.closest('.required-logic-panel').find('.message').length).toBe(1)
+
     describe 'on initial load (not already Conditional) — legacy boolean detection still works', ->
       it 'still recognizes a legacy boolean "true" value as Always', ->
         {ctx} = buildRenderCtx('true', isConditionalSelected: false)
