@@ -6,8 +6,9 @@ module.exports = do ->
   viewUtils.Validator = Validator
 
   # OC-28482: tell screen readers that a field has an error. `$message` is the
-  # error text shown under `$field`. role=alert reads it out once, when it is
-  # inserted, so callers create it once and remove it when the value is fixed.
+  # error text shown under `$field`. Call this before inserting `$message`, so
+  # it enters the page with role=alert already set and is read out once.
+  # Callers create it once and remove it when the value is fixed.
   viewUtils.markFieldInvalid = ($field, $message) ->
     id = _.uniqueId('field-error-')
     $message.attr(id: id, role: 'alert')

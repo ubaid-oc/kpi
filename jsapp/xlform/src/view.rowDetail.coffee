@@ -345,8 +345,8 @@ module.exports = do ->
         $el.closest('div').addClass(fieldClass)
         if $el.siblings('.message').length is 0
           $message = $('<div/>').addClass('message').text(message)
-          $el.after($message)
           $viewUtils.markFieldInvalid($el, $message)
+          $el.after($message)
 
       hideMessage =() =>
         $el.closest('div').removeClass(fieldClass)
@@ -2303,9 +2303,9 @@ module.exports = do ->
       $select.closest('div').addClass(fieldClass)
       if $select.siblings('.message').length is 0
         $message = $('<div/>').addClass('message').text(message)
-        $select.after($message)
         # The signature hint uses no field class; it is guidance, not an error.
         $viewUtils.markFieldInvalid($select, $message) if fieldClass is 'input-error'
+        $select.after($message)
 
     showErrorMessage: () ->
       errorMessage = t("Constraint / Constraint Message is not empty")

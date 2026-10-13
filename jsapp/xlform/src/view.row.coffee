@@ -991,8 +991,8 @@ module.exports = do ->
               $field.addClass('input-error')
               if $calcTextarea.siblings('.message').length is 0
                 $message = $('<div/>').addClass('message').text(t('This field is required'))
-                $calcTextarea.after($message)
                 $viewUtils.markFieldInvalid($calcTextarea, $message)
+                $calcTextarea.after($message)
             else
               $field.removeClass('input-error')
               $calcTextarea.siblings('.message').remove()
@@ -1022,8 +1022,8 @@ module.exports = do ->
                 $hint = $('<div/>')
                   .addClass('message js-calculation-readonly-hint')
                   .text(hintText)
-                $calcTextarea.after($hint)
                 $viewUtils.markFieldInvalid($calcTextarea, $hint)
+                $calcTextarea.after($hint)
             else
               $field.removeClass('input-error')
               $field.find('.js-calculation-readonly-hint').remove()

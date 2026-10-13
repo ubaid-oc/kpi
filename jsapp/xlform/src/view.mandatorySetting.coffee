@@ -124,8 +124,8 @@ module.exports = do ->
       # field's name as well as its description.
       if $label.next('.message').length is 0
         $message = $('<div/>').addClass('message').text(t("This field is required"))
-        $label.after($message)
         $viewUtils.markFieldInvalid($customEl, $message)
+        $label.after($message)
 
     hideMessage: () ->
       return unless @$panelEl
