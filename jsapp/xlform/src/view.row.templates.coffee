@@ -588,8 +588,8 @@ module.exports = do ->
         <p>#{t('If this item is a question users see on the form (any type other than Calculate), select')} <strong>#{t('Read only')}</strong> #{t('on the')} <strong>#{t('Question Options')}</strong> #{t('tab, or select a trigger item below. Otherwise the calculation will overwrite anything a user enters. To fill in a starting value only once, use a Default Value instead.')}</p>
       </div>
       <div class="calculation-panel__field">
-        <label class="logic-panel__label">#{t('Triggered by')}</label>
-        <select class="calculation-panel__select js-calculation-trigger-select">
+        <label class="logic-panel__label" for="#{cid}-calculation-trigger">#{t('Triggered by')}</label>
+        <select id="#{cid}-calculation-trigger" class="calculation-panel__select js-calculation-trigger-select">
         </select>
         <p class="calculation-panel__hint">#{t("To control when the value is calculated, select a trigger item. The calculation then runs only when that item's value changes. It does not run when other data changes or when the form is reopened. This lets the calculated value act as a starting point that users can edit. Their edit is overwritten only if the trigger item's value changes.")}</p>
       </div>

@@ -108,6 +108,7 @@ export default function AssetNavigator(props: AssetNavigatorProps) {
       <TextInput
         ref={searchInputRef}
         placeholder='Search…'
+        aria-label={t('Search Library')}
         leftSection={<Icon name='search' />}
         value={searchQuery}
         onChange={(event) => setSearchQuery(event.currentTarget.value)}

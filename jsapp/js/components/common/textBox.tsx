@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useId } from 'react'
 
 import classnames from 'classnames'
 import TextareaAutosize from 'react-textarea-autosize'
@@ -71,6 +71,8 @@ interface TextBoxProps {
 export default function TextBox(props: TextBoxProps) {
   const inputReference: React.MutableRefObject<null | HTMLInputElement> = React.createRef()
   const textareaReference: React.MutableRefObject<null | HTMLTextAreaElement> = React.createRef()
+  // Explicit label-input association, so screen readers announce the label.
+  const inputId = useId()
 
   useEffect(() => {
     if (props.renderFocused) {
@@ -153,6 +155,7 @@ export default function TextBox(props: TextBoxProps) {
   // need this is because for `text-multiline` type we use special component,
   // and for all the other types we use the `<input>` HTML tag.
   const inputProps = {
+    id: inputId,
     value: props.value,
     placeholder: props.placeholder,
     onBlur: onBlur,
@@ -175,11 +178,16 @@ export default function TextBox(props: TextBoxProps) {
   return (
     // The whole component is a label, because clicking it will bring focus to
     // the real input inside.
-    <label className={classnames(rootClassNames)}>
+    <label className={classnames(rootClassNames)} htmlFor={inputId}>
       {/* The label over the input */}
       {props.label && (
         <div className={styles.label}>
-          {props.label} {props.required && <span className={styles.requiredMark}>*</span>}
+          {props.label}{' '}
+          {props.required && (
+            <span className={styles.requiredMark} aria-hidden='true'>
+              *
+            </span>
+          )}
         </div>
       )}
 
