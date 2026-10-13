@@ -339,16 +339,19 @@ module.exports = do ->
       fieldClass = opts.fieldClass || 'input-error'
       message = opts.message || "This field is required"
       checkIfNotEmpty = opts.checkIfNotEmpty || false
+      $el.attr('aria-required', 'true') unless checkIfNotEmpty
 
       showMessage =() =>
         $el.closest('div').addClass(fieldClass)
         if $el.siblings('.message').length is 0
           $message = $('<div/>').addClass('message').text(message)
+          $viewUtils.markFieldInvalid($el, $message)
           $el.after($message)
 
       hideMessage =() =>
         $el.closest('div').removeClass(fieldClass)
         $el.siblings('.message').remove()
+        $viewUtils.clearFieldInvalid($el)
 
       showOrHideCondition = () =>
         if checkIfNotEmpty
@@ -381,6 +384,8 @@ module.exports = do ->
       $el.off 'keyup'
       $el.closest('div').removeClass(fieldClass)
       $el.siblings('.message').remove()
+      $el.removeAttr('aria-required')
+      $viewUtils.clearFieldInvalid($el)
 
       return
 
@@ -2298,6 +2303,8 @@ module.exports = do ->
       $select.closest('div').addClass(fieldClass)
       if $select.siblings('.message').length is 0
         $message = $('<div/>').addClass('message').text(message)
+        # The signature hint uses no field class; it is guidance, not an error.
+        $viewUtils.markFieldInvalid($select, $message) if fieldClass is 'input-error'
         $select.after($message)
 
     showErrorMessage: () ->
@@ -2319,6 +2326,7 @@ module.exports = do ->
         if ($select.closest('div').hasClass(fieldClass))
           $select.closest('div').removeClass(fieldClass)
       $select.siblings('.message').remove()
+      $viewUtils.clearFieldInvalid($select)
 
     hideErrorMessage: () ->
       @hideMessage('input-error')

@@ -326,6 +326,7 @@ do ->
         # instance, so it needs its own copy. Mirrors the real implementation
         # for this fixture, where model.changed is always null.
         getChangedValue: -> String(model.getValue())
+        hideMessage: jest.fn()
 
       {ctx, model, $panelEl}
 
@@ -382,6 +383,58 @@ do ->
         {ctx, $panelEl} = buildRenderCtx('true', isConditionalSelected: true, panelValue: 'true')
         MandatorySettingView.prototype.render.call ctx
         expect($panelEl.find('.mandatory-setting-custom-text').val()).toBe('')
+
+    # OC-28482: an external write (AI Apply) sets the value without typing,
+    # so render() must clear an error shown for the empty field.
+    describe 'clears a shown required error on an external write (OC-28482)', ->
+      it 'clears it when the external write sets a Conditional expression', ->
+        {ctx} = buildRenderCtx('${age} > 18', isConditionalSelected: true)
+        MandatorySettingView.prototype.render.call ctx
+        expect(ctx.hideMessage.mock.calls.length).toBe(1)
+
+      it 'clears it when the external write leaves Conditional', ->
+        {ctx} = buildRenderCtx('true', isConditionalSelected: true, panelValue: 'true')
+        MandatorySettingView.prototype.render.call ctx
+        expect(ctx.hideMessage.mock.calls.length).toBe(1)
+
+      it 'keeps it while the Conditional expression is still empty', ->
+        {ctx} = buildRenderCtx('', isConditionalSelected: true)
+        MandatorySettingView.prototype.render.call ctx
+        expect(ctx.hideMessage.mock.calls.length).toBe(0)
+
+    # OC-28482: the real showMessage/hideMessage against the real panel
+    # markup, so the alert placement and ARIA linkage are checked directly.
+    describe 'Required Logic error state in the DOM (OC-28482)', ->
+      buildPanelCtx = ->
+        $viewTemplates = require('../../jsapp/xlform/src/view.templates')
+        $panelEl = $($viewTemplates.$$render('row.requiredLogicPanel'))
+        {ctx: {$panelEl}, $panelEl, $input: $panelEl.find('.mandatory-setting-custom-text')}
+
+      it 'puts the alert after the label and links it to the field', ->
+        {ctx, $input} = buildPanelCtx()
+        MandatorySettingView.prototype.showMessage.call ctx
+        $label = $input.closest('label')
+        $alert = $label.next('.message')
+        expect($alert.length).toBe(1)
+        expect($label.find('.message').length).toBe(0)
+        expect($alert.attr('role')).toBe('alert')
+        expect($input.attr('aria-invalid')).toBe('true')
+        expect($input.attr('aria-describedby')).toBe($alert.attr('id'))
+        expect($input.attr('aria-required')).toBe('true')
+
+      it 'removes the alert and both attributes once cleared', ->
+        {ctx, $input} = buildPanelCtx()
+        MandatorySettingView.prototype.showMessage.call ctx
+        MandatorySettingView.prototype.hideMessage.call ctx
+        expect($input.closest('label').next('.message').length).toBe(0)
+        expect($input.attr('aria-invalid')).toBe(undefined)
+        expect($input.attr('aria-describedby')).toBe(undefined)
+
+      it 'adds only one alert when shown twice', ->
+        {ctx, $input} = buildPanelCtx()
+        MandatorySettingView.prototype.showMessage.call ctx
+        MandatorySettingView.prototype.showMessage.call ctx
+        expect($input.closest('.required-logic-panel').find('.message').length).toBe(1)
 
     describe 'on initial load (not already Conditional) — legacy boolean detection still works', ->
       it 'still recognizes a legacy boolean "true" value as Always', ->

@@ -134,9 +134,12 @@ export default function TextBox(props: TextBoxProps) {
   } else if (typeof props.errors === 'string' && props.errors.length > 0) {
     errors.push(props.errors)
   }
-  if (errors.length > 0 || props.errors === true) {
+  const isInvalid = errors.length > 0 || props.errors === true
+  if (isInvalid) {
     rootClassNames.push(styles.hasError)
   }
+  // Screen readers read the error text as the field's description.
+  const errorsId = `${inputId}-errors`
 
   if (props.disabled) {
     rootClassNames.push(styles.isDisabled)
@@ -156,6 +159,9 @@ export default function TextBox(props: TextBoxProps) {
   // and for all the other types we use the `<input>` HTML tag.
   const inputProps = {
     id: inputId,
+    // Left out (not `false`) when there is no error.
+    'aria-invalid': isInvalid || undefined,
+    'aria-describedby': errors.length > 0 ? errorsId : undefined,
     value: props.value,
     placeholder: props.placeholder,
     onBlur: onBlur,
@@ -176,78 +182,83 @@ export default function TextBox(props: TextBoxProps) {
   const iconSize = ButtonToIconMap.get('l')
 
   return (
-    // The whole component is a label, because clicking it will bring focus to
-    // the real input inside.
-    <label className={classnames(rootClassNames)} htmlFor={inputId}>
-      {/* The label over the input */}
-      {props.label && (
-        <div className={styles.label}>
-          {props.label}{' '}
-          {props.required && (
-            <span className={styles.requiredMark} aria-hidden='true'>
-              *
-            </span>
+    <div className={classnames(rootClassNames)}>
+      {/*
+        The label wraps the input area, because clicking it will bring focus to
+        the real input inside. The error messages stay outside it, so they are
+        read as the field's description and not as part of its name.
+      */}
+      <label htmlFor={inputId}>
+        {/* The label over the input */}
+        {props.label && (
+          <div className={styles.label}>
+            {props.label}{' '}
+            {props.required && (
+              <span className={styles.requiredMark} aria-hidden='true'>
+                *
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className={styles.inputWrapper}>
+          {/* The custom icon on the left */}
+          {props.startIcon && <Icon size={iconSize} name={props.startIcon} className={styles.startIcon} />}
+          {/* We use this to prevent browsers that ignore autocomplete='off' from attempting to fill the field */}
+          {props.disableAutocomplete && <input type='password' hidden={true} />}
+          {/* We use two different components based on the type of the TextBox */}
+          {props.type === 'text-multiline' && (
+            <TextareaAutosize
+              className={styles.input}
+              aria-required={props.required}
+              ref={textareaReference}
+              onChange={(evt: React.FormEvent<HTMLTextAreaElement>) => {
+                onValueChange(evt.currentTarget.value)
+              }}
+              autoComplete={props.disableAutocomplete ? 'off' : 'on'}
+              {...inputProps}
+            />
           )}
-        </div>
-      )}
+          {props.type !== 'text-multiline' && (
+            <input
+              className={styles.input}
+              aria-required={props.required}
+              type={type}
+              ref={inputReference}
+              autoComplete={props.disableAutocomplete ? 'off' : 'on'}
+              // We use `onInput` instead of `onChange` here, because (for some
+              // reason I wasn't able to grasp) `input[type="number"]` is not
+              // calling onChange when non-number is typed, but regardless to that
+              // the non-number character ends up added to the input value.
+              // This happens on Firefox.
+              onInput={(evt: React.ChangeEvent<HTMLInputElement>) => {
+                onValueChange(evt.currentTarget.value)
+              }}
+              // We need this fake `onChange` here to avoid React complaining that
+              // we're creating a read-only input (clearly not true).
+              onChange={() => false}
+              {...inputProps}
+            />
+          )}
 
-      <div className={styles.inputWrapper}>
-        {/* The custom icon on the left */}
-        {props.startIcon && <Icon size={iconSize} name={props.startIcon} className={styles.startIcon} />}
-        {/* We use this to prevent browsers that ignore autocomplete='off' from attempting to fill the field */}
-        {props.disableAutocomplete && <input type='password' hidden={true} />}
-        {/* We use two different components based on the type of the TextBox */}
-        {props.type === 'text-multiline' && (
-          <TextareaAutosize
-            className={styles.input}
-            aria-required={props.required}
-            ref={textareaReference}
-            onChange={(evt: React.FormEvent<HTMLTextAreaElement>) => {
-              onValueChange(evt.currentTarget.value)
-            }}
-            autoComplete={props.disableAutocomplete ? 'off' : 'on'}
-            {...inputProps}
-          />
-        )}
-        {props.type !== 'text-multiline' && (
-          <input
-            className={styles.input}
-            aria-required={props.required}
-            type={type}
-            ref={inputReference}
-            autoComplete={props.disableAutocomplete ? 'off' : 'on'}
-            // We use `onInput` instead of `onChange` here, because (for some
-            // reason I wasn't able to grasp) `input[type="number"]` is not
-            // calling onChange when non-number is typed, but regardless to that
-            // the non-number character ends up added to the input value.
-            // This happens on Firefox.
-            onInput={(evt: React.ChangeEvent<HTMLInputElement>) => {
-              onValueChange(evt.currentTarget.value)
-            }}
-            // We need this fake `onChange` here to avoid React complaining that
-            // we're creating a read-only input (clearly not true).
-            onChange={() => false}
-            {...inputProps}
-          />
-        )}
-
-        {/*
+          {/*
           The custom icon on the right. It is being displayed only if there are
           no errors. For TextBox with error, we display always an alert icon.
         */}
-        {errors.length === 0 && props.endIcon && (
-          <Icon size={iconSize} name={props.endIcon} className={styles.endIcon} />
-        )}
-        {errors.length > 0 && <Icon size={iconSize} name='alert' color='mid-red' className={styles.errorIcon} />}
-      </div>
+          {errors.length === 0 && props.endIcon && (
+            <Icon size={iconSize} name={props.endIcon} className={styles.endIcon} />
+          )}
+          {errors.length > 0 && <Icon size={iconSize} name='alert' color='mid-red' className={styles.errorIcon} />}
+        </div>
+      </label>
 
       {errors.length > 0 && (
-        <section className={styles.errorMessages}>
+        <section id={errorsId} role='alert' className={styles.errorMessages}>
           {errors.map((message: string, index: number) => (
             <div key={`textbox-error-${index}`}>{message}</div>
           ))}
         </section>
       )}
-    </label>
+    </div>
   )
 }

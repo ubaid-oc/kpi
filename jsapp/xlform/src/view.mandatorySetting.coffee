@@ -4,6 +4,7 @@ alertify = require 'alertifyjs'
 $configs = require './model.configs'
 $baseView = require './view.pluggedIn.backboneView'
 $viewTemplates = require './view.templates'
+$viewUtils = require './view.utils'
 generateButtonBridge = require '#/openclinica/generateButtonBridge'
 runSyntaxCheck = require('#/openclinica/syntaxCheckBridge').runSyntaxCheck
 {forgetSyntaxVerdictFor} = require('#/openclinica/syntaxCheckBridge')
@@ -76,6 +77,9 @@ module.exports = do ->
           panelInput.val(reqVal)
         else
           panelInput.val('')
+        # An AI Apply or leaving Conditional sets the value without typing, so
+        # clear a shown error here. An empty Conditional field keeps its state.
+        @hideMessage() unless @isConditionalSelected and reqVal is ''
       @_updateRequiredLogicTabVisibility()
       # OC-28718 AC3: detect when Generate applied an expression while selector was Always/Never
       if @rowView and @_hasRenderedOnce and not prevIsConditional and @isConditionalSelected and not @_ac3ModalPending
@@ -117,16 +121,22 @@ module.exports = do ->
     showMessage: () ->
       return unless @$panelEl
       $customEl = @$panelEl.find('.mandatory-setting-custom-text')
-      $customEl.closest('label').addClass('input-error')
-      if $customEl.siblings('.message').length is 0
+      $label = $customEl.closest('label')
+      $label.addClass('input-error')
+      # After the <label>, not inside it, or the error becomes part of the
+      # field's name as well as its description.
+      if $label.next('.message').length is 0
         $message = $('<div/>').addClass('message').text(t("This field is required"))
-        $customEl.after($message)
+        $viewUtils.markFieldInvalid($customEl, $message)
+        $label.after($message)
 
     hideMessage: () ->
       return unless @$panelEl
       $customEl = @$panelEl.find('.mandatory-setting-custom-text')
-      $customEl.closest('label').removeClass('input-error')
-      $customEl.siblings('.message').remove()
+      $label = $customEl.closest('label')
+      $label.removeClass('input-error')
+      $label.next('.message').remove()
+      $viewUtils.clearFieldInvalid($customEl)
 
     showOrHideCondition: () ->
       return unless @$panelEl

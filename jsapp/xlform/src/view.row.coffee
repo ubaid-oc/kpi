@@ -991,11 +991,16 @@ module.exports = do ->
               $field.addClass('input-error')
               if $calcTextarea.siblings('.message').length is 0
                 $message = $('<div/>').addClass('message').text(t('This field is required'))
+                $viewUtils.markFieldInvalid($calcTextarea, $message)
                 $calcTextarea.after($message)
             else
               $field.removeClass('input-error')
               $calcTextarea.siblings('.message').remove()
+              $viewUtils.clearFieldInvalid($calcTextarea)
+          $calcTextarea.attr('aria-required', 'true')
           $calcTextarea.on('blur input', makeRequiredCheck)
+          # An AI Apply writes the model without input or blur events.
+          @listenTo(calculationModel, 'change:value', makeRequiredCheck)
 
         else
           # OC (OC-28464): non-Calculate items with a calculation must be
@@ -1019,6 +1024,8 @@ module.exports = do ->
                 $hint = $('<div/>')
                   .addClass('message js-calculation-readonly-hint')
                   .text(hintText)
+                # Guidance about Read only or the trigger, not an error in the
+                # expression, so the field is not marked invalid.
                 $calcTextarea.after($hint)
             else
               $field.removeClass('input-error')
