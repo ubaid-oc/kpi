@@ -77,6 +77,9 @@ module.exports = do ->
           panelInput.val(reqVal)
         else
           panelInput.val('')
+        # An AI Apply or leaving Conditional sets the value without typing, so
+        # clear a shown error here. An empty Conditional field keeps its state.
+        @hideMessage() unless @isConditionalSelected and reqVal is ''
       @_updateRequiredLogicTabVisibility()
       # OC-28718 AC3: detect when Generate applied an expression while selector was Always/Never
       if @rowView and @_hasRenderedOnce and not prevIsConditional and @isConditionalSelected and not @_ac3ModalPending

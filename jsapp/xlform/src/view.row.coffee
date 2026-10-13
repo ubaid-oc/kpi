@@ -999,6 +999,8 @@ module.exports = do ->
               $viewUtils.clearFieldInvalid($calcTextarea)
           $calcTextarea.attr('aria-required', 'true')
           $calcTextarea.on('blur input', makeRequiredCheck)
+          # An AI Apply writes the model without input or blur events.
+          @listenTo(calculationModel, 'change:value', makeRequiredCheck)
 
         else
           # OC (OC-28464): non-Calculate items with a calculation must be

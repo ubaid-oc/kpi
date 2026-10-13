@@ -326,6 +326,7 @@ do ->
         # instance, so it needs its own copy. Mirrors the real implementation
         # for this fixture, where model.changed is always null.
         getChangedValue: -> String(model.getValue())
+        hideMessage: jest.fn()
 
       {ctx, model, $panelEl}
 
@@ -382,6 +383,24 @@ do ->
         {ctx, $panelEl} = buildRenderCtx('true', isConditionalSelected: true, panelValue: 'true')
         MandatorySettingView.prototype.render.call ctx
         expect($panelEl.find('.mandatory-setting-custom-text').val()).toBe('')
+
+    # OC-28482: an external write (AI Apply) sets the value without typing,
+    # so render() must clear an error shown for the empty field.
+    describe 'clears a shown required error on an external write (OC-28482)', ->
+      it 'clears it when the external write sets a Conditional expression', ->
+        {ctx} = buildRenderCtx('${age} > 18', isConditionalSelected: true)
+        MandatorySettingView.prototype.render.call ctx
+        expect(ctx.hideMessage.mock.calls.length).toBe(1)
+
+      it 'clears it when the external write leaves Conditional', ->
+        {ctx} = buildRenderCtx('true', isConditionalSelected: true, panelValue: 'true')
+        MandatorySettingView.prototype.render.call ctx
+        expect(ctx.hideMessage.mock.calls.length).toBe(1)
+
+      it 'keeps it while the Conditional expression is still empty', ->
+        {ctx} = buildRenderCtx('', isConditionalSelected: true)
+        MandatorySettingView.prototype.render.call ctx
+        expect(ctx.hideMessage.mock.calls.length).toBe(0)
 
     describe 'on initial load (not already Conditional) — legacy boolean detection still works', ->
       it 'still recognizes a legacy boolean "true" value as Always', ->
