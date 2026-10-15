@@ -2,14 +2,14 @@ module.exports = do ->
 
   xlfRowSelector = {}
 
-  closeRowSelectorButton = """
-      <button type="button" class="row__questiontypes__close js-close-row-selector shrink pull-right close close-button close-button--depr" aria-hidden="true">&times;</button>
+  closeRowSelectorButton = -> """
+      <button type="button" class="row__questiontypes__close js-close-row-selector shrink pull-right close close-button close-button--depr" aria-label="#{t('Close')}">&times;</button>
   """
 
   xlfRowSelector.line = (name) ->
       template = """
           <div class="row__questiontypes row-fluid clearfix">
-            #{closeRowSelectorButton}
+            #{closeRowSelectorButton()}
             <input type="text" value="#{name}" class="row__questiontypes__new-question-name js-cancel-sort" dir="auto" />
             <div class="row__questiontypes__list clearfix"></div>
           </div>
@@ -28,7 +28,7 @@ module.exports = do ->
   xlfRowSelector.namer = () ->
     template = """
       <div class="row__questiontypes row__questiontypes--namer">
-        #{closeRowSelectorButton}
+        #{closeRowSelectorButton()}
         <form class="row__questiontypes__form" action="javascript:void(0);" >
           <input type="text" class="js-cancel-sort mdl-textfield__input" data-cy="textfield_input" dir="auto" placeholder="#{t('Enter question text')}" />
           <button class="kobo-button kobo-button--storm" data-cy="add_question">+ #{t("Add Question")}</button>

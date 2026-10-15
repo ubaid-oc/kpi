@@ -67,6 +67,9 @@ module.exports = do ->
       "click .js-close-warning": "closeWarningBox"
       "click .js-expand-row-selector": "expandRowSelector"
       "keydown .js-expand-row-selector": "addRowKeydown"
+      # Icon-only controls rendered as <span>/<i> with role="button" (card
+      # buttons, caret toggles, delete icons): activate them like native buttons.
+      "keydown .js-icon-button": "iconButtonKeydown"
       # it is important to distinct these buttons from the group buttons
       "mouseenter .card__header .card__buttons__button": "buttonHoverIn"
       "mouseleave .card__header .card__buttons__button": "buttonHoverOut"
@@ -351,6 +354,17 @@ module.exports = do ->
       if evt.which is 32
         evt.preventDefault()
         $(evt.currentTarget).trigger('click')
+      return
+
+    iconButtonKeydown: (evt) ->
+      if evt.which in [13, 32]
+        evt.preventDefault()
+        evt.stopPropagation()
+        $et = $(evt.currentTarget)
+        # Locking disables controls with `pointer-events: none` only, which a
+        # scripted click bypasses, so honour it (and hidden controls) here.
+        if $et.closest(".#{LOCKING_UI_CLASSNAMES.DISABLED}, .hidden").length is 0
+          $et.trigger('click')
       return
 
     _render_html: ->

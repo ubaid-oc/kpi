@@ -120,7 +120,7 @@ const MainHeader = class MainHeader extends React.Component<MainHeaderProps> {
         <GitRev />
 
         {isLoggedIn && (
-          <button className={styles.mobileMenuToggle} onClick={this.toggleFixedDrawer}>
+          <button className={styles.mobileMenuToggle} onClick={this.toggleFixedDrawer} aria-label={t('Menu')}>
             <Icon name='menu' size='xl' />
           </button>
         )}

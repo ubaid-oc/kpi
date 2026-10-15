@@ -132,7 +132,11 @@ export default class MetadataEditor extends React.Component {
         {t('Audit settings')}
 
         {envStore.isReady && envStore.data.support_url && (
-          <bem.FormBuilderMeta__labelLink href={envStore.data.support_url + AUDIT_SUPPORT_URL} target='_blank'>
+          <bem.FormBuilderMeta__labelLink
+            href={envStore.data.support_url + AUDIT_SUPPORT_URL}
+            target='_blank'
+            aria-label={t('Learn more about audit settings')}
+          >
             <Icon name='help' size='xs' color='blue' />
           </bem.FormBuilderMeta__labelLink>
         )}
@@ -146,7 +150,11 @@ export default class MetadataEditor extends React.Component {
         {t('Background audio')}
 
         {envStore.isReady && envStore.data.support_url && (
-          <bem.FormBuilderMeta__labelLink href={envStore.data.support_url + RECORDING_SUPPORT_URL} target='_blank'>
+          <bem.FormBuilderMeta__labelLink
+            href={envStore.data.support_url + RECORDING_SUPPORT_URL}
+            target='_blank'
+            aria-label={t('Learn more about background audio')}
+          >
             <Icon name='help' size='s' color='blue' />
           </bem.FormBuilderMeta__labelLink>
         )}

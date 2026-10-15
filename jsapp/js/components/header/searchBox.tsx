@@ -5,6 +5,7 @@ import { autorun } from 'mobx'
 import { observer } from 'mobx-react'
 import bem from '#/bem'
 import { KEY_CODES } from '#/constants'
+import { iconButtonProps } from '#/utils'
 import searchBoxStore from './searchBoxStore'
 
 interface SearchBoxProps {
@@ -81,7 +82,16 @@ class SearchBox extends React.Component<SearchBoxProps, SearchBoxState> {
           placeholder={this.props.placeholder || t('Search…')}
           disabled={this.props.disabled}
         />
-        {this.state.inputVal !== '' && <bem.Search__cancel className='k-icon k-icon-close' onClick={this.clear} />}
+        {this.state.inputVal !== '' && (
+          <bem.Search__cancel
+            className='k-icon k-icon-close'
+            {...iconButtonProps(t('Clear search'), (evt) => {
+              // The icon unmounts once cleared, so keep focus in the search field.
+              ;(evt.currentTarget as HTMLElement).parentElement?.querySelector('input')?.focus()
+              this.clear()
+            })}
+          />
+        )}
       </bem.Search>
     )
   }

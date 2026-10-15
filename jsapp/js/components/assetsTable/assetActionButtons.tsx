@@ -474,6 +474,7 @@ class AssetActionButtons extends React.Component<AssetActionButtonsProps, AssetA
 
         {!isCollection && (
           <PopoverMenu
+            triggerAriaLabel={t('Manage collection')}
             triggerLabel={
               <div className='right-tooltip' data-tip={t('Manage collection')}>
                 <i className='k-icon k-icon-folder' />

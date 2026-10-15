@@ -1441,6 +1441,7 @@ export default function EditableForm(props: EditableFormProps) {
               size='m'
               isDisabled={!groupable}
               onClick={groupQuestions}
+              aria-label={t('Create group with selected questions')}
               tooltip={
                 groupable
                   ? t('Create group with selected questions')
@@ -1461,6 +1462,7 @@ export default function EditableForm(props: EditableFormProps) {
               size='m'
               isDisabled={!groupable}
               onClick={deleteQuestions}
+              aria-label={t('Delete selected questions')}
               tooltip={
                 groupable
                   ? t('Delete selected questions')
@@ -1475,6 +1477,7 @@ export default function EditableForm(props: EditableFormProps) {
               size='m'
               isDisabled={!groupable}
               onClick={duplicateQuestions}
+              aria-label={t('Duplicate selected questions')}
               tooltip={
                 groupable
                   ? t('Duplicate selected questions')
@@ -1498,6 +1501,7 @@ export default function EditableForm(props: EditableFormProps) {
                   onClick={addQuestionsToLibrary}
                   disabled={!groupable}
                   className='add-questions-to-library'
+                  aria-label={t('Add selected questions to library')}
                 >
                   <i className='k-icon-folder'>
                     <i className='k-icon-plus' />
@@ -1515,7 +1519,12 @@ export default function EditableForm(props: EditableFormProps) {
 
           {/* OC fork: link to the OpenClinica Form Designer help docs. */}
           <bem.FormBuilderHeader__cell m='supportUrl'>
-            <a href={FORM_DESIGNER_SUPPORT_URL} target='_blank' data-tip={t('Learn more about Form Designer')}>
+            <a
+              href={FORM_DESIGNER_SUPPORT_URL}
+              target='_blank'
+              data-tip={t('Learn more about Form Designer')}
+              aria-label={t('Learn more about Form Designer')}
+            >
               <i className='k-icon k-icon-help' />
             </a>
           </bem.FormBuilderHeader__cell>
@@ -1739,6 +1748,7 @@ export default function EditableForm(props: EditableFormProps) {
               href={envStore.data.support_url + LOCKING_SUPPORT_URL}
               target='_blank'
               data-tip={t('Read more about Locking')}
+              aria-label={t('Read more about Locking')}
             >
               <i className='k-icon k-icon-help' />
             </a>
@@ -1854,6 +1864,7 @@ export default function EditableForm(props: EditableFormProps) {
               href={envStore.data.support_url + CHOICE_LIST_SUPPORT_URL}
               target='_blank'
               data-tip={t('Learn more about importing cascading lists from Excel')}
+              aria-label={t('Learn more about importing cascading lists from Excel')}
             >
               <i className='k-icon k-icon-help' />
             </a>

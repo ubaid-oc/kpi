@@ -10,6 +10,7 @@
 import type * as Sentry from '@sentry/react'
 import random from 'lodash.random'
 import moment from 'moment'
+import type React from 'react'
 import { Cookies } from 'react-cookie'
 import type { Toast, ToastOptions } from 'react-hot-toast'
 import { toast } from 'react-hot-toast'
@@ -642,3 +643,23 @@ export function createDateQuery(startDate: string, endDate: string): MongoQuery[
 }
 
 export const sleep = (ms: number): Promise<void> => new Promise<void>((resolve) => setTimeout(() => resolve(), ms))
+
+/**
+ * Props that make a non-button element (e.g. an icon-only `<a>` or `<i>`) a
+ * named, keyboard-operable button: focusable, and activated by Enter or Space
+ * like a native button.
+ */
+export function iconButtonProps(label: string, onActivate: (evt: React.SyntheticEvent) => void) {
+  return {
+    role: 'button',
+    tabIndex: 0,
+    'aria-label': label,
+    onClick: onActivate,
+    onKeyDown: (evt: React.KeyboardEvent) => {
+      if (evt.key === 'Enter' || evt.key === ' ') {
+        evt.preventDefault()
+        onActivate(evt)
+      }
+    },
+  }
+}
