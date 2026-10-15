@@ -364,7 +364,7 @@ module.exports = do ->
         $et = $(evt.currentTarget)
         # Locking disables controls with `pointer-events: none` only, which a
         # scripted click bypasses, so honour it (and hidden controls) here.
-        if $et.closest(".#{LOCKING_UI_CLASSNAMES.DISABLED}, .hidden").length is 0
+        if $et.closest(".#{LOCKING_UI_CLASSNAMES.DISABLED}, .#{LOCKING_UI_CLASSNAMES.HIDDEN}, .hidden").length is 0
           $et.trigger('click')
       return
 
