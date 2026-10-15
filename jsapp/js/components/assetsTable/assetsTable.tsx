@@ -226,12 +226,7 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
       )
     }
 
-    let icon = <i className='k-icon k-icon-filter-arrows' />
-    if (this.props.filterColumnId === columnDef.id) {
-      icon = (
-        <i className='k-icon k-icon-close' {...iconButtonProps(t('Clear filter'), this.onClearFilter.bind(this))} />
-      )
-    }
+    const isFiltered = this.props.filterColumnId === columnDef.id
 
     return (
       <bem.AssetsTableRow__column m={columnDef.id}>
@@ -239,7 +234,7 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
           type='assets-table'
           triggerLabel={
             <span>
-              {columnDef.label} {icon}
+              {columnDef.label} {!isFiltered && <i className='k-icon k-icon-filter-arrows' />}
             </span>
           }
           clearPopover={this.state.shouldHidePopover}
@@ -269,6 +264,10 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
             )
           })}
         </PopoverMenu>
+        {/* A sibling of the popover toggle, so the two controls are not nested. */}
+        {isFiltered && (
+          <i className='k-icon k-icon-close' {...iconButtonProps(t('Clear filter'), this.onClearFilter.bind(this))} />
+        )}
       </bem.AssetsTableRow__column>
     )
   }

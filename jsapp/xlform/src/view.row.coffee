@@ -687,6 +687,7 @@ module.exports = do ->
       # disable all UI from "Relevant Logic" tab of group settings
       if (isLockable and @hasRestriction(LockingRestrictionName.group_skip_logic_edit.name))
         @$settings.find('.js-card-settings-relevant-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
+          .find('.js-icon-button').attr({'aria-disabled': 'true', tabindex: '-1'})
 
       return
 
@@ -1189,6 +1190,7 @@ module.exports = do ->
         # disable removing question options
         if (isLockable and @hasRestriction(LockingRestrictionName.choice_delete))
           @$el.find('.js-remove-option').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
+            .attr({'aria-disabled': 'true', tabindex: '-1'})
 
         # disable changing question options labels
         if (isLockable and @hasRestriction(LockingRestrictionName.choice_label_edit))
@@ -1217,6 +1219,7 @@ module.exports = do ->
         # disable all UI from "Relevant Logic" tab of question settings
         if (isLockable and @hasRestriction(LockingRestrictionName.question_skip_logic_edit.name))
           @$settings.find('.js-card-settings-relevant-logic').addClass(LOCKING_UI_CLASSNAMES.DISABLED)
+            .find('.js-icon-button').attr({'aria-disabled': 'true', tabindex: '-1'})
 
         # disable all UI from "Validation Criteria" tab of question settings
         if (isLockable and @hasRestriction(LockingRestrictionName.question_validation_edit))
