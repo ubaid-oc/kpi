@@ -3,6 +3,7 @@ import {
   generateAutoname,
   getLangAsObject,
   getLangString,
+  iconButtonProps,
   join,
   truncateFile,
   truncateString,
@@ -168,6 +169,46 @@ describe('utils', () => {
       const INDEX_FIRST_WORD = 4
       const INDEX_LAST_WORD = 21
       chai.expect(generateAutoname(testString, INDEX_FIRST_WORD, INDEX_LAST_WORD)).to.equal('___a_very_long_na')
+    })
+  })
+
+  describe('iconButtonProps', () => {
+    const keyEvent = (key) => {
+      let prevented = 0
+      return { key, preventDefault: () => prevented++, prevented: () => prevented }
+    }
+
+    it('names a focusable button', () => {
+      const props = iconButtonProps('Clear search', () => {})
+      chai.expect(props.role).to.equal('button')
+      chai.expect(props.tabIndex).to.equal(0)
+      chai.expect(props['aria-label']).to.equal('Clear search')
+    })
+
+    it('activates once on Enter and on Space, and prevents the default action', () => {
+      for (const key of ['Enter', ' ']) {
+        let calls = 0
+        const props = iconButtonProps('Clear search', () => calls++)
+        const evt = keyEvent(key)
+        props.onKeyDown(evt)
+        chai.expect(calls).to.equal(1)
+        chai.expect(evt.prevented()).to.equal(1)
+      }
+    })
+
+    it('ignores other keys', () => {
+      let calls = 0
+      const props = iconButtonProps('Clear search', () => calls++)
+      const evt = keyEvent('Tab')
+      props.onKeyDown(evt)
+      chai.expect(calls).to.equal(0)
+      chai.expect(evt.prevented()).to.equal(0)
+    })
+
+    it('activates on click', () => {
+      let calls = 0
+      iconButtonProps('Clear search', () => calls++).onClick({})
+      chai.expect(calls).to.equal(1)
     })
   })
 })

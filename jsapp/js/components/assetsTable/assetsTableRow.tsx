@@ -31,13 +31,21 @@ class AssetsTableRow extends React.Component<AssetsTableRowProps> {
       settingsVersion = this.props.asset.summary.settings_version
     }
 
+    const rowLinkLabel = assetUtils.getAssetDisplayName(this.props.asset).final
+
     return (
       <bem.AssetsTableRow m={['asset', `type-${this.props.asset.asset_type}`]}>
         {this.props.asset.asset_type === ASSET_TYPES.collection.id && (
-          <bem.AssetsTableRow__link href={buildHashHrefWithEConsent(`#/library/asset/${this.props.asset.uid}`)} />
+          <bem.AssetsTableRow__link
+            href={buildHashHrefWithEConsent(`#/library/asset/${this.props.asset.uid}`)}
+            aria-label={rowLinkLabel}
+          />
         )}
         {this.props.asset.asset_type !== ASSET_TYPES.collection.id && (
-          <bem.AssetsTableRow__link href={buildHashHrefWithEConsent(`#/library/asset/${this.props.asset.uid}/edit`)} />
+          <bem.AssetsTableRow__link
+            href={buildHashHrefWithEConsent(`#/library/asset/${this.props.asset.uid}/edit`)}
+            aria-label={rowLinkLabel}
+          />
         )}
 
         <bem.AssetsTableRow__column m='name' dir='auto'>

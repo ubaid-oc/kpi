@@ -86,6 +86,11 @@ export interface ButtonProps {
   isUpperCase?: boolean
   /** Additional class names. */
   className?: string
+  /**
+   * Accessible name for the button. Icon-only buttons fall back to `tooltip`, so
+   * pass this only when the tooltip text is not a good spoken name.
+   */
+  'aria-label'?: string
   /** You don't need to pass the callback for `isSubmit` option. */
   onClick?: (event: any) => void
 }
@@ -122,6 +127,8 @@ const Button = (props: ButtonProps) => {
     }
   }
 
+  const ariaLabel = props['aria-label'] ?? (props.label ? undefined : props.tooltip)
+
   const onKeyUp = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (event?.key === 'space' || event?.key === 'enter') {
       handleClick(event)
@@ -147,7 +154,8 @@ const Button = (props: ButtonProps) => {
       aria-disabled={props.isDisabled || props.isPending}
       onClick={handleClick}
       onKeyUp={onKeyUp}
-      aria-labelledby={props.label ? `k-button__label--${labelId}` : undefined}
+      aria-label={ariaLabel}
+      aria-labelledby={props.label && !ariaLabel ? `k-button__label--${labelId}` : undefined}
       {...additionalButtonAttributes}
     >
       {props.startIcon && <Icon name={props.startIcon} size={iconSize} />}

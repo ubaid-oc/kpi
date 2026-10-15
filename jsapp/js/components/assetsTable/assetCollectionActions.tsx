@@ -61,7 +61,7 @@ class AssetCollectionActions extends React.Component<AssetCollectionActionsProps
     return (
       <bem.AssetCollectionActions>
         {!isCollection && (
-          <PopoverMenu triggerLabel={this.renderTrigger()}>
+          <PopoverMenu triggerLabel={this.renderTrigger()} triggerAriaLabel={t('Manage collection')}>
             {assetType !== ASSET_TYPES.survey.id &&
               assetType !== ASSET_TYPES.collection.id &&
               this.props.asset.parent !== null && (

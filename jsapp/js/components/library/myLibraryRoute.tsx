@@ -16,7 +16,7 @@ import subdomainLibraryStore from '#/oc/subdomainLibraryStore'
 import type { SubdomainLibraryStoreData } from '#/oc/subdomainLibraryStore'
 import pageState from '#/pageState.store'
 import type { OrderDirection } from '#/projects/projectViews/constants'
-import { validFileTypes } from '#/utils'
+import { iconButtonProps, validFileTypes } from '#/utils'
 import libraryTypeFilterStore from './libraryTypeFilterStore'
 import subdomainCollectionsStore from './subdomainCollectionsStore'
 import './assetBreadcrumbs.scss'
@@ -162,13 +162,17 @@ export default class MyLibraryRoute extends React.Component<{}, MyLibraryRouteSt
                 href={LIBRARY_MANAGEMENT_SUPPORT_URL}
                 target='_blank'
                 data-tip={t('Learn more about Library Management')}
+                aria-label={t('Learn more about Library Management')}
               >
                 <i className='k-icon k-icon-help' />
               </bem.LibraryActionsButtons__button>
               <bem.LibraryActionsButtons__button
                 m='all-tags-toggle'
-                onClick={this.clickShowAllTagsToggle.bind(this)}
                 data-tip={this.state.showAllTags ? t('Hide all labels') : t('Show all labels')}
+                {...iconButtonProps(
+                  this.state.showAllTags ? t('Hide all labels') : t('Show all labels'),
+                  this.clickShowAllTagsToggle.bind(this),
+                )}
               >
                 <i className='k--icon k-icon-tag' />
               </bem.LibraryActionsButtons__button>

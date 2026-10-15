@@ -124,7 +124,7 @@ module.exports = do ->
       Backbone.on('consentRowChoiceValueNotError', @onConsentRowChoiceValueNotError, @)
     render: ->
       @h = $("<span class=\"multioptions__drag-handle js-drag-handle\">")
-      @t = $("<i class=\"k-icon k-icon-trash js-remove-option\">")
+      @t = $("<i class=\"k-icon k-icon-trash js-remove-option js-icon-button\" role=\"button\" tabindex=\"0\" aria-label=\"#{t("Delete choice")}\">")
       @pw = $("<div class=\"editable-wrapper js-option-label-input js-cancel-select-row\">")
       @p = $("<input placeholder=\"#{t("No value")}\" class=\"js-cancel-select-row option-view-input\" dir=\"auto\">")
       @c = $("<code><input type=\"text\" class=\"js-option-name-input js-cancel-select-row\"></input></code>")

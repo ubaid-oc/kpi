@@ -264,7 +264,11 @@ class LibrarySidebar extends Reflux.Component<any, any> {
                     {collection.name}
                   </bem.FormSidebar__itemlink>
                   {subdomainLibraryStore.getCollectionUid() === collection.uid && (
-                    <PopoverMenu type='collectionSidebarPublic-menu' triggerLabel={<i className='k-icon-more' />}>
+                    <PopoverMenu
+                      type='collectionSidebarPublic-menu'
+                      triggerLabel={<i className='k-icon-more' />}
+                      triggerAriaLabel={t('Collection actions')}
+                    >
                       <bem.PopoverMenu__link
                         m={'rename'}
                         onClick={() => this.renameCollection(collection)}

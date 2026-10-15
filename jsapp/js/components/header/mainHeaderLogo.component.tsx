@@ -14,7 +14,7 @@ bem.Header__logo = makeBem(bem.Header, 'logo', 'span')
 export default function MainHeaderLogo() {
   return (
     <span className='mdl-layout__title'>
-      <a href='/'>
+      <a href='/' aria-label={t('Home')}>
         <bem.Header__logo />
       </a>
     </span>

@@ -21,6 +21,12 @@ interface PopoverMenuProps {
   additionalModifiers?: string[]
   /** the element that will be opening the menu, menu will be placed in relation to it */
   triggerLabel: React.ReactNode
+  /**
+   * Accessible name for the toggle. Pass it when `triggerLabel` is an icon
+   * only. It also exposes the toggle as a button that Enter/Space opens. Note:
+   * the menu items themselves are still not keyboard-reachable.
+   */
+  triggerAriaLabel?: string
   /** content of the menu, can be anything really */
   children?: React.ReactNode
 }
@@ -116,6 +122,13 @@ export default class PopoverMenu extends React.Component<PopoverMenuProps, Popov
     }
   }
 
+  onToggleKeyDown(evt: React.KeyboardEvent<HTMLElement>) {
+    if (evt.key === 'Enter' || evt.key === ' ') {
+      evt.preventDefault()
+      this.toggle(evt.nativeEvent as unknown as HTMLElementEvent<HTMLButtonElement>)
+    }
+  }
+
   render() {
     const wrapperMods = this.props.additionalModifiers || []
     wrapperMods.push(this.state.placement)
@@ -135,7 +148,17 @@ export default class PopoverMenu extends React.Component<PopoverMenuProps, Popov
 
     return (
       <bem.PopoverMenu m={wrapperMods}>
-        <bem.PopoverMenu__toggle onClick={this.toggle} onBlur={this.toggle} tabIndex={0}>
+        <bem.PopoverMenu__toggle
+          onClick={this.toggle}
+          onBlur={this.toggle}
+          tabIndex={0}
+          {...(this.props.triggerAriaLabel && {
+            role: 'button',
+            'aria-label': this.props.triggerAriaLabel,
+            'aria-expanded': this.state.popoverVisible,
+            onKeyDown: this.onToggleKeyDown,
+          })}
+        >
           {this.props.triggerLabel}
         </bem.PopoverMenu__toggle>
 

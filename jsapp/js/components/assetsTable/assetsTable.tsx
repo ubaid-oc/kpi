@@ -9,7 +9,7 @@ import LoadingSpinner from '#/components/common/loadingSpinner'
 import type { AssetResponse, MetadataResponse } from '#/dataInterface'
 import PopoverMenu from '#/popoverMenu'
 import type { OrderDirection } from '#/projects/projectViews/constants'
-import { getScrollbarWidth, hasVerticalScrollbar } from '#/utils'
+import { getScrollbarWidth, hasVerticalScrollbar, iconButtonProps } from '#/utils'
 import { ASSETS_TABLE_COLUMNS, ASSETS_TABLE_CONTEXTS, ORDER_DIRECTIONS } from './assetsTableConstants'
 import type { AssetsTableColumn, AssetsTableContextName } from './assetsTableConstants'
 import AssetsTableRow from './assetsTableRow'
@@ -170,7 +170,7 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
     }
   }
 
-  onClearFilter(evt: React.MouseEvent | React.TouchEvent) {
+  onClearFilter(evt: React.SyntheticEvent) {
     evt.stopPropagation()
     this.props.onFilterChange(null, null)
   }
@@ -226,10 +226,7 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
       )
     }
 
-    let icon = <i className='k-icon k-icon-filter-arrows' />
-    if (this.props.filterColumnId === columnDef.id) {
-      icon = <i className='k-icon k-icon-close' onClick={this.onClearFilter.bind(this)} />
-    }
+    const isFiltered = this.props.filterColumnId === columnDef.id
 
     return (
       <bem.AssetsTableRow__column m={columnDef.id}>
@@ -237,7 +234,7 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
           type='assets-table'
           triggerLabel={
             <span>
-              {columnDef.label} {icon}
+              {columnDef.label} {!isFiltered && <i className='k-icon k-icon-filter-arrows' />}
             </span>
           }
           clearPopover={this.state.shouldHidePopover}
@@ -267,6 +264,10 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
             )
           })}
         </PopoverMenu>
+        {/* A sibling of the popover toggle, so the two controls are not nested. */}
+        {isFiltered && (
+          <i className='k-icon k-icon-close' {...iconButtonProps(t('Clear filter'), this.onClearFilter.bind(this))} />
+        )}
       </bem.AssetsTableRow__column>
     )
   }
