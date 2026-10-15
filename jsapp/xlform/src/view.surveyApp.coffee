@@ -310,6 +310,7 @@ module.exports = do ->
       $et = $(evt.currentTarget)
       $et.toggleClass('k-icon-caret-down')
       $et.toggleClass('k-icon-caret-right')
+      $et.attr('aria-expanded', String(groupsAreShrunk))
 
       view.$el.toggleClass('group--shrunk', !groupsAreShrunk)
 

@@ -1503,6 +1503,7 @@ module.exports = do ->
     hideMultioptions: ->
       @$card.removeClass('card--expandedchoices')
       @is_expanded = false
+      @$('.js-toggle-row-multioptions').attr('aria-expanded', 'false')
       @$('.js-toggle-row-multioptions .k-icon')
         .addClass('k-icon-caret-right')
         .removeClass('k-icon-caret-down')
@@ -1511,6 +1512,7 @@ module.exports = do ->
     showMultioptions: ->
       @$card.addClass('card--expandedchoices')
       @is_expanded = true
+      @$('.js-toggle-row-multioptions').attr('aria-expanded', 'true')
       @$('.js-toggle-row-multioptions .k-icon')
         .addClass('k-icon-caret-down')
         .removeClass('k-icon-caret-right')

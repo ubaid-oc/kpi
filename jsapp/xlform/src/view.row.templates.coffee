@@ -252,7 +252,7 @@ module.exports = do ->
         <div class="group__header__icon js-group-icon">
           <i class="k-icon"></i>
         </div>
-        <i class="group__caret js-toggle-group-expansion k-icon k-icon-caret-down js-icon-button" role="button" tabindex="0" aria-label="#{t("Expand / collapse group")}"></i>
+        <i class="group__caret js-toggle-group-expansion k-icon k-icon-caret-down js-icon-button" role="button" tabindex="0" aria-expanded="true" aria-label="#{t("Expand / collapse group")}"></i>
         <input type="text" class="card__header-title js-card-label js-cancel-select-row js-cancel-sort" dir="auto">
         <div class="card__buttons">
           <span class="card__buttons__button card__buttons__button--settings card__buttons__button--gray js-toggle-card-settings js-icon-button" role="button" tabindex="0" aria-label="#{t("Group settings")}">
@@ -534,7 +534,7 @@ module.exports = do ->
 
   expandChoiceList = ()->
     template = """
-    <span class="card__buttons__multioptions js-toggle-row-multioptions js-cancel-select-row js-icon-button" role="button" tabindex="0" aria-label="#{t("Show / hide choices")}"><i class='k-icon k-icon-caret-down' /></span>
+    <span class="card__buttons__multioptions js-toggle-row-multioptions js-cancel-select-row js-icon-button" role="button" tabindex="0" aria-expanded="true" aria-label="#{t("Show / hide choices")}"><i class='k-icon k-icon-caret-down' /></span>
     """
     return template
 
