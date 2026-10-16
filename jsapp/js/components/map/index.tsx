@@ -1061,7 +1061,15 @@ class FormMap extends React.Component<FormMapProps, FormMapState> {
                 <div
                   key='m-reset'
                   className='map-marker-item map-marker-reset'
+                  role='button'
+                  tabIndex={0}
                   onClick={this.resetFilterByMarker.bind(this)}
+                  onKeyDown={(e: React.KeyboardEvent) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      this.resetFilterByMarker()
+                    }
+                  }}
                 >
                   {t('Reset')}
                 </div>
@@ -1091,8 +1099,16 @@ class FormMap extends React.Component<FormMapProps, FormMapState> {
 
                     <span
                       className={'map-marker-label'}
+                      role='button'
+                      tabIndex={0}
                       onClick={() => {
                         this.filterByMarker(m.id)
+                      }}
+                      onKeyDown={(e: React.KeyboardEvent) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          this.filterByMarker(m.id)
+                        }
                       }}
                       title={markerLabel}
                     >
@@ -1102,8 +1118,22 @@ class FormMap extends React.Component<FormMapProps, FormMapState> {
                 )
               })}
             </div>
-            <div className='maplist-legend' onClick={this.toggleLegend.bind(this)}>
-              <i className={cx('k-icon', this.state.showExpandedLegend ? 'k-icon-angle-down' : 'k-icon-angle-up')} />{' '}
+            <div
+              className='maplist-legend'
+              role='button'
+              tabIndex={0}
+              onClick={this.toggleLegend.bind(this)}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  this.toggleLegend()
+                }
+              }}
+            >
+              <i
+                className={cx('k-icon', this.state.showExpandedLegend ? 'k-icon-angle-down' : 'k-icon-angle-up')}
+                aria-hidden
+              />{' '}
               {t('Legend')}
             </div>
           </bem.FormView__mapList>
