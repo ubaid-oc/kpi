@@ -1,21 +1,5 @@
 @use 'scss/colors';
 
-// Focus ring for all keyboard-focusable controls in the matrix editor.
-// box-shadow survives the global `outline: none !important` in _base.scss.
-.kobomatrix [role='button']:focus,
-.matrix-cols [role='button']:focus,
-.matrix-cols__options [role='button']:focus {
-  box-shadow: 0 0 0 2px colors.$kobo-mid-blue;
-  border-radius: 2px;
-}
-
-@supports selector(:focus-visible) {
-  .kobomatrix [role='button']:focus:not(:focus-visible),
-  .matrix-cols [role='button']:focus:not(:focus-visible),
-  .matrix-cols__options [role='button']:focus:not(:focus-visible) {
-    box-shadow: none;
-  }
-}
 
 .card__kobomatrix {
   border: 1px solid colors.$kobo-gray-500;

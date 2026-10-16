@@ -178,17 +178,6 @@ body .leaflet-control-layers,
       vertical-align: bottom;
       color: colors.$kobo-blue;
     }
-
-    &:focus {
-      box-shadow: 0 0 0 2px colors.$kobo-mid-blue;
-      border-radius: 2px;
-    }
-
-    @supports selector(:focus-visible) {
-      &:focus:not(:focus-visible) {
-        box-shadow: none;
-      }
-    }
   }
 
   .maplist-contents {
@@ -253,17 +242,6 @@ body .leaflet-control-layers,
         opacity: 1;
       }
     }
-
-    &:focus {
-      box-shadow: 0 0 0 2px colors.$kobo-mid-blue;
-      border-radius: 2px;
-    }
-
-    @supports selector(:focus-visible) {
-      &:focus:not(:focus-visible) {
-        box-shadow: none;
-      }
-    }
   }
 
   span {
@@ -302,17 +280,6 @@ body .leaflet-control-layers,
     width: calc(100% - 56px);
     @include mixins.textEllipsis;
     cursor: pointer;
-
-    &:focus {
-      box-shadow: 0 0 0 2px colors.$kobo-mid-blue;
-      border-radius: 2px;
-    }
-
-    @supports selector(:focus-visible) {
-      &:focus:not(:focus-visible) {
-        box-shadow: none;
-      }
-    }
   }
 }
 

@@ -43,17 +43,6 @@ $assets-table-hover-bg: colors.$kobo-gray-100;
 
 .assets-table__header .assets-table-row .assets-table-row__column {
   color: colors.$kobo-gray-800;
-
-  &:focus {
-    box-shadow: 0 0 0 2px colors.$kobo-mid-blue;
-    border-radius: 2px;
-  }
-
-  @supports selector(:focus-visible) {
-    &:focus:not(:focus-visible) {
-      box-shadow: none;
-    }
-  }
 }
 
 .assets-table__header,
