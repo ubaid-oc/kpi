@@ -657,6 +657,7 @@ class KoboMatrix extends React.Component<KoboMatrixProps, KoboMatrixState> {
                 <i
                   className='k-icon k-icon-settings'
                   {...iconButtonProps(t('Column settings'), this.toggleColumnSettings.bind(this, colKuid))}
+                  aria-expanded={expandedCol === colKuid}
                 />
               </bem.MatrixCols__col>
             )
@@ -777,6 +778,7 @@ class KoboMatrix extends React.Component<KoboMatrixProps, KoboMatrixState> {
                   <i
                     className='k-icon k-icon-settings'
                     {...iconButtonProps(t('Row settings'), this.toggleRowSettings.bind(this, item.$kuid))}
+                    aria-expanded={expandedRow === item.$kuid}
                   />
                 </bem.MatrixItems__itemattr>
                 {cols.map((colKuid) => {

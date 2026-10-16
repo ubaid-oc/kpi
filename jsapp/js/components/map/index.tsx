@@ -1101,6 +1101,7 @@ class FormMap extends React.Component<FormMapProps, FormMapState> {
                       className={'map-marker-label'}
                       role='button'
                       tabIndex={0}
+                      aria-pressed={this.state.filteredByMarker?.includes(m.id.toString()) ?? false}
                       onClick={() => {
                         this.filterByMarker(m.id)
                       }}
@@ -1122,6 +1123,7 @@ class FormMap extends React.Component<FormMapProps, FormMapState> {
               className='maplist-legend'
               role='button'
               tabIndex={0}
+              aria-expanded={this.state.showExpandedLegend}
               onClick={this.toggleLegend.bind(this)}
               onKeyDown={(e: React.KeyboardEvent) => {
                 if (e.key === 'Enter' || e.key === ' ') {

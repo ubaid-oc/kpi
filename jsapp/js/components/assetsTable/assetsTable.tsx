@@ -299,6 +299,7 @@ export default class AssetsTable extends React.Component<AssetsTableProps, Asset
         m={columnDef.id}
         role='button'
         tabIndex={0}
+        aria-label={columnDef.label}
         onClick={this.onChangeOrder.bind(this, columnDef.id)}
         onKeyDown={(e: React.KeyboardEvent) => {
           if (e.key === 'Enter' || e.key === ' ') {
