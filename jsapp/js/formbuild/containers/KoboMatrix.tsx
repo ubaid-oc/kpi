@@ -8,7 +8,7 @@ import Checkbox from '#/components/common/checkbox'
 import type { AnyRowTypeName } from '#/constants'
 import type { LabelValuePair, SurveyChoice } from '#/dataInterface'
 import { bemComponents } from '#/libs/reactBemComponents'
-import { iconButtonProps, txtid } from '#/utils'
+import { txtid } from '#/utils'
 import { sluggify } from '../../../xlform/src/model.utils'
 
 const bem = bemComponents({
@@ -488,7 +488,7 @@ class KoboMatrix extends React.Component<KoboMatrixProps, KoboMatrixState> {
    * 1. adding new "row" to KoboMatrix
    * 2. adding new option to `select_one` or `select_multiple` matrix response
    */
-  newChoiceOption(e: React.SyntheticEvent | false) {
+  newChoiceOption(e: React.MouseEvent<HTMLElement> | false) {
     let data = this.state.data
     let listName = null
     if (e && e.target) {
@@ -654,11 +654,7 @@ class KoboMatrix extends React.Component<KoboMatrixProps, KoboMatrixState> {
               <bem.MatrixCols__col key={n} m={'header'} className={expandedCol === colKuid ? 'active' : ''}>
                 <bem.MatrixCols__colattr m={'label'}>{col.get('label')}</bem.MatrixCols__colattr>
                 <bem.MatrixCols__colattr m={'type'}>{col.get('type')}</bem.MatrixCols__colattr>
-                <i
-                  className='k-icon k-icon-settings'
-                  {...iconButtonProps(t('Column settings'), this.toggleColumnSettings.bind(this, colKuid))}
-                  aria-expanded={expandedCol === colKuid}
-                />
+                <i className='k-icon k-icon-settings' onClick={this.toggleColumnSettings.bind(this, colKuid)} />
               </bem.MatrixCols__col>
             )
           })}
@@ -741,10 +737,7 @@ class KoboMatrix extends React.Component<KoboMatrixProps, KoboMatrixState> {
                             />
                           </span>
                           <span className='matrix-options__delete'>
-                            <i
-                              className='k-icon k-icon-trash'
-                              {...iconButtonProps(t('Delete option'), this.deleteRow.bind(this, ch))}
-                            />
+                            <i className='k-icon k-icon-trash' onClick={this.deleteRow.bind(this, ch)} />
                           </span>
                         </div>
                       )
@@ -755,16 +748,17 @@ class KoboMatrix extends React.Component<KoboMatrixProps, KoboMatrixState> {
                   <div className='matrix-cols__options--row-foot'>
                     <i
                       className='k-icon k-icon-plus'
-                      {...iconButtonProps(t('Add new option'), this.newChoiceOption.bind(this))}
+                      title={t('Add new option')}
+                      onClick={this.newChoiceOption.bind(this)}
                       data-list-name={this.getCol(expandedCol, 'select_from_list_name')}
                     />
                   </div>
                 </div>
               )}
               <div className='matrix-cols__delete'>
-                <button type='button' className='matrix-cols__delete-action' onClick={this.deleteColumn}>
-                  {t('Delete column')} <i className='k-icon k-icon-trash' aria-hidden />
-                </button>
+                <span className='matrix-cols__delete-action' onClick={this.deleteColumn}>
+                  {t('Delete column')} <i className='k-icon k-icon-trash' />
+                </span>
               </div>
             </bem.MatrixCols__settings_inner>
           )}
@@ -775,11 +769,7 @@ class KoboMatrix extends React.Component<KoboMatrixProps, KoboMatrixState> {
               <bem.MatrixItems__itemrow>
                 <bem.MatrixItems__itemattr m={'label'}>
                   <label>{item.label}</label>
-                  <i
-                    className='k-icon k-icon-settings'
-                    {...iconButtonProps(t('Row settings'), this.toggleRowSettings.bind(this, item.$kuid))}
-                    aria-expanded={expandedRow === item.$kuid}
-                  />
+                  <i className='k-icon k-icon-settings' onClick={this.toggleRowSettings.bind(this, item.$kuid)} />
                 </bem.MatrixItems__itemattr>
                 {cols.map((colKuid) => {
                   if (!colKuid) return null
@@ -835,13 +825,9 @@ class KoboMatrix extends React.Component<KoboMatrixProps, KoboMatrixState> {
                       />
                     </label>
                     <div className='matrix-cols__delete'>
-                      <button
-                        type='button'
-                        className='matrix-cols__delete-action'
-                        onClick={this.deleteRow.bind(this, item.$kuid)}
-                      >
-                        {t('Delete row')} <i className='k-icon k-icon-trash' aria-hidden />
-                      </button>
+                      <span className='matrix-cols__delete-action' onClick={this.deleteRow.bind(this, item.$kuid)}>
+                        {t('Delete row')} <i className='k-icon k-icon-trash' />
+                      </span>
                     </div>
                   </bem.MatrixCols__settings_inner>
                 )}
@@ -850,14 +836,15 @@ class KoboMatrix extends React.Component<KoboMatrixProps, KoboMatrixState> {
           ))}
           <bem.MatrixItems__item key={'new'} m={'new'}>
             <i
+              title={t('Add new row')}
               className='k-icon k-icon-plus'
-              {...iconButtonProps(t('Add new row'), this.newChoiceOption.bind(this))}
+              onClick={this.newChoiceOption.bind(this)}
               data-list-name={this.state.kobomatrix_list}
             />
           </bem.MatrixItems__item>
         </bem.MatrixItems>
         <bem.MatrixItemsNewCol>
-          <i className='k-icon k-icon-plus' {...iconButtonProps(t('Add new column'), this.newColumn)} />
+          <i title={t('Add new column')} className='k-icon k-icon-plus' onClick={this.newColumn} />
         </bem.MatrixItemsNewCol>
       </bem.Matrix>
     )
