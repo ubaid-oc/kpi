@@ -488,7 +488,7 @@ class KoboMatrix extends React.Component<KoboMatrixProps, KoboMatrixState> {
    * 1. adding new "row" to KoboMatrix
    * 2. adding new option to `select_one` or `select_multiple` matrix response
    */
-  newChoiceOption(e: React.SyntheticEvent<HTMLElement> | false) {
+  newChoiceOption(e: React.SyntheticEvent | false) {
     let data = this.state.data
     let listName = null
     if (e && e.target) {
